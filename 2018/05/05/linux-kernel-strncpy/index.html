@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="strncpy函数的内核实现与分析">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-05T08:06:46.686Z">
+<meta property="og:updated_time" content="2018-05-06T04:37:24.167Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从strncpy的实现说起">
 <meta name="twitter:description" content="strncpy函数的内核实现与分析">
@@ -306,16 +306,6 @@
 
           
             
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/05/05/linux-kernel-strncpy/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/05/05/linux-kernel-strncpy/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
           
 
           
@@ -340,10 +330,11 @@
       
 
       
-        <p><code>strncpy</code>函数的内核实现与分析<br><a id="more"></a></p>
+        <p><code>strncpy</code>函数的内核实现与分析</p>
+<a id="more"></a>
 <p>第一次阅读内核源码是在网上浏览博客的时候，有个博主说<code>strncpy</code>的执行效率很低，而且并不是绝对安全，也存在缓冲区溢出的风险。</p>
 <p>先贴出来其实现，再逐行分析。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#ifndef __HAVE_ARCH_STRNCPY</span><br><span class="line">/**</span><br><span class="line"> * strncpy - Copy a length-limited, %NUL-terminated string</span><br><span class="line"> * @dest: Where to copy the string to</span><br><span class="line"> * @src: Where to copy the string from</span><br><span class="line"> * @count: The maximum number of bytes to copy</span><br><span class="line"> *</span><br><span class="line"> * The result is not %NUL-terminated if the source exceeds</span><br><span class="line"> * @count bytes.</span><br><span class="line"> *</span><br><span class="line"> * In the case where the length of @src is less than  that  of</span><br><span class="line"> * count, the remainder of @dest will be padded with %NUL.</span><br><span class="line"> *</span><br><span class="line"> */</span><br><span class="line">char *strncpy(char *dest, const char *src, size_t count)</span><br><span class="line">&#123;</span><br><span class="line">    char *tmp = dest;	(1)</span><br><span class="line"></span><br><span class="line">    while (count) &#123;		(2)</span><br><span class="line">        if ((*tmp = *src) != 0)		(3)</span><br><span class="line">            src++;		(4)</span><br><span class="line">        tmp++;			(5)</span><br><span class="line">        count--;			(6)</span><br><span class="line">    &#125;</span><br><span class="line">    return dest;			(7)</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(strncpy);</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __HAVE_ARCH_STRNCPY</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * strncpy - Copy a length-limited, %NUL-terminated string</span></span><br><span class="line"><span class="comment"> * @dest: Where to copy the string to</span></span><br><span class="line"><span class="comment"> * @src: Where to copy the string from</span></span><br><span class="line"><span class="comment"> * @count: The maximum number of bytes to copy</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The result is not %NUL-terminated if the source exceeds</span></span><br><span class="line"><span class="comment"> * @count bytes.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * In the case where the length of @src is less than  that  of</span></span><br><span class="line"><span class="comment"> * count, the remainder of @dest will be padded with %NUL.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">strncpy</span><span class="params">(<span class="keyword">char</span> *dest, <span class="keyword">const</span> <span class="keyword">char</span> *src, <span class="keyword">size_t</span> count)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *tmp = dest;	(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (count) &#123;		(<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">if</span> ((*tmp = *src) != <span class="number">0</span>)		(<span class="number">3</span>)</span><br><span class="line">            src++;		(<span class="number">4</span>)</span><br><span class="line">        tmp++;			(<span class="number">5</span>)</span><br><span class="line">        count--;			(<span class="number">6</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dest;			(<span class="number">7</span>)</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(<span class="built_in">strncpy</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
 <h3 id="首先，我们整体看一下函数的执行流程"><a href="#首先，我们整体看一下函数的执行流程" class="headerlink" title="首先，我们整体看一下函数的执行流程"></a>首先，我们整体看一下函数的执行流程</h3><ol>
 <li>行1，将tmp指向dest</li>
 <li>行2，初次进入while循环时，count为dest大小</li>
@@ -356,7 +347,7 @@
 <li>如果src的长度 &gt;= count 会发生什么？</li>
 <li>如果src的长度 &lt; count，该函数性能如何？</li>
 </ol>
-<h4 id="问题1："><a href="#问题1：" class="headerlink" title="问题1："></a>问题1：</h4><p>如果src_len &gt;= count，根据<code>行2</code>、<code>行3</code>可知，dest会被填充count字节，也就是说src的前count字节会被copy到dest，所以dest末尾并不是<code>\0</code>。</p>
+<h4 id="问题1："><a href="#问题1：" class="headerlink" title="问题1："></a>问题1：</h4><p>如果<code>src_len &gt;= count</code>，根据<code>行2</code>、<code>行3</code>可知，dest会被填充count字节，也就是说src的前count字节会被copy到dest，所以dest末尾并不是<code>\0</code>。</p>
 <h4 id="问题2："><a href="#问题2：" class="headerlink" title="问题2："></a>问题2：</h4><p>如果src_len &lt; count，考虑边界情况，假设当前src指向字符串末尾（也就是<code>\0</code>的前一个字符），则<code>行3</code>把src的值赋值到tmp，<code>行4</code>src往后移动一个字节，指向<code>\0</code>，行5、行6，把tmp向后移动一个字节，count减1，while循环进入下一次，<code>行3</code>把src的值（也就是<code>\0</code>）赋值给tmp，注意观察<code>行3</code>，此时<code>if</code>语句值为false，src不向后移动（所以src依然指向<code>\0</code>），行5、行6，tmp向后移动，count减1。再次进入下一次循环，<code>行3</code>，把src的当前值（<code>\0</code>）赋值给tmp，<code>if</code>语句值为false，src不向后移动，tmp向后移动，count减1。<strong>所以，此情况下，该函数会使用<code>\0</code>填充dest剩下的全部字节。</strong></p>
 <h4 id="看看如下常用的使用方式："><a href="#看看如下常用的使用方式：" class="headerlink" title="看看如下常用的使用方式："></a>看看如下常用的使用方式：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">char buff[1024];</span><br><span class="line">const char* src = &quot;hello world&quot;;</span><br><span class="line">strncpy(buff, src, sizeof(buff));</span><br></pre></td></tr></table></figure>
 <p>把src内容拷贝到buff后，会将剩余的空间全部填充0，效率非常低。</p>
@@ -432,13 +423,6 @@
           
 
   
-    <div class="comments" id="comments">
-      <div class="ds-thread" data-thread-key="2018/05/05/linux-kernel-strncpy/"
-           data-title="从strncpy的实现说起" data-url="http://www.xiaocc.xyz/2018/05/05/linux-kernel-strncpy/">
-      </div>
-    </div>
-
-  
 
 
 
@@ -486,7 +470,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -692,35 +676,25 @@
 
   
 
-  
-    
-  
-
-  <script type="text/javascript">
-    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.id = 'duoshuo-script';
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0]
-      || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-  </script>
 
   
-    
-    
-    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
-    <script src="/js/src/hook-duoshuo.js"></script>
+
+
+
+
+	
+
+
+
+
+
   
 
 
 
 
 
-
+  
 
 
 
