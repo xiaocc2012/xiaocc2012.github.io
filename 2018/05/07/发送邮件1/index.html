@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="工作中需要发送邮件，本来用python几行代码就可以搞定的事情，可是为了与整个项目框架匹配，以利于监控和维护，只能采用C++形式了">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-08T03:52:07.519Z">
+<meta property="og:updated_time" content="2018-05-08T05:27:29.469Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++发送邮件">
 <meta name="twitter:description" content="工作中需要发送邮件，本来用python几行代码就可以搞定的事情，可是为了与整个项目框架匹配，以利于监控和维护，只能采用C++形式了">
@@ -340,7 +340,7 @@
 <h4><span id="代码实现">代码实现</span></h4><p>根据这个流程就可以编写C++代码，没什么难度，注意：每次往server端发送命令，以 <code>\r\n</code> 结尾</p>
 <h4><span id="思考">思考</span></h4><p>这个方案有一个安全问题，整个交互都是以明文形式，如果存在中间人劫持，很容易获取邮件正文，风险很大<br><strong>那么，如何解决这个安全问题呢？</strong><br>http的不安全问题导致了https的产生，那么有没有安全的smtp协议呢？</p>
 <p><em>请听下回分解</em></p>
-<p><script src="https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js"></script><script src="https://cdn.bootcss.com/raphael/2.2.7/raphael.min.js"></script><script src="https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdn.bootcss.com/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">client->server: telnet smtp.sina.com 25
+<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">client->server: telnet smtp.sina.com 25
 server-->client: xxx
 client->server: EHLO smtp.sina.com
 server-->client: xxx
@@ -350,14 +350,14 @@ client->server: base64(邮箱账号名)
 server-->client: xxx
 client->server: base64(邮箱密码)
 server-->client: xxx
-client->server: MAIL FROM: <ww@sina.com>
+client->server: MAIL FROM: &lt;ww@sina.com&gt;
 server-->client: xxx
-client->server: RCPT TO: <yy@qq.com>
+client->server: RCPT TO: &lt;yy@sina.com&gt;
 server-->client: xxx
 client->server: DATA:
 server-->client: xxx
 client->server: 发送内容content
-server-->client: xxx</yy@qq.com></ww@sina.com></textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script></p>
+server-->client: xxx</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script></p>
 
       
     </div>
