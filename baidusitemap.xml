@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018/05/07/%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B61/</loc>
+    <lastmod>2018-05-08T05:33:45.252Z</lastmod>
+    <data>
+        <display>
+        <title>C++发送邮件</title>
+        <pubTime>2018-05-07T14:15:00.000Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018/05/06/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</loc>
+    <lastmod>2018-05-06T14:49:26.982Z</lastmod>
+    <data>
+        <display>
+        <title>Mac OS环境下利用Hexo搭建个人博客</title>
+        <pubTime>2018-05-06T14:30:00.000Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018/05/05/linux-kernel-strncpy/</loc>
+    <lastmod>2018-05-06T04:37:24.167Z</lastmod>
+    <data>
+        <display>
+        <title>从strncpy的实现说起</title>
+        <pubTime>2018-05-05T05:32:37.000Z</pubTime>
+        
+        <tag>linux kernel</tag>
+         
+        <tag>strncpy</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018/05/05/hello-world/</loc>
+    <lastmod>2018-05-06T04:34:20.140Z</lastmod>
+    <data>
+        <display>
+        <title>Hello World</title>
+        <pubTime>2018-05-05T08:07:50.631Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+    
+    
+</urlset>
