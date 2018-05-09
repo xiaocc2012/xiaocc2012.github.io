@@ -18,8 +18,8 @@
   
   <entry>
     <title>C++发送邮件</title>
-    <link href="http://www.xiaocc.xyz/2018/05/07/%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B61/"/>
-    <id>http://www.xiaocc.xyz/2018/05/07/发送邮件1/</id>
+    <link href="http://www.xiaocc.xyz/2018-05-07/%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B61/"/>
+    <id>http://www.xiaocc.xyz/2018-05-07/发送邮件1/</id>
     <published>2018-05-07T14:15:00.000Z</published>
     <updated>2018-05-08T05:33:45.252Z</updated>
     
@@ -36,8 +36,8 @@
   
   <entry>
     <title>Mac OS环境下利用Hexo搭建个人博客</title>
-    <link href="http://www.xiaocc.xyz/2018/05/06/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/"/>
-    <id>http://www.xiaocc.xyz/2018/05/06/博客搭建/</id>
+    <link href="http://www.xiaocc.xyz/2018-05-06/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/"/>
+    <id>http://www.xiaocc.xyz/2018-05-06/博客搭建/</id>
     <published>2018-05-06T14:30:00.000Z</published>
     <updated>2018-05-06T14:49:26.982Z</updated>
     
@@ -54,8 +54,8 @@
   
   <entry>
     <title>Hello World</title>
-    <link href="http://www.xiaocc.xyz/2018/05/05/hello-world/"/>
-    <id>http://www.xiaocc.xyz/2018/05/05/hello-world/</id>
+    <link href="http://www.xiaocc.xyz/2018-05-05/hello-world/"/>
+    <id>http://www.xiaocc.xyz/2018-05-05/hello-world/</id>
     <published>2018-05-05T08:07:50.631Z</published>
     <updated>2018-05-06T04:34:20.140Z</updated>
     
@@ -72,8 +72,8 @@
   
   <entry>
     <title>从strncpy的实现说起</title>
-    <link href="http://www.xiaocc.xyz/2018/05/05/linux-kernel-strncpy/"/>
-    <id>http://www.xiaocc.xyz/2018/05/05/linux-kernel-strncpy/</id>
+    <link href="http://www.xiaocc.xyz/2018-05-05/linux-kernel-strncpy/"/>
+    <id>http://www.xiaocc.xyz/2018-05-05/linux-kernel-strncpy/</id>
     <published>2018-05-05T05:32:37.000Z</published>
     <updated>2018-05-06T04:37:24.167Z</updated>
     
