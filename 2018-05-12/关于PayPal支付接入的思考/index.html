@@ -80,17 +80,17 @@
 
 
 
-<meta name="description" content="在网上查找资料时候碰到很多有意思的技术博客，也一直想拥有个人主页，可是拖延症晚期患者，总是由于各种原因，迟迟未能动手搭建。昨天周六在公司加班，没什么特别紧急的事情，决定把这个坑填上。经过多方面查找资料与实践，有了如今这个小窝，感谢各位知识的分享者。">
+<meta name="description" content="最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mac OS环境下利用Hexo搭建个人博客">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-06/博客搭建/index.html">
+<meta property="og:title" content="关于PayPal支付接入的思考——唯一ID的生成">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-12/关于PayPal支付接入的思考/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="在网上查找资料时候碰到很多有意思的技术博客，也一直想拥有个人主页，可是拖延症晚期患者，总是由于各种原因，迟迟未能动手搭建。昨天周六在公司加班，没什么特别紧急的事情，决定把这个坑填上。经过多方面查找资料与实践，有了如今这个小窝，感谢各位知识的分享者。">
+<meta property="og:description" content="最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-06T14:49:26.982Z">
+<meta property="og:updated_time" content="2018-05-12T15:09:02.777Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mac OS环境下利用Hexo搭建个人博客">
-<meta name="twitter:description" content="在网上查找资料时候碰到很多有意思的技术博客，也一直想拥有个人主页，可是拖延症晚期患者，总是由于各种原因，迟迟未能动手搭建。昨天周六在公司加班，没什么特别紧急的事情，决定把这个坑填上。经过多方面查找资料与实践，有了如今这个小窝，感谢各位知识的分享者。">
+<meta name="twitter:title" content="关于PayPal支付接入的思考——唯一ID的生成">
+<meta name="twitter:description" content="最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-06/博客搭建/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-12/关于PayPal支付接入的思考/"/>
 
 
 
 
 
-  <title>Mac OS环境下利用Hexo搭建个人博客 | 曾经浮华的小窝</title>
+  <title>关于PayPal支付接入的思考——唯一ID的生成 | 曾经浮华的小窝</title>
   
 
 
@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-06/博客搭建/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-12/关于PayPal支付接入的思考/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -289,7 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Mac OS环境下利用Hexo搭建个人博客</h1>
+          <h1 class="post-title" itemprop="name headline">关于PayPal支付接入的思考——唯一ID的生成</h1>
         
 
         <div class="post-meta">
@@ -301,8 +301,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-06T22:30:00+08:00">
-                2018-05-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-12T17:00:00+08:00">
+                2018-05-12
               </time>
             
 
@@ -319,7 +319,7 @@
 
           
           
-             <span id="/2018-05-06/博客搭建/" class="leancloud_visitors" data-flag-title="Mac OS环境下利用Hexo搭建个人博客">
+             <span id="/2018-05-12/关于PayPal支付接入的思考/" class="leancloud_visitors" data-flag-title="关于PayPal支付接入的思考——唯一ID的生成">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -350,46 +350,68 @@
       
 
       
-        <p>在网上查找资料时候碰到很多有意思的技术博客，也一直想拥有个人主页，可是拖延症晚期患者，<br>总是由于各种原因，迟迟未能动手搭建。<br>昨天周六在公司加班，没什么特别紧急的事情，决定把这个坑填上。经过多方面查找资料与实践，有了如今这个小窝，感谢各位知识的分享者。</p>
+        <p>最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考</p>
 <a id="more"></a>
-<p><strong>注意：本人搭建环境为Mac OS</strong></p>
-<p><em>暂未找到合适的图床，只能先用纯文字表述了。。</em></p>
-<h4><span id="大体步骤">大体步骤</span></h4><ul>
-<li>在github创建个人主页仓库</li>
-<li>安装git</li>
-<li>安装nodejs</li>
-<li>安装hexo</li>
-<li>网站预览与推送</li>
-<li>域名申请与绑定</li>
-<li>更换主题等个性化配置</li>
-</ul>
-<h4><span id="详细步骤">详细步骤</span></h4><h4><span id="github相关">github相关</span></h4><p>首先注册github账号，然后创建github pages，创建方法可以自行搜索或者阅读 <a href="https://pages.github.com/" target="_blank" rel="noopener">github官方指引</a> 点击new repository创建一个新仓库，其中仓库名字比较特殊为：<code>xxx.github.io</code> ，其中xxx为自己的github账号名，例如我的仓库名就是：<code>xiaocc2012.github.io</code> 。</p>
-<h4><span id="安装git">安装git</span></h4><h5><span id="安装">安装</span></h5><p>我在mac环境下安装软件，一般是通过homebrew进行，它的安装和使用可以自行搜索一下。<br>执行 <code>brew install git</code> 进行git安装，这时如果遇到错误，一般是因为mac环境的git依赖CommandLineTools需要对其进行安装。</p>
-<h5><span id="配置">配置</span></h5><p>git安装完毕后需要对其进行相关配置<br>设置user.name和user.mail信息<br><code>git config --global user.name &quot;你的GitHub用户名&quot;</code><br><code>git config --global user.email &quot;你的GitHub注册邮箱&quot;</code></p>
-<h5><span id="ssh-秘钥">ssh 秘钥</span></h5><p>执行 <code>ssh-keygen -t rsa -C &quot;你的GitHub注册邮箱&quot;</code><br>直接3个回车即可，默认不需要设置密码<br>在 <code>~/.ssh/</code> 目录下会生成 id_rsa、id_rsa.pub 文件，其中 id_rsa.pub 为公钥文件<br>执行 <code>cat id_rsa.pub</code> 打印公钥文件内容，打开 <a href="https://github.com/settings/keys" target="_blank" rel="noopener">github ssh keys设置</a>，创建一个新的ssh key，其中Title随便填写，Key内容即为公钥文件内容。<br>执行 <code>ssh git@github.com</code> 检测公钥是否设置成功</p>
-<p><strong>为什么需要设置ssh 秘钥？</strong></p>
-<p>github每次推送时候都会检查用户是否合法，就需要输入用户名和密码来进行检测，为了省去每次输入密码的步骤，采用ssh非对称加密形式，将公钥保存在github网站，私钥保存在电脑上，每次推送的时候，github会检查私钥是否能与公钥匹配，从而判断用户是否合法。</p>
-<h4><span id="安装nodejs">安装nodejs</span></h4><p>同样采用homebrew进行安装<br><code>brew install node</code><br>执行 <code>node -v</code> 查看nodejs是否安装成功<br>执行 <code>npm -v</code> 查看npm是否安装成功</p>
-<h4><span id="安装hexo">安装hexo</span></h4><p>参考 <a href="https://hexo.io/docs/index.html" target="_blank" rel="noopener">hexo官方文档</a>进行安装</p>
-<p>执行 <code>npm install -g hexo-cli</code> 安装hexo<br>执行 <code>hexo init blog</code> 创建blog目录，并进行相关初始化工作<br><code>cd blog</code><br><code>npm install</code><br>创建一个页面来检查网站<br><code>hexo new test_page</code><br><code>hexo g</code><br>启动网站 <code>hexo s</code></p>
-<p><strong>注意：hexo 3需要单独安装 hexo server</strong></p>
-<p>执行 <code>npm install hexo-server --save</code> 进行安装<br>安装完server端后，再次执行 <code>hexo s</code> 启动网站</p>
-<h4><span id="网站预览与推送">网站预览与推送</span></h4><p>待hexo server端启动后，用浏览器打开：localhost:4000，即可查看网站</p>
-<p><strong>hexo与github pages联系</strong></p>
-<p>打开blog根目录下的 <code>_config.yml</code> 文件，该文件存储了站点相关配置<br>找到底部 <code>deploy:</code> 相关，填入如下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/xiaocc2012/xiaocc2012.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure></p>
-<p>其中repo内容填写自己在github上新建仓库的完整url路径，记得url最后要添加 <strong>.git</strong><br>保存配置文件，这里做的配置其实就是给 <code>hexo d</code> 命令使用，告诉hexo要把blog部署在哪里<br>安装git部署插件 <code>npm install hexo-deployer-git --save</code><br>执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure></p>
-<p>对网站进行clean，重新生成，并启动服务<br>再次在浏览器打开：localhost:4000 进行网站预览</p>
-<p><strong>将网站推送至github</strong><br>网站预览无误后，执行 <code>hexo d</code> 将网站内容推送至github，这时在github查看仓库内容，会发现多了一些文件。<br>在浏览器输入：xiaocc2012.github.io（即为最开始创建的仓库名称），就可以看到刚才一样的博客网站了，也即咱们的博客可以在互联网上进行访问。</p>
-<p><em>我遇到的问题：</em><br>在浏览器通过输入github地址方式访问，一直提示404错误，后来尝试各种折腾，在 <code>Settings</code> 页面的子选项 <code>GitHub Pages</code> 中选择了一个主题theme，然后网页就能正常展示了。</p>
-<h4><span id="域名申请与绑定">域名申请与绑定</span></h4><p>申请一个自己喜欢的域名<br>在解析中新建两条配置：</p>
-<ol>
-<li>新建一条解析，记录类型选择 <code>CNAME</code> ，主机记录：<code>www</code> ，记录值：xiaocc2012.github.io <em>(就是github pages直接访问的那个url地址)</em></li>
-<li>执行 <code>ping xiaocc2012.github.io</code> 获取IP地址W，新建一条解析，记录类型为 <code>A</code>, 主机记录：<code>@</code>，记录值：W <em>(就是刚才通过 ping 获取的ip地址)</em></li>
+<h4><span id="系统框架">系统框架</span></h4><p>主要流程：<br>在页面引入PayPal支付购买物品，系统生成CDKey，用户拿着CDKey可以兑换物品。</p>
+<p>框架如下：</p>
+<div id="sequence-0"></div>
+
+<p>其中，<strong>接入服务</strong>主要负责接入并与外围其它服务交互，而<strong>CDKey服务</strong>主要负责CDKey的维护，包括生成、校验、使用等。</p>
+<h4><span id="paypal支付流程">PayPal支付流程</span></h4><p>既然是接入PayPay支付，阅读其说明文档就能理清整个交互流程，如下：</p>
+<div id="sequence-1"></div>
+
+<h5><span id="流程解释">流程解释</span></h5><ol>
+<li>用户在web页面点击购买物品，server端做相关检查后，调用paypal接口进行<strong>订单创建</strong></li>
+<li>paypal订单创建接口需要填入<strong>return_url与cancel_url</strong>，这两个字段的含义稍后解释。订单创建成功后，paypal会返回一个<strong>redirect_url</strong>，这个url页面是paypal的，<strong>server端需要让用户web页面重定向至该url</strong>。</li>
+<li>用户web页面被重定向至redirect_url后，需要输入paypal账号、密码进行登录，<strong>如果确认支付</strong>，paypal会让页面跳转至return_url，<strong>如果用户取消支付</strong>，paypal会让页面跳转至cancel_url。</li>
+<li>如果用户确认支付，paypal让用户web页面跳转至return_url的同时，会附带payment_id、user_id，server端需要拿着这些参数<strong>execute订单</strong>。</li>
+<li>等待一小段时间，paypal会以异步通知的形式，通知server端支付结果信息</li>
+<li>server端需要<strong>检查该notify信息是否真的paypal下发</strong>，并检查订单当前支付状态</li>
 </ol>
-<p><strong>在github上的配置</strong><br>在仓库的 <code>Settings</code> 页面的子选项 <code>GitHub Pages</code> 中的 <code>Custom domain</code> 选项中填入自己申请的域名：<code>www.xxx.yyy</code><br>等待约1分钟，待github重新发布页面，就可以通过自己的域名访问网站啦</p>
-<h4><span id="更换主题等个性化配置">更换主题等个性化配置</span></h4><p>hexo默认主题个人不是很喜欢，更换成了next主题，流程如下：<br>进入blog目录 <code>cd blog</code><br>执行 <code>git clone https://github.com/iissnan/hexo-theme-next themes/next</code> 下载next主题<br>打开站点的 <code>_config.yml</code> 配置文件，将主题更换为next主题 <code>theme: next</code><br>执行预览网站的相关命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure></p>
-<p>在浏览器打开：localhost:4000 预览网站，会发现网站主题样式已经更改<br>将新网站推送至github<br><code>hexo d</code><br>通过自己申请的域名进行访问，也会发现网站样式已经更改</p>
-<p>至此，采用hexo + github pages搭建博客全流程完毕，其它hexo用法与配置就需要各位去探索啦<br><em>enjoy a good time！</em></p>
+<p><strong>注意：检查notify信息是否paypal下发，非常重要！</strong><br><strong>异步通知只是一个web接口的调用，任何第三方都可以调用该接口，以伪装支付成功！</strong></p>
+<p>整个系统分为两个模块，一个模块负责与paypal交互，一个模块负责CDKey相关。</p>
+<h4><span id="cdkey的生成">CDKey的生成</span></h4><p>CDKey本质上是一个唯一ID，且不是单纯的数字id，可以是大小写字母、数字组合。<br>知乎上有关于短链生成算法的讨论，可以借鉴其思想。</p>
+<p>生成方式主要有几种：<br>1.通过随机算法生成一个随机数，这个数要尽可能分散，如何解决<strong>碰撞问题</strong>是个难题，可以碰撞后再次尝试生成，但无法根本解决碰撞问题。<br>常用的实现可以对字符串进行hash，其中字符串可以是网站原始url或者自己构造的代表该次请求的唯一串。<br>hash函数要求散列性高，可以使用 <a href="https://zh.wikipedia.org/wiki/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener">MurmurHash</a>。</p>
+<p>2.通过redis或者mysql产生自增id来当做唯一ID，该方式可以解决碰撞问题，但是该方式生成的唯一ID具有<strong>规律性</strong>。<br>而在我们这个使用场景中，用它来当做CDKey不满足要求，因为我们这个系统中CDKey是不记名式的。<br>如果用户知道CDKey=100可用，那么他会拿101这个新的CDKey尝试兑换，这样他就兑换走了其它用户购买的物品，因而不能采用该方式。</p>
+<p>3.方式1 + 方式2<br>唯一ID分为两部分，<strong>hash部分 + 自增部分</strong>，其中自增部分保证唯一性，而hash部分解决单纯自增的规律性问题。<br>或者采用<strong>signature(自增id) + 自增id</strong>的方式，签名部分可以解决规律性问题、同时可以用来校验整个id的合法性。</p>
+<h4><span id="防刷-盗刷问题">防刷、盗刷问题</span></h4><p>由于物品兑换的唯一依据是不记名的CDKey，如何做防刷、盗刷？</p>
+<ol>
+<li><p>能不能单纯依靠增加CDKey的长度来解决盗刷问题<br>理论上不行，实际可行<br>假设CDKey长度6个字符，每个字符由大小写字母、数字构成，共计62种变化，6个字符约500亿种变化。按照100qps的速度扫描，需要18年才能扫完整个空间，CDKey长度每增加1个字符，扫描难度增大62倍。如果CDKey长度由6个字符，增加到12个字符，破解难度可想而知。</p>
+</li>
+<li><p>能不能通过限制每个ip的访问频率，来控制扫描破解CDKey的速度<br>不行<br>假设黑客控制了100台肉鸡，每台100qps的扫描速度，CDKey长度6个字符，那么他只需要65天，就能扫完整个CDKey空间，如果他控制了10000台呢，那就更快扫完了。</p>
+</li>
+<li><p>能不能对服务端的处理速度做限制，例如：每秒只处理10个请求<br>不行<br>这样虽然控制了黑客的扫描速度，但是也阻挡了正常用户的请求，降低了系统吞吐量</p>
+</li>
+<li><p>能不能针对CDKey做一些检测或者限制<br>不行<br>黑客每次扫描的CDKey都不相同，无规律性</p>
+</li>
+<li><p>那有什么好的解决办法呢？<br>可以考虑给CDKey增加Secret</p>
+<ul>
+<li>添加Secret，相当于增加了CDKey的长度，增加了黑客扫描破解的难度，他必须先猜中CDKey，再猜中Secret才能非法获取</li>
+<li>可以对针对CDKey做一些安全性控制，如果CDKey的密码输入错误3次，冻结该ip及CDKey一段时间，这样可以极大的降低黑客扫描的速度，扫描破解，命中CDKey后，尝试扫描破解Secret密码，只要错误几次，该肉鸡的ip即被冻结，同时该CDKey也暂不可用，阻止黑客采用其它ip继续破解Secret。</li>
+</ul>
+</li>
+</ol>
+<p><em>关于PayPal中Notify的校验问题，下次讨论</em></p>
+<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">User->接入服务: 购买
+接入服务->CDKey服务: 请求生成CDKey
+Note right of CDKey服务: 根据算法生成CDKey
+CDKey服务-->接入服务: CDKey
+接入服务-->User: CDKey
+User->接入服务: 用CDKey兑换物品
+接入服务->CDKey服务: 校验CDKey
+CDKey服务-->接入服务: yes or no
+接入服务-->User: 物品</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script><textarea id="sequence-1-code" style="display: none">user->server: web页面点击购买物品
+server->paypal: 创建订单(填写return_url、cancel_url)
+paypal->server: 订单创建成功，返回redirect_url
+server->user: 让web页面302跳转到redirect_url
+user->user: 输入paypal账号、密码登录
+user->user: 确认支付
+paypal-->user: 页面跳转至return_url并附加相关参数
+user->server: 将附加参数传递给server端
+server->paypal: execute订单
+paypal-->server: 异步notify订单支付信息
+server-->paypal: 校验notify信息
+server-->paypal: 检查订单支付状态</textarea><textarea id="sequence-1-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-1-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-1", options);</script></p>
 
       
     </div>
@@ -414,8 +436,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-05-05/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/2018-05-10/发送邮件2/" rel="next" title="使用C++安全的发送邮件">
+                <i class="fa fa-chevron-left"></i> 使用C++安全的发送邮件
               </a>
             
           </div>
@@ -423,10 +445,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-07/发送邮件1/" rel="prev" title="使用C++发送邮件">
-                使用C++发送邮件 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -549,7 +567,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">大体步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">详细步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">github相关</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">安装git</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">ssh 秘钥</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">安装nodejs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">安装hexo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">网站预览与推送</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">8.</span> <span class="nav-text">域名申请与绑定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">9.</span> <span class="nav-text">更换主题等个性化配置</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">系统框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">PayPal支付流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">流程解释</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">CDKey的生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">防刷、盗刷问题</span></a></li></ol></div>
             
 
           </div>

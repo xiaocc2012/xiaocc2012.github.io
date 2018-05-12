@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xiaocc.xyz/"/>
-  <updated>2018-05-11T13:06:43.031Z</updated>
+  <updated>2018-05-12T15:09:02.777Z</updated>
   <id>http://www.xiaocc.xyz/</id>
   
   <author>
@@ -15,6 +15,24 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>关于PayPal支付接入的思考——唯一ID的生成</title>
+    <link href="http://www.xiaocc.xyz/2018-05-12/%E5%85%B3%E4%BA%8EPayPal%E6%94%AF%E4%BB%98%E6%8E%A5%E5%85%A5%E7%9A%84%E6%80%9D%E8%80%83/"/>
+    <id>http://www.xiaocc.xyz/2018-05-12/关于PayPal支付接入的思考/</id>
+    <published>2018-05-12T09:00:00.000Z</published>
+    <updated>2018-05-12T15:09:02.777Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考</p><a id="more"></a><h4><span id="系统框架">系统框架</span></h4><p>主要流程：<br>在页面引入PayPal支付购买物品，系统生成CDKey，用户拿着CDKey可以兑换物品。</p><p>框架如下：</p><div id="sequence-0"></div><p>其中，<strong>接入服务</strong>主要负责接入并与外围其它服务交互，而<strong>CDKey服务</strong>主要负责CDKey的维护，包括生成、校验、使用等。</p><h4><span id="paypal支付流程">PayPal支付流程</span></h4><p>既然是接入PayPay支付，阅读其说明文档就能理清整个交互流程，如下：</p><div id="sequence-1"></div><h5><span id="流程解释">流程解释</span></h5><ol><li>用户在web页面点击购买物品，server端做相关检查后，调用paypal接口进行<strong>订单创建</strong></li><li>paypal订单创建接口需要填入<strong>return_url与cancel_url</strong>，这两个字段的含义稍后解释。订单创建成功后，paypal会返回一个<strong>redirect_url</strong>，这个url页面是paypal的，<strong>server端需要让用户web页面重定向至该url</strong>。</li><li>用户web页面被重定向至redirect_url后，需要输入paypal账号、密码进行登录，<strong>如果确认支付</strong>，paypal会让页面跳转至return_url，<strong>如果用户取消支付</strong>，paypal会让页面跳转至cancel_url。</li><li>如果用户确认支付，paypal让用户web页面跳转至return_url的同时，会附带payment_id、user_id，server端需要拿着这些参数<strong>execute订单</strong>。</li><li>等待一小段时间，paypal会以异步通知的形式，通知server端支付结果信息</li><li>server端需要<strong>检查该notify信息是否真的paypal下发</strong>，并检查订单当前支付状态</li></ol><p><strong>注意：检查notify信息是否paypal下发，非常重要！</strong><br><strong>异步通知只是一个web接口的调用，任何第三方都可以调用该接口，以伪装支付成功！</strong></p><p>整个系统分为两个模块，一个模块负责与paypal交互，一个模块负责CDKey相关。</p><h4><span id="cdkey的生成">CDKey的生成</span></h4><p>CDKey本质上是一个唯一ID，且不是单纯的数字id，可以是大小写字母、数字组合。<br>知乎上有关于短链生成算法的讨论，可以借鉴其思想。</p><p>生成方式主要有几种：<br>1.通过随机算法生成一个随机数，这个数要尽可能分散，如何解决<strong>碰撞问题</strong>是个难题，可以碰撞后再次尝试生成，但无法根本解决碰撞问题。<br>常用的实现可以对字符串进行hash，其中字符串可以是网站原始url或者自己构造的代表该次请求的唯一串。<br>hash函数要求散列性高，可以使用 <a href="https://zh.wikipedia.org/wiki/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener">MurmurHash</a>。</p><p>2.通过redis或者mysql产生自增id来当做唯一ID，该方式可以解决碰撞问题，但是该方式生成的唯一ID具有<strong>规律性</strong>。<br>而在我们这个使用场景中，用它来当做CDKey不满足要求，因为我们这个系统中CDKey是不记名式的。<br>如果用户知道CDKey=100可用，那么他会拿101这个新的CDKey尝试兑换，这样他就兑换走了其它用户购买的物品，因而不能采用该方式。</p><p>3.方式1 + 方式2<br>唯一ID分为两部分，<strong>hash部分 + 自增部分</strong>，其中自增部分保证唯一性，而hash部分解决单纯自增的规律性问题。<br>或者采用<strong>signature(自增id) + 自增id</strong>的方式，签名部分可以解决规律性问题、同时可以用来校验整个id的合法性。</p><h4><span id="防刷-盗刷问题">防刷、盗刷问题</span></h4><p>由于物品兑换的唯一依据是不记名的CDKey，如何做防刷、盗刷？</p><ol><li><p>能不能单纯依靠增加CDKey的长度来解决盗刷问题<br>理论上不行，实际可行<br>假设CDKey长度6个字符，每个字符由大小写字母、数字构成，共计62种变化，6个字符约500亿种变化。按照100qps的速度扫描，需要18年才能扫完整个空间，CDKey长度每增加1个字符，扫描难度增大62倍。如果CDKey长度由6个字符，增加到12个字符，破解难度可想而知。</p></li><li><p>能不能通过限制每个ip的访问频率，来控制扫描破解CDKey的速度<br>不行<br>假设黑客控制了100台肉鸡，每台100qps的扫描速度，CDKey长度6个字符，那么他只需要65天，就能扫完整个CDKey空间，如果他控制了10000台呢，那就更快扫完了。</p></li><li><p>能不能对服务端的处理速度做限制，例如：每秒只处理10个请求<br>不行<br>这样虽然控制了黑客的扫描速度，但是也阻挡了正常用户的请求，降低了系统吞吐量</p></li><li><p>能不能针对CDKey做一些检测或者限制<br>不行<br>黑客每次扫描的CDKey都不相同，无规律性</p></li><li><p>那有什么好的解决办法呢？<br>可以考虑给CDKey增加Secret</p><ul><li>添加Secret，相当于增加了CDKey的长度，增加了黑客扫描破解的难度，他必须先猜中CDKey，再猜中Secret才能非法获取</li><li>可以对针对CDKey做一些安全性控制，如果CDKey的密码输入错误3次，冻结该ip及CDKey一段时间，这样可以极大的降低黑客扫描的速度，扫描破解，命中CDKey后，尝试扫描破解Secret密码，只要错误几次，该肉鸡的ip即被冻结，同时该CDKey也暂不可用，阻止黑客采用其它ip继续破解Secret。</li></ul></li></ol><p><em>关于PayPal中Notify的校验问题，下次讨论</em></p><p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">User->接入服务: 购买接入服务->CDKey服务: 请求生成CDKeyNote right of CDKey服务: 根据算法生成CDKeyCDKey服务-->接入服务: CDKey接入服务-->User: CDKeyUser->接入服务: 用CDKey兑换物品接入服务->CDKey服务: 校验CDKeyCDKey服务-->接入服务: yes or no接入服务-->User: 物品</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script><textarea id="sequence-1-code" style="display: none">user->server: web页面点击购买物品server->paypal: 创建订单(填写return_url、cancel_url)paypal->server: 订单创建成功，返回redirect_urlserver->user: 让web页面302跳转到redirect_urluser->user: 输入paypal账号、密码登录user->user: 确认支付paypal-->user: 页面跳转至return_url并附加相关参数user->server: 将附加参数传递给server端server->paypal: execute订单paypal-->server: 异步notify订单支付信息server-->paypal: 校验notify信息server-->paypal: 检查订单支付状态</textarea><textarea id="sequence-1-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-1-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-1", options);</script></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近工作中需要接入PayPal支付，由此引发了关于唯一ID生成、签名校验机制的一些思考&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>使用C++安全的发送邮件</title>
