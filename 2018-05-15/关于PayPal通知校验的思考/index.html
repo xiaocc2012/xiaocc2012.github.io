@@ -80,17 +80,17 @@
 
 
 
-<meta name="description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta name="description" content="PayPal支付中通知校验机制的思考">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用C++安全的发送邮件">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-10/发送邮件2/index.html">
+<meta property="og:title" content="关于PayPal支付接入的思考——通知校验机制">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta property="og:description" content="PayPal支付中通知校验机制的思考">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-11T13:06:43.031Z">
+<meta property="og:updated_time" content="2018-05-15T12:49:30.912Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用C++安全的发送邮件">
-<meta name="twitter:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta name="twitter:title" content="关于PayPal支付接入的思考——通知校验机制">
+<meta name="twitter:description" content="PayPal支付中通知校验机制的思考">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/"/>
 
 
 
 
 
-  <title>使用C++安全的发送邮件 | 曾经浮华的小窝</title>
+  <title>关于PayPal支付接入的思考——通知校验机制 | 曾经浮华的小窝</title>
   
 
 
@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -289,7 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用C++安全的发送邮件</h1>
+          <h1 class="post-title" itemprop="name headline">关于PayPal支付接入的思考——通知校验机制</h1>
         
 
         <div class="post-meta">
@@ -301,8 +301,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T23:00:00+08:00">
-                2018-05-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-15T19:30:00+08:00">
+                2018-05-15
               </time>
             
 
@@ -319,7 +319,7 @@
 
           
           
-             <span id="/2018-05-10/发送邮件2/" class="leancloud_visitors" data-flag-title="使用C++安全的发送邮件">
+             <span id="/2018-05-15/关于PayPal通知校验的思考/" class="leancloud_visitors" data-flag-title="关于PayPal支付接入的思考——通知校验机制">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -350,45 +350,44 @@
       
 
       
-        <p>前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施</p>
-<a id="more"></a>
-<p>要解释SMTP协议的不安全问题，得先说说http协议</p>
-<h4><span id="http协议">HTTP协议</span></h4><p>具体解释可以参考wiki <a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">HTTP协议</a></p>
-<blockquote>
-<p>它是一种用于分布式、协作式和超媒体信息系统的应用层协议<br>设计HTTP最初的目的是为了提供一种发布和接收HTML页面的方法</p>
-</blockquote>
-<p>http交互内容是明文传输，例如获取google首页的方式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.google.com</span><br></pre></td></tr></table></figure>
-<p>服务器返回内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Length: 3059</span><br><span class="line">Server: GWS/2.0</span><br><span class="line">Date: Sat, 11 Jan 2003 02:44:04 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Cache-control: private</span><br><span class="line">Set-Cookie: PREF=ID=73d4aef52e57bae9:TM=1042253044:LM=1042253044:S=SMCc_HRPCQiqy</span><br><span class="line">X9j; expires=Sun, 17-Jan-2038 19:14:07 GMT; path=/; domain=.google.com</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
-<p>这样有什么安全问题呢？整个交互内容除了Client和Server端，没有第三个人知道。<br>你可能有这样的疑问，其实不对，我们在网络上发送消息，并不是直接传递到Server端，中间会经过很多节点的转发，这样就存在干坏事的时机。</p>
+        <p>PayPal支付中通知校验机制的思考<br><a id="more"></a></p>
+<h4><span id="校验机制介绍">校验机制介绍</span></h4><p>PayPal支付流程中，待用户支付完毕后，会以WebHook的形式异步通知商户。</p>
+<p>所谓的异步通知，其实就是以Post的形式调用商户提前在PayPal网站注册的一个URL。</p>
+<p>可见，该URL任何第三方亦可调用，以伪装成支付成功，所以商户接收到Notification的时候，需要<strong>校验</strong>其是否PayPal下发。</p>
+<p>PayPal开发者文档中提供了一个API用以校验Notification的真实性。<br>文档地址：<a href="https://developer.paypal.com/docs/api/webhooks/#verify-webhook-signature" target="_blank" rel="noopener">https://developer.paypal.com/docs/api/webhooks/#verify-webhook-signature</a><br>校验流程为，将接收到的相关信息以Post形式请求PayPal校验接口，其会返回：SUCCESS、FAILURE</p>
+<p>Post的数据格式为Json，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;transmission_id&quot;: &quot;69cd13f0-d67a-11e5-baa3-778b53f4ae55&quot;,</span><br><span class="line">  &quot;transmission_time&quot;: &quot;2016-02-18T20:01:35Z&quot;,</span><br><span class="line">  &quot;cert_url&quot;: &quot;cert_url&quot;,</span><br><span class="line">  &quot;auth_algo&quot;: &quot;SHA256withRSA&quot;,</span><br><span class="line">  &quot;transmission_sig&quot;: &quot;xxxx&quot;,</span><br><span class="line">  &quot;webhook_id&quot;: &quot;1JE4291016473214C&quot;,</span><br><span class="line">  &quot;webhook_event&quot;: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除了 <code>webhook_event</code> 字段的Value为Object，其它字段的Value均为String。</p>
+<p>按照API文档使用curl工具自测，返回 <code>FAILURE</code><br>使用Postman工具测试，亦返回 <code>FAILURE</code><br>翻看文档，尝试各种解决方案，无果，只能求助万能的google。</p>
+<p>还真有人反馈这个问题：<a href="https://github.com/paypal/PayPal-Python-SDK/issues/175" target="_blank" rel="noopener">https://github.com/paypal/PayPal-Python-SDK/issues/175</a>，其中一个解答者为PayPal官方开发者。<br>经过尝试，发现调整 <code>webhook_event</code> 这个Object中某些key的顺序就可以顺利通过检查。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;webhook_event&quot;:</span><br><span class="line">&#123;</span><br><span class="line">    &quot;id&quot;:&quot;WH-64U11527U2666304T-3BK004431V7313539&quot;,</span><br><span class="line">    &quot;event_version&quot;:&quot;1.0&quot;,</span><br><span class="line">    &quot;create_time&quot;:&quot;2016-12-07T09:10:39Z&quot;, </span><br><span class="line">    .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>API校验<strong>失败</strong></p>
+<p>然而，调整 <code>create_time</code> 与 <code>event_version</code> 的顺序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;webhook_event&quot;:</span><br><span class="line">&#123;</span><br><span class="line">    &quot;id&quot;:&quot;WH-64U11527U2666304T-3BK004431V7313539&quot;,</span><br><span class="line">    &quot;create_time&quot;:&quot;2016-12-07T09:10:39Z&quot;, </span><br><span class="line">    &quot;event_version&quot;:&quot;1.0&quot;,</span><br><span class="line">    .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>API却校验<strong>成功</strong></p>
+<p>通过curl工具，我能方便的调整Post给PayPal的数据中字段的顺序，可是在代码中实测的时候，我却无法做到！</p>
+<p><strong>为什么？</strong></p>
+<p>因为通过Http接口Post给PayPal的数据本质上是一个 <code>String</code>，只不过在Http头中指定数据格式为Json，<code>Content-type: application/json</code>。<br>这个String肯定是通过调用Json对象的序列化函数得来，我没有办法去改变序列化函数的实现，从而调整序列化成String后Key的顺序。</p>
+<h4><span id="校验机制的问题">校验机制的问题</span></h4><p><strong>为什么会导致校验失败？</strong></p>
+<p>这得从 <code>webhook_event</code> 这个字段所需的值说起。<br>这个字段的值，实际上就是PayPal支付成功后通知商户的Notification的值。</p>
+<p>我们复盘一下整个流程：</p>
 <div id="sequence-0"></div>
 
-<p>经常上网的你会碰到，有时候打开网页，莫名其妙的多了广告，而且有些是非常著名的网站，这些网站不会自主添加广告。</p>
-<p><strong>那这些广告是哪里来的呢？</strong></p>
-<p>其实是网络运营商对服务端返回的数据进行解析与篡改，由于整个交互内容是明文，很容易知道数据格式，就可以在返回数据中添加自己的广告，然后返回给用户。利用这个原理也可以做一些别的事情，例如：针对非法网页的打击。</p>
-<div id="sequence-1"></div>
-
-<p>这就是常说的 <code>中间人劫持</code>。</p>
-<h4><span id="https">HTTPS</span></h4><p><a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">wiki解释</a></p>
-<blockquote>
-<p>超文本传输安全协议，是一种通过计算机网络进行安全通信的传输协议<br>HTTPS经由HTTP进行通信，但利用SSL/TLS来加密数据包。HTTPS开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。</p>
-</blockquote>
-<h5><span id="与http的差异">与HTTP的差异</span></h5><blockquote>
-<p>与HTTP的URL由“http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443<br>HTTP协议和安全协议同属于应用层（OSI模型的最高层），具体来讲，安全协议工作在HTTP之下，运输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。<br>严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（TLS或SSL）上的常规HTTP协议的称呼。<br><strong>HTTPS报文中的任何东西都被加密，包括所有报头和荷载</strong>。<br>除了可能的选择密文攻击之外，一个攻击者所能知道的只有在两者之间有一连接这一事实。</p>
-</blockquote>
-<p><strong>由此可见，https能够实现网页信息的安全传输</strong></p>
-<h4><span id="smtps">SMTPS</span></h4><p>http协议有对应的安全版本https，其实，smtp协议也有对应的安全版本smtps。<br>smtps协议的 <a href="https://en.wikipedia.org/wiki/SMTPS" target="_blank" rel="noopener">wiki解释</a><br>与https协议类似，smtps协议也是通过 SSL/TLS 在传输层上通过对信息加密来保证安全性</p>
-<h4><span id="实际例子">实际例子</span></h4><p>libcurl中有一个smtp + ssl的例子：<a href="https://curl.haxx.se/libcurl/c/smtp-ssl.html" target="_blank" rel="noopener">code</a></p>
-<p><em>我想知道，还有什么功能是libcurl不能实现的。。。</em></p>
-<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">Client->Node1: data
-Node1-->Node2: data
-Node2-->Node3: data
-Node3-->NodeN: data
-NodeN->Server: data</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script><textarea id="sequence-1-code" style="display: none">Server->Node1: data
-Node1->Node2: data
-Node2-->NodeN: data->data'
-NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-1-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-1", options);</script></p>
+<p>可见，最初PayPal传递给商户的数据<strong>nf_string</strong>，经过反序列化、再序列化之后得到的数据<strong>nf_string’</strong>，两者并不是byte尺度一致。</p>
+<p><strong>商户的Json库序列化实现与PayPal侧的实现无法保证一致</strong></p>
+<p>这就导致PayPal侧，在接收商户校验Notification请求时候，直接以序列化后新的String计算signature值产生偏差。</p>
+<h4><span id="思考">思考</span></h4><p>要解决该问题，有几种方式：</p>
+<ul>
+<li>PayPal侧保证数据顺序的一致性，在接收到商户发送来的校验请求 <code>nf_string</code> 后，先反序列化成Json对象，再调用序列化函数转换成String，这样就能保证与最初下发给商户的 <code>nf_string</code> 在byte尺度一致，<strong>因为两个String都是在PayPal侧完成序列化</strong>。<br>  不管商户对这个 <code>nf_string</code> 如何调整key的顺序，最终校验签名需要的String，都是在PayPal侧完成序列化，能够保证与最初下发给商户时数据一致。</li>
+<li>回顾整个流程，症结在于商户序列化的实现，影响了PayPal侧对于签名的计算，所以可以修改API，将 <code>webhook_event</code> 字段的Value修改为<strong>String</strong>。<br>  这样，商户只需要将PayPal最初下发的 <code>nf_string</code> 填入即可，PayPal从商户post_data中取到的值即与最初下发一致。</li>
+</ul>
+<p>由于多平台、多语言的存在，对于需要byte级别一致的数据，不应该对客户的环境做任何假设，相关字段最好以 <code>String</code> 形式传递。</p>
+<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">PayPal->商户: post形式通知支付结果，nf_string
+商户-->商户: 根据nf_string反序列化成json对象，nf_object
+商户-->商户: 构造需要校验的Json对象，post_body
+商户-->商户: 将Json对象序列化成String，post_data
+商户->PayPal: 以http的形式将post_data发送</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script></p>
 
       
     </div>
@@ -413,8 +412,8 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-05-07/发送邮件1/" rel="next" title="使用C++发送邮件">
-                <i class="fa fa-chevron-left"></i> 使用C++发送邮件
+              <a href="/2018-05-12/关于PayPal支付接入的思考/" rel="next" title="关于PayPal支付接入的思考——唯一ID的生成">
+                <i class="fa fa-chevron-left"></i> 关于PayPal支付接入的思考——唯一ID的生成
               </a>
             
           </div>
@@ -422,10 +421,6 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-12/关于PayPal支付接入的思考/" rel="prev" title="关于PayPal支付接入的思考——唯一ID的生成">
-                关于PayPal支付接入的思考——唯一ID的生成 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -548,7 +543,7 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">HTTP协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">与HTTP的差异</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">SMTPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">实际例子</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">校验机制介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">校验机制的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">思考</span></a></li></ol></div>
             
 
           </div>
