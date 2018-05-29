@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.xiaocc.xyz/2018-05-05/hello-world/</loc>
+    
+    <lastmod>2018-05-29T02:12:44.428Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/</loc>
     
-    <lastmod>2018-05-28T13:46:46.078Z</lastmod>
+    <lastmod>2018-05-28T13:53:27.533Z</lastmod>
     
   </url>
   
@@ -61,13 +68,6 @@
     <loc>http://www.xiaocc.xyz/2018-05-05/linux-kernel-strncpy/</loc>
     
     <lastmod>2018-05-06T04:37:24.167Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.xiaocc.xyz/2018-05-05/hello-world/</loc>
-    
-    <lastmod>2018-05-06T04:34:20.140Z</lastmod>
     
   </url>
   

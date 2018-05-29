@@ -80,18 +80,18 @@
 
 
 
-<meta name="description" content="Google出品的内存检测工具AddressSanitizer、介绍与分析">
+<meta name="description" content="Google出品的内存检测工具AddressSanitizer介绍与分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存检测工具AddressSanitizer">
 <meta property="og:url" content="http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="Google出品的内存检测工具AddressSanitizer、介绍与分析">
+<meta property="og:description" content="Google出品的内存检测工具AddressSanitizer介绍与分析">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180528214308.png">
-<meta property="og:updated_time" content="2018-05-28T13:46:46.078Z">
+<meta property="og:updated_time" content="2018-05-28T13:53:27.533Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内存检测工具AddressSanitizer">
-<meta name="twitter:description" content="Google出品的内存检测工具AddressSanitizer、介绍与分析">
+<meta name="twitter:description" content="Google出品的内存检测工具AddressSanitizer介绍与分析">
 <meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/20180528214308.png">
 
 
@@ -352,13 +352,14 @@
       
 
       
-        <p>Google出品的内存检测工具AddressSanitizer、介绍与分析</p>
+        <p>Google出品的内存检测工具AddressSanitizer介绍与分析</p>
 <a id="more"></a>
 <h4><span id="介绍">介绍</span></h4><p>AddressSanitizer是Google旗下的一个内存问题检测工具，项目地址：<a href="https://github.com/google/sanitizers/wiki/AddressSanitizer" target="_blank" rel="noopener">https://github.com/google/sanitizers/wiki/AddressSanitizer</a></p>
 <p>它与传统的内存问题检测工具，例如 <code>Valgrind</code> ，有何区别？</p>
 <p>用过 <code>Valgrind</code> 的朋友应该都清楚，其会极大的降低程序运行速度，大约降低10倍，而 <code>AddressSanitizer</code> 大约只降低2倍，这是什么概念，果然是Google大法好！</p>
-<h4><span id="具体使用">具体使用</span></h4><p>在LLVM及高版本编译器中已经自带了该工具，编译时添加 <code>-fsanitize=address</code> 选项。<br>正常运行程序，如有内存相关问题，即会打印相关信息。</p>
-<h4><span id="工具原理">工具原理</span></h4><p>工具用法比较简单，这里想重点说说该工具的原理。<br>可参考文档：<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="noopener">https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm</a></p>
+<h4><span id="具体使用">具体使用</span></h4><p>在LLVM及高版本编译器中已经自带了该工具，编译时添加 <code>-fsanitize=address</code> 选项。<br>正常运行程序，如有内存相关问题，即会打印异常信息。</p>
+<h4><span id="工具原理">工具原理</span></h4><p>工具用法比较简单，这里想重点说说该工具的原理。</p>
+<p>可参考文档：<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="noopener">https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm</a></p>
 <p>由于是内存检测工具，其需要对每一次内存读写操作进行检查：<br><code>*address = ...;  // or: ... = *address;</code></p>
 <p>进行如下的逻辑判断：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (IsPoisoned(address)) &#123;</span><br><span class="line">  ReportError(address, kAccessSize, kIsWrite);</span><br><span class="line">&#125;</span><br><span class="line">*address = ...;  <span class="comment">// or: ... = *address;</span></span><br></pre></td></tr></table></figure>
@@ -374,11 +375,11 @@
 <p>为什么是 8 bytes ，因为malloc分配内存是按照 8 bytes 对齐。</p>
 <p>这样，8 bytes 的主内存，共构成 9 种不同情况：</p>
 <ul>
-<li>8 bytes 的数据是可读写的，影子内存中的value值为 <strong>0</strong></li>
-<li>8 bytes 的数据不可读写，影子内存中的value为 <strong>负数</strong></li>
-<li>前 k bytes 可读写，后 8 - k bytes 不可读写，影子内存中的value为 k 。</li>
+<li>8 bytes 的数据可读写，影子内存中的value值为 <strong>0</strong></li>
+<li>8 bytes 的数据不可读写，影子内存中的value值为 <strong>负数</strong></li>
+<li>前 k bytes 可读写，后 (8 - k) bytes 不可读写，影子内存中的value值为 <strong>k</strong> 。</li>
 </ul>
-<p>如果malloc(13)，根据 8 bytes 字节对齐的原则，需要 2 bytes 的影子内存，第一个byte的值为 0，第二个byte的值为 5。</p>
+<p>如果 <code>malloc(13)</code> ，根据 8 bytes 字节对齐的原则，需要 2 bytes 的影子内存，第一个byte的值为 0，第二个byte的值为 5。</p>
 <p>这时，整个判断流程，可改写为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">byte *shadow_address = MemToShadow(address);</span><br><span class="line">byte shadow_value = *shadow_address;</span><br><span class="line"><span class="keyword">if</span> (shadow_value) &#123;</span><br><span class="line">  <span class="keyword">if</span> (SlowPathCheck(shadow_value, address, kAccessSize)) &#123;</span><br><span class="line">    ReportError(address, kAccessSize, kIsWrite);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Check the cases where we access first k bytes of the qword</span></span><br><span class="line"><span class="comment">// and these k bytes are unpoisoned.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">SlowPathCheck</span><span class="params">(shadow_value, address, kAccessSize)</span> </span>&#123;</span><br><span class="line">  last_accessed_byte = (address &amp; <span class="number">7</span>) + kAccessSize - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> (last_accessed_byte &gt;= shadow_value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4><span id="主内存映射到影子内存">主内存映射到影子内存</span></h4><p><code>MemToShadow</code> 采用简单直接映射的方式<br>64-bit <code>Shadow = (Mem &gt;&gt; 3) + 0x7fff8000;</code><br>32-bit <code>Shadow = (Mem &gt;&gt; 3) + 0x20000000;</code></p>
