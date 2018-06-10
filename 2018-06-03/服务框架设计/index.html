@@ -91,7 +91,7 @@
 <meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-175915.jpg">
 <meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-181150.jpg">
 <meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-201920.jpg">
-<meta property="og:updated_time" content="2018-06-03T12:20:44.007Z">
+<meta property="og:updated_time" content="2018-06-03T12:27:03.602Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="服务框架设计">
 <meta name="twitter:description" content="最近在研究raft论文，想动手实现一下，但是手上没有合适的网络框架，花了几天造了个轮子。">
@@ -363,6 +363,7 @@
 <h4><span id="worker_dispatcher">worker_dispatcher</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-175915.jpg" alt=""><br>以ZMQ_ROUTER的形式对接监听tcp端口，将client请求通过内部inproc的socket负载均衡的转发给worker进行处理<br>数据转发给worker时，将ZMQ_ROUTER的identity帧一并发送，这样待worker处理完毕，通过inproc的socket返回数据时，ZMQ_ROUTER能将数据返回给请求对应的client</p>
 <h4><span id="worker">worker</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-181150.jpg" alt=""><br>创建ZMQ_DEALER的inproc的socket，并与worker_dispatcher连接，以此处理其转发过来的client的请求<br>当其要请求其它服务时，统一通过client_dispatcher对外处理</p>
 <h4><span id="client_dispather">client_dispather</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-201920.jpg" alt=""><br>其通过inproc的socket接收worker中对其它服务的请求，并管理对外连接，释放长时间不使用的连接等<br>待下游服务返回数据，其通过inproc的socket返回给对应的worker</p>
+<p><em>下次讲一下定时器的设计</em></p>
 
       
     </div>
@@ -396,6 +397,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018-06-10/cpu的cache与一致性/" rel="prev" title="CPU Cache与一致性">
+                CPU Cache与一致性 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -472,7 +477,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

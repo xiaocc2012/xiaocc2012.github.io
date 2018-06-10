@@ -80,14 +80,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="tags">
-<meta property="og:url" content="http://www.xiaocc.xyz/tags/index.html">
+<meta name="description" content="现代计算机多核CPU的多级缓存构成与一致性算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CPU Cache与一致性">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-06-10/cpu的cache与一致性/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
+<meta property="og:description" content="现代计算机多核CPU的多级缓存构成与一致性算法">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-05T09:42:28.610Z">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-101826.jpg">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-103044.jpg">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-104418.jpg">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-110431.jpg">
+<meta property="og:updated_time" content="2018-06-10T03:19:52.304Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="tags">
+<meta name="twitter:title" content="CPU Cache与一致性">
+<meta name="twitter:description" content="现代计算机多核CPU的多级缓存构成与一致性算法">
+<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-101826.jpg">
 
 
 
@@ -117,13 +125,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/tags/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-06-10/cpu的cache与一致性/"/>
 
 
 
 
 
-  <title>tags | 曾经浮华的小窝</title>
+  <title>CPU Cache与一致性 | 曾经浮华的小窝</title>
   
 
 
@@ -257,40 +265,166 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-06-10/cpu的cache与一致性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="曾经浮华">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曾经浮华的小窝">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">tags</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-                目前共计 2 个标签
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/linux-kernel/" style="font-size: 12px; color: #ccc">linux kernel</a> <a href="/tags/strncpy/" style="font-size: 12px; color: #ccc">strncpy</a>
-            </div>
-          </div>
+          <h1 class="post-title" itemprop="name headline">CPU Cache与一致性</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-10T10:00:00+08:00">
+                2018-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018-06-10/cpu的cache与一致性/" class="leancloud_visitors" data-flag-title="CPU Cache与一致性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>现代计算机多核CPU的多级缓存构成与一致性算法</p>
+<a id="more"></a>
+<p>最近看了CPU Cache相关的资料，涉及Cache的构成及一致性解决办法，现总结并记录</p>
+<h4><span id="存储层次构成">存储层次构成</span></h4><p>由于CPU运行速度非常快，而主内存相对来说很慢，因此CPU并不直接访问主内存，两者之间有多次缓存结构。</p>
+<p>存储层次，如下图：<br><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-101826.jpg" alt=""></p>
+<p><em>图片来源：内核月谈——CPU Cache Line伪共享问题的总结和分析<br><a href="https://mp.weixin.qq.com/s/y1NSE5xdh8Nt5hlmK0E8Og" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/y1NSE5xdh8Nt5hlmK0E8Og</a></em></p>
+<p>从上图可以看出，register与主memory访问速度相差约<strong>40倍</strong>，而磁盘访问一次耗时大约5ms，主memory与其访问速度相差约<strong>100倍</strong>。</p>
+<h4><span id="cpu的cache架构">CPU的Cache架构</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-103044.jpg" alt=""></p>
+<p><em>图片来源：内核月谈——CPU Cache Line伪共享问题的总结和分析<br><a href="https://mp.weixin.qq.com/s/y1NSE5xdh8Nt5hlmK0E8Og" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/y1NSE5xdh8Nt5hlmK0E8Og</a></em></p>
+<p>如上图所示：<br>一个物理CPU有四个物理core，每个物理core有两个HT(Hyper Thread)<br>每个物理core内的所有HT，共享：L1-指令cache、L1-数据cache、L2-cache<br>所有物理core共享L3-cache</p>
+<h4><span id="cache的一致性问题">Cache的一致性问题</span></h4><p>通过了解CPU的Cache架构可以发现，每个物理CPU都有自己的Cache，如何解决Cache的不一致问题。</p>
+<h5><span id="不一致问题的产生">不一致问题的产生</span></h5><p>假设多核CPU在每个CPU内不单独设置Cache，而是所有物理CPU共享一个Cache，这样全部CPU的读写操作均串行通过同一个Cache。<br><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-104418.jpg" alt=""><br>这样，当其中一个CPU进行写操作，而另一个CPU进行读操作，总是能读到正确的值。<br>但是，所有CPU共享同一个Cache的设计，会极大的降低系统的运算速度，因为所有CPU均需要串行的访问Cache以获取数据，大部分时间均在等待Cache使用权。</p>
+<p>如果引入多个Cache，就会涉及到Cache的一致性问题。<br>所以，Cache的一致性问题，不是因为多CPU导致，而是多Cache导致。</p>
+<h5><span id="一致性协议">一致性协议</span></h5><p>参考WIKI关于Cache一致性的解释：<a href="https://en.wikipedia.org/wiki/Cache_coherence" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Cache_coherence</a><br>常用的一致性协议有 <code>snooping</code> 协议，也称为窥探协议。</p>
+<p>该协议对总线上的操作进行监听，例如：一个CPU_A，对变量X进行了写操作，但是还未回写到memory，而另外一个CPU_B需要读取变量X，这时如果直接从memory获取变量X的值，是过期值，<br>这时CPU_A能够从总线上窥探到该次读操作，其把X值写入memory，而CPU_B的读操作由于未得到响应，其会重新发起读请求，这时就能从memory读取到最新值。</p>
+<p>以上只是简单讲解，具体有 <code>MESI</code> 协议，其把Cache分为几个状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">M: Modified（被修改的），处于这一状态的数据只在本CPU中有缓存，且其数据已被修改，没有更新到内存中 </span><br><span class="line">E: Exclusive（独占的），处于这一状态的数据只在本CPU中有缓存，且其数据没有被修改，与内存一致 </span><br><span class="line">S: Shared（共享的），处于这一状态的数据在多个CPU中有缓存 </span><br><span class="line">I: Invalid（无效的），本CPU中的这份缓存已经无效了。</span><br></pre></td></tr></table></figure>
+<p>状态机如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180610-110431.jpg" alt=""></p>
+
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018-06-03/服务框架设计/" rel="next" title="服务框架设计">
+                <i class="fa fa-chevron-left"></i> 服务框架设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -323,8 +457,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -375,6 +518,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">存储层次构成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">CPU的Cache架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">Cache的一致性问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">不一致问题的产生</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">一致性协议</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
