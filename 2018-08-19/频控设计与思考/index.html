@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-19T15:24:28.154Z">
+<meta property="og:updated_time" content="2018-08-19T15:30:26.178Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="频控设计与思考">
 <meta name="twitter:description" content="频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题">
@@ -360,7 +360,7 @@
 <li>个人级频控</li>
 </ul>
 <p>以下将分别介绍实现方式与相关问题</p>
-<p>#####<code>系统级频控</code><br>该级别频控有多种实现如下：</p>
+<h5><span id="系统级频控"><code>系统级频控</code></span></h5><p>该级别频控有多种实现如下：</p>
 <ul>
 <li>基于内存计数</li>
 <li>基于内存的double-buffer计数</li>
@@ -417,6 +417,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018-08-20/数据分页拉取机制探讨/" rel="prev" title="数据分页拉取机制探讨">
+                数据分页拉取机制探讨 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -493,7 +497,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -539,7 +543,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">什么是频控？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">如何进行频控？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">用户级频控</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">redis频控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">结语</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">什么是频控？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">如何进行频控？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">系统级频控</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">用户级频控</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">redis频控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">结语</span></a></li></ol></div>
             
 
           </div>

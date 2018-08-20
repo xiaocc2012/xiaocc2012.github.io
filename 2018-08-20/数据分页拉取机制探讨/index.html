@@ -81,17 +81,23 @@
 
 
 
-<meta name="description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta name="description" content="评论系统及各种时间线feeds系统，数据分页拉取机制讨论。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用C++安全的发送邮件">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-10/发送邮件2/index.html">
+<meta property="og:title" content="数据分页拉取机制探讨">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-08-20/数据分页拉取机制探讨/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta property="og:description" content="评论系统及各种时间线feeds系统，数据分页拉取机制讨论。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-11T13:06:43.031Z">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180820203459.png">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180820204642.png">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180820210640.png">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180820211305.png">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180820212548.png">
+<meta property="og:updated_time" content="2018-08-20T15:52:19.954Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用C++安全的发送邮件">
-<meta name="twitter:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta name="twitter:title" content="数据分页拉取机制探讨">
+<meta name="twitter:description" content="评论系统及各种时间线feeds系统，数据分页拉取机制讨论。">
+<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/20180820203459.png">
 
 
 
@@ -121,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-08-20/数据分页拉取机制探讨/"/>
 
 
 
 
 
-  <title>使用C++安全的发送邮件 | 曾经浮华的小窝</title>
+  <title>数据分页拉取机制探讨 | 曾经浮华的小窝</title>
   
 
 
@@ -273,7 +279,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-08-20/数据分页拉取机制探讨/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -290,7 +296,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用C++安全的发送邮件</h1>
+          <h1 class="post-title" itemprop="name headline">数据分页拉取机制探讨</h1>
         
 
         <div class="post-meta">
@@ -302,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T23:00:00+08:00">
-                2018-05-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-20T23:30:00+08:00">
+                2018-08-20
               </time>
             
 
@@ -320,7 +326,7 @@
 
           
           
-             <span id="/2018-05-10/发送邮件2/" class="leancloud_visitors" data-flag-title="使用C++安全的发送邮件">
+             <span id="/2018-08-20/数据分页拉取机制探讨/" class="leancloud_visitors" data-flag-title="数据分页拉取机制探讨">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -351,45 +357,35 @@
       
 
       
-        <p>前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施</p>
+        <p>评论系统及各种时间线feeds系统，数据分页拉取机制讨论。</p>
 <a id="more"></a>
-<p>要解释SMTP协议的不安全问题，得先说说http协议</p>
-<h4><span id="http协议">HTTP协议</span></h4><p>具体解释可以参考wiki <a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">HTTP协议</a></p>
-<blockquote>
-<p>它是一种用于分布式、协作式和超媒体信息系统的应用层协议<br>设计HTTP最初的目的是为了提供一种发布和接收HTML页面的方法</p>
-</blockquote>
-<p>http交互内容是明文传输，例如获取google首页的方式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.google.com</span><br></pre></td></tr></table></figure>
-<p>服务器返回内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Length: 3059</span><br><span class="line">Server: GWS/2.0</span><br><span class="line">Date: Sat, 11 Jan 2003 02:44:04 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Cache-control: private</span><br><span class="line">Set-Cookie: PREF=ID=73d4aef52e57bae9:TM=1042253044:LM=1042253044:S=SMCc_HRPCQiqy</span><br><span class="line">X9j; expires=Sun, 17-Jan-2038 19:14:07 GMT; path=/; domain=.google.com</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
-<p>这样有什么安全问题呢？整个交互内容除了Client和Server端，没有第三个人知道。<br>你可能有这样的疑问，其实不对，我们在网络上发送消息，并不是直接传递到Server端，中间会经过很多节点的转发，这样就存在干坏事的时机。</p>
-<div id="sequence-0"></div>
-
-<p>经常上网的你会碰到，有时候打开网页，莫名其妙的多了广告，而且有些是非常著名的网站，这些网站不会自主添加广告。</p>
-<p><strong>那这些广告是哪里来的呢？</strong></p>
-<p>其实是网络运营商对服务端返回的数据进行解析与篡改，由于整个交互内容是明文，很容易知道数据格式，就可以在返回数据中添加自己的广告，然后返回给用户。利用这个原理也可以做一些别的事情，例如：针对非法网页的打击。</p>
-<div id="sequence-1"></div>
-
-<p>这就是常说的 <code>中间人劫持</code>。</p>
-<h4><span id="https">HTTPS</span></h4><p><a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">wiki解释</a></p>
-<blockquote>
-<p>超文本传输安全协议，是一种通过计算机网络进行安全通信的传输协议<br>HTTPS经由HTTP进行通信，但利用SSL/TLS来加密数据包。HTTPS开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。</p>
-</blockquote>
-<h5><span id="与http的差异">与HTTP的差异</span></h5><blockquote>
-<p>与HTTP的URL由“http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443<br>HTTP协议和安全协议同属于应用层（OSI模型的最高层），具体来讲，安全协议工作在HTTP之下，运输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。<br>严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（TLS或SSL）上的常规HTTP协议的称呼。<br><strong>HTTPS报文中的任何东西都被加密，包括所有报头和荷载</strong>。<br>除了可能的选择密文攻击之外，一个攻击者所能知道的只有在两者之间有一连接这一事实。</p>
-</blockquote>
-<p><strong>由此可见，https能够实现网页信息的安全传输</strong></p>
-<h4><span id="smtps">SMTPS</span></h4><p>http协议有对应的安全版本https，其实，smtp协议也有对应的安全版本smtps。<br>smtps协议的 <a href="https://en.wikipedia.org/wiki/SMTPS" target="_blank" rel="noopener">wiki解释</a><br>与https协议类似，smtps协议也是通过 SSL/TLS 在传输层上通过对信息加密来保证安全性</p>
-<h4><span id="实际例子">实际例子</span></h4><p>libcurl中有一个smtp + ssl的例子：<a href="https://curl.haxx.se/libcurl/c/smtp-ssl.html" target="_blank" rel="noopener">code</a></p>
-<p><em>我想知道，还有什么功能是libcurl不能实现的。。。</em></p>
-<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">Client->Node1: data
-Node1-->Node2: data
-Node2-->Node3: data
-Node3-->NodeN: data
-NodeN->Server: data</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script><textarea id="sequence-1-code" style="display: none">Server->Node1: data
-Node1->Node2: data
-Node2-->NodeN: data->data'
-NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-1-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-1", options);</script></p>
+<h4><span id="业务形态">业务形态</span></h4><p>分页拉取机制使用场景较多，在各种产品的评论模块、基于时间线feeds的产品中，均能见到其身影。<br>由于该机制使用的普遍性，本文分析常见实现中的问题，并探讨优化方案。</p>
+<p>本文主要基于 <a href="https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines" target="_blank" rel="noopener">拉取twitter时间线</a> 整理而来，可以认为是一篇阅读心得。</p>
+<h4><span id="常见实现">常见实现</span></h4><p>一般是凭直觉设计API，请求参数包含 <code>page + count</code>，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//请求第一页</span><br><span class="line">page = 0;</span><br><span class="line">count = 5;</span><br><span class="line"></span><br><span class="line">//请求第二页</span><br><span class="line">page = 1;</span><br><span class="line">count = 5;</span><br></pre></td></tr></table></figure>
+<p>服务端根据 <code>page</code>、<code>count</code> 检索数据并返回，流程如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/20180820203459.png" alt=""><br>(图片借用自 twitter 博客图片，原图底部就缺失……)</p>
+<h5><span id="问题">问题</span></h5><p>假如世界静止，一切不变的情况下，该机制运行良好。</p>
+<p>如果，在第一次拉取后，时间线新插入2条数据，这时拉取第二页会发生什么情况。<br>如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/20180820204642.png" alt=""></p>
+<p>服务端根据 <code>page = 1，count = 5</code>，从top往下找，到第5条（id 为 <code>Tweet 7</code>），获取count条数据，然后返回给前端。</p>
+<p>可以明显发现问题：返回给前端的数据存在重复，id为<code>Tweet 7、Tweet 6</code>的两条数据，在client第一次拉取时，已经返回过该数据。<br>并且，在client两次拉取间隔内，新插入时间线的数据条数越多，发生重复返回的数据条数越多。</p>
+<h5><span id="如何解决该问题">如何解决该问题</span></h5><p>思考一下，上面提到的拉取机制为什么会存在重复问题？</p>
+<p>由于两次拉取均以实时<code>top</code> 作为基准线，而这个基准线会因为数据新增而浮动，所以后续拉取会出现数据重复问题。</p>
+<p>我们能不能在第一次拉取后，返回一个 <code>cursor</code> 作为下次拉取的top，并以该top来获取数据？</p>
+<h4><span id="max_id机制">max_id机制</span></h4><p>经过上面的思考，我们对server端返回的数据结构做改造，新增 <code>max_id</code>参数作为下次拉取的top。<br>如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/20180820210640.png" alt=""></p>
+<p>client第一次拉取：不用传递 <code>max_id</code> 参数，server端返回数据的同时返回 <code>max_id</code> 参数。</p>
+<p>client第二次拉取：以 <code>max_id + count</code> 作为参数，server端返回 <code>max_id</code> 之后的 <code>count</code> 条数据。</p>
+<p>注意：该处有一个小优化，如果 <code>max_id</code> 是数字型，而不是字符串型，server端可以使用 <code>max_id - 1</code> 来过滤数据。<br><img src="http://p9ffylu89.bkt.clouddn.com/20180820211305.png" alt=""></p>
+<p>至此，采用该机制，我们能很好的拉取<strong>存量数据</strong>。</p>
+<h4><span id="since_id机制">since_id机制</span></h4><p>如上图，经过2次拉取后，id为 <code>Tweet 10</code> 到 <code>Tweet 1</code> 的数据均已返回给前端，用户如何获取新增的数据呢？</p>
+<p>直接开始一个新的拉取周期，传递 <code>count = 5</code> 会有什么问题？</p>
+<p>首次拉取会返回 <code>Tweet 12</code> 到 <code>Tweet 8</code> 的数据，其中有三条数据是已经处理过的！</p>
+<p><strong>糟糕！除了让client端做id级别的去重，有别的处理办法吗？</strong></p>
+<p>其实，我们可以记录上一个拉取周期的top，这样开始下一个周期的时候，只需要拉取当前top到上个周期top之间的数据，也即新增数据。</p>
+<p>如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/20180820212548.png" alt=""></p>
+<p>第二个拉取周期的第一次拉取，传递 <code>count</code>的同时，传递 <code>since_id</code> 参数，server端返回 <code>Tweet 18</code> 到 <code>Tweet 14</code> 的数据。</p>
+<p>在第二次拉取的时候，server端根据 <code>max_id</code>、<code>since_id</code> 只会返回 <code>3</code> 条新增数据，而不会返回已经处理过的 <code>Tweet 10</code>、<code>Tweet 9</code>这两条数据。</p>
+<h4><span id="结语">结语</span></h4><p>经过以上讨论，该优化机制可以很好的解决基于时间线的分页数据拉取问题。</p>
+<p>但是，对于乱序数据，例如：评论根据点赞数而非时间排序，在用户两次分页拉取之间，由于其他用户的点赞操作，列表数据会上下波动、甚至发生剧烈变化，该 <code>max_id + since_id</code> 的机制并不能工作。</p>
 
       
     </div>
@@ -414,8 +410,8 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-05-07/发送邮件1/" rel="next" title="使用C++发送邮件">
-                <i class="fa fa-chevron-left"></i> 使用C++发送邮件
+              <a href="/2018-08-19/频控设计与思考/" rel="next" title="频控设计与思考">
+                <i class="fa fa-chevron-left"></i> 频控设计与思考
               </a>
             
           </div>
@@ -423,10 +419,6 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-12/关于PayPal支付接入的思考/" rel="prev" title="关于PayPal支付接入的思考——唯一ID的生成">
-                关于PayPal支付接入的思考——唯一ID的生成 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -549,7 +541,7 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">HTTP协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">与HTTP的差异</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">SMTPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">实际例子</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">业务形态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">常见实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">如何解决该问题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">max_id机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">since_id机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">结语</span></a></li></ol></div>
             
 
           </div>
