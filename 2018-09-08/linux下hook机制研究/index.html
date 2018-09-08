@@ -81,17 +81,19 @@
 
 
 
-<meta name="description" content="Hexo用法简介">
+<meta name="description" content="在研究C++中的协程机制时，发现有些实现通过hack掉glibc的read、write等IO操作函数，以达到迁移协程框架时，最小化代码改动。遂小小研究一下linux下的hook机制。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-05/hello-world/index.html">
+<meta property="og:title" content="linux hook机制研究">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-09-08/linux下hook机制研究/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="Hexo用法简介">
+<meta property="og:description" content="在研究C++中的协程机制时，发现有些实现通过hack掉glibc的read、write等IO操作函数，以达到迁移协程框架时，最小化代码改动。遂小小研究一下linux下的hook机制。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-29T02:12:44.428Z">
+<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180908-232110.jpg">
+<meta property="og:updated_time" content="2018-09-08T15:59:14.220Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Hexo用法简介">
+<meta name="twitter:title" content="linux hook机制研究">
+<meta name="twitter:description" content="在研究C++中的协程机制时，发现有些实现通过hack掉glibc的read、write等IO操作函数，以达到迁移协程框架时，最小化代码改动。遂小小研究一下linux下的hook机制。">
+<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180908-232110.jpg">
 
 
 
@@ -121,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-05/hello-world/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-09-08/linux下hook机制研究/"/>
 
 
 
 
 
-  <title>Hello World | 曾经浮华的小窝</title>
+  <title>linux hook机制研究 | 曾经浮华的小窝</title>
   
 
 
@@ -273,7 +275,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-05/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-09-08/linux下hook机制研究/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -290,7 +292,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">linux hook机制研究</h1>
         
 
         <div class="post-meta">
@@ -302,8 +304,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T12:00:00+08:00">
-                2018-05-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-08T23:00:00+08:00">
+                2018-09-08
               </time>
             
 
@@ -320,7 +322,7 @@
 
           
           
-             <span id="/2018-05-05/hello-world/" class="leancloud_visitors" data-flag-title="Hello World">
+             <span id="/2018-09-08/linux下hook机制研究/" class="leancloud_visitors" data-flag-title="linux hook机制研究">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -351,17 +353,36 @@
       
 
       
-        <p>Hexo用法简介</p>
+        <p>在研究C++中的协程机制时，发现有些实现通过hack掉glibc的read、write等IO操作函数，以达到迁移协程框架时，最小化代码改动。<br>遂小小研究一下linux下的hook机制。</p>
 <a id="more"></a>
-<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2><span id="quick-start">Quick Start</span></h2><h3><span id="create-a-new-post">Create a new post</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3><span id="run-server">Run server</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3><span id="generate-static-files">Generate static files</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3><span id="deploy-to-remote-sites">Deploy to remote sites</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<h4><span id="引子">引子</span></h4><p>在linux下调用C库中的函数，本质上主要是调用得 <code>libc.so.6</code> 这个动态链接库中的函数。<br>那么我们有没有办法让应用程序改调其它函数，而应用程序无感知，也就是hack掉应用程序中调用的某些函数。</p>
+<p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180908-232110.jpg" alt=""></p>
+<p>由于是调用得动态链接库中函数，我们可以通过劫持该函数的方式引入额外处理。<br>例如通过劫持 <code>malloc</code>、<code>free</code> 来追踪内存使用情况等等。</p>
+<h4><span id="实际操作">实际操作</span></h4><h5><span id="so文件">so文件</span></h5><p>我们先创建一个 <code>my_hook.c</code> 文件，并编写需要hook的函数实现。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;dlfcn.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> unlikely(x) __builtin_expect(!!(x), 0)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TRY_LOAD_HOOK_FUNC(name) <span class="meta-keyword">if</span> (unlikely(!g_sys_##name)) &#123;g_sys_##name = (sys_##name##_t)dlsym(RTLD_NEXT,#name);&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span>* (*<span class="keyword">sys_malloc_t</span>)(<span class="keyword">size_t</span> size);</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">sys_malloc_t</span> g_sys_malloc = <span class="literal">NULL</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">malloc</span><span class="params">(<span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TRY_LOAD_HOOK_FUNC(<span class="built_in">malloc</span>);</span><br><span class="line">    <span class="keyword">void</span> *p = g_sys_malloc(size);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"in malloc hook function ...\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*<span class="keyword">sys_free_t</span>)</span><span class="params">(<span class="keyword">void</span> *ptr)</span></span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">sys_free_t</span> g_sys_free = <span class="literal">NULL</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">free</span><span class="params">(<span class="keyword">void</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TRY_LOAD_HOOK_FUNC(<span class="built_in">free</span>);</span><br><span class="line">    g_sys_free(ptr);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"in free hook function ...\n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中使用 <code>RTLD_NEXT</code> 来获取系统glibc的 <code>malloc</code> 函数地址，由于待会使用 <code>LD_PRELOAD</code> 来优先加载我们自己创建的 <code>so</code> 文件，因而系统的 <code>libc.so.6</code> 排在第二位，也就是 <code>next</code> 。</p>
+<p>编译该文件生成一个 <code>so</code> 库：<br><code>gcc -fPIC -shared -o libmyhook.so my_hook.c -ldl</code></p>
+<h5><span id="测试程序">测试程序</span></h5><p>接下来创建测试程序：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;malloc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"enter main...\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> *p = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="number">10</span>);</span><br><span class="line">    <span class="keyword">if</span> (!p) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"allocation error...\n"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"returning to main...\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(<span class="string">"aa"</span>, <span class="string">"bb"</span>) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"hook strcmp\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"not match\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="hack测试">hack测试</span></h4><p>对上面的测试程序，直接编译并运行<br><code>gcc -o main main.c</code><br><code>./main</code></p>
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">enter main...</span><br><span class="line">returning to main...</span><br><span class="line">not match</span><br></pre></td></tr></table></figure>
+<p>可以清楚的看到，我们创建的 <code>so</code> 中函数并没有被调用到，也就是说<strong>hack失败</strong>！</p>
+<p>等等！目前为止我们生成的 <code>so</code> 文件，并没有与测试程序产生关联，所以 <code>malloc</code>、<code>free</code> 函数没有被hack掉，理所应当。</p>
+<p><strong>那么，如何才能让两者产生关联呢？</strong></p>
+<p><strong>LD_PRELOAD</strong>这个环境变量，能够影响程序运行时候动态链接库的加载，可以通过设置其来优先加载某些库，进而覆盖掉某些函数。</p>
+<p>这里只需要<strong>稍加更改运行方式</strong>：<br><code>LD_PRELOAD=./libmyhook.so ./main</code></p>
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">enter main...</span><br><span class="line">in malloc hook function ...</span><br><span class="line">returning to main...</span><br><span class="line">in free hook function ...</span><br><span class="line">not match</span><br></pre></td></tr></table></figure>
+<p>大功告成，我们自定义的 <code>malloc</code>、<code>free</code> 被调用到，<strong>hack成功</strong>！</p>
+<h4><span id="问题">问题</span></h4><p>在尝试对<code>strcmp</code> 函数进行hack时，按照如上方式并不能hack成功，通过查阅资料，原来编译器对很多函数进行了内联优化，并不会调用到 <code>so</code> 库中的函数，因而通过优先加载自定义动态库的方式不可行。<br>不过，可以在编译测试程序时，添加 <code>-fno-builtin-strcmp</code>，关闭 <code>strcmp</code> 函数的优化<br><code>gcc -o main main.c -fno-builtin-strcmp</code></p>
+<p>以相同的方式运行测试程序：<br><code>LD_PRELOAD=./libmyhook.so ./main</code></p>
+<p>运行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">enter main...</span><br><span class="line">in malloc hook function ...</span><br><span class="line">returning to main...</span><br><span class="line">in free hook function ...</span><br><span class="line">in strcmp hook function ...</span><br><span class="line">hook strcmp</span><br></pre></td></tr></table></figure>
+<h4><span id="参考资料">参考资料</span></h4><ul>
+<li><a href="https://blog.csdn.net/haoel/article/details/1602108" target="_blank" rel="noopener">警惕UNIX下的LD_PRELOAD环境变量</a></li>
+<li><a href="https://stackoverflow.com/questions/44606523/hook-strcmp-using-ld-preload-in-linux" target="_blank" rel="noopener">如何hack strcmp</a></li>
+</ul>
 
       
     </div>
@@ -386,15 +407,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018-08-20/数据分页拉取机制探讨/" rel="next" title="数据分页拉取机制探讨">
+                <i class="fa fa-chevron-left"></i> 数据分页拉取机制探讨
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-05/linux-kernel-strncpy/" rel="prev" title="从strncpy的实现说起">
-                从strncpy的实现说起 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -517,7 +538,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">实际操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">so文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">测试程序</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">hack测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
