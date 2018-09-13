@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="PayPal支付中通知校验机制的思考">
+<meta name="description" content="观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于PayPal支付接入的思考——通知校验机制">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/index.html">
+<meta property="og:title" content="穷，是一种病">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-09-12/穷是一种病/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="PayPal支付中通知校验机制的思考">
+<meta property="og:description" content="观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-15T13:10:42.826Z">
+<meta property="og:updated_time" content="2018-09-13T03:54:08.337Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于PayPal支付接入的思考——通知校验机制">
-<meta name="twitter:description" content="PayPal支付中通知校验机制的思考">
+<meta name="twitter:title" content="穷，是一种病">
+<meta name="twitter:description" content="观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。">
 
 
 
@@ -121,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-09-12/穷是一种病/"/>
 
 
 
 
 
-  <title>关于PayPal支付接入的思考——通知校验机制 | 曾经浮华的小窝</title>
+  <title>穷，是一种病 | 曾经浮华的小窝</title>
   
 
 
@@ -273,7 +273,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-15/关于PayPal通知校验的思考/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-09-12/穷是一种病/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -290,7 +290,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">关于PayPal支付接入的思考——通知校验机制</h1>
+          <h1 class="post-title" itemprop="name headline">穷，是一种病</h1>
         
 
         <div class="post-meta">
@@ -302,8 +302,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-15T19:30:00+08:00">
-                2018-05-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-12T23:00:00+08:00">
+                2018-09-12
               </time>
             
 
@@ -320,7 +320,7 @@
 
           
           
-             <span id="/2018-05-15/关于PayPal通知校验的思考/" class="leancloud_visitors" data-flag-title="关于PayPal支付接入的思考——通知校验机制">
+             <span id="/2018-09-12/穷是一种病/" class="leancloud_visitors" data-flag-title="穷，是一种病">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -351,47 +351,44 @@
       
 
       
-        <p>PayPal支付中通知校验机制的思考<br><a id="more"></a></p>
-<h4><span id="校验机制介绍">校验机制介绍</span></h4><p>PayPal支付流程中，待用户支付完毕后，会以WebHook的形式异步通知商户。</p>
-<p>所谓的异步通知，其实就是以Post的形式调用商户提前在PayPal网站注册的一个URL。</p>
-<p>可见，该URL任何第三方亦可调用，以伪装成支付成功，所以商户接收到Notification的时候，需要<strong>校验</strong>其是否PayPal下发。</p>
-<p>PayPal开发者文档中提供了一个API用以校验Notification的真实性。<br>文档地址：<a href="https://developer.paypal.com/docs/api/webhooks/#verify-webhook-signature" target="_blank" rel="noopener">https://developer.paypal.com/docs/api/webhooks/#verify-webhook-signature</a><br>校验流程为，将接收到的相关信息以Post形式请求PayPal校验接口，其会返回：SUCCESS、FAILURE</p>
-<p>Post的数据格式为Json，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;transmission_id&quot;: &quot;69cd13f0-d67a-11e5-baa3-778b53f4ae55&quot;,</span><br><span class="line">  &quot;transmission_time&quot;: &quot;2016-02-18T20:01:35Z&quot;,</span><br><span class="line">  &quot;cert_url&quot;: &quot;cert_url&quot;,</span><br><span class="line">  &quot;auth_algo&quot;: &quot;SHA256withRSA&quot;,</span><br><span class="line">  &quot;transmission_sig&quot;: &quot;xxxx&quot;,</span><br><span class="line">  &quot;webhook_id&quot;: &quot;1JE4291016473214C&quot;,</span><br><span class="line">  &quot;webhook_event&quot;: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>除了 <code>webhook_event</code> 字段的Value为<strong>Object</strong>，其它字段的Value均为<strong>String</strong>。</p>
-<p>按照API文档使用curl工具自测，返回 <code>FAILURE</code><br>使用Postman工具测试，亦返回 <code>FAILURE</code><br>翻看文档，尝试各种解决方案，无果，只能求助万能的google。</p>
-<p>还真有人反馈这个问题：<a href="https://github.com/paypal/PayPal-Python-SDK/issues/175" target="_blank" rel="noopener">https://github.com/paypal/PayPal-Python-SDK/issues/175</a>，其中一个解答者为PayPal官方开发者。<br>经过尝试，发现调整 <code>webhook_event</code> 这个Object中某些key的顺序就可以顺利通过检查。</p>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;webhook_event&quot;:</span><br><span class="line">&#123;</span><br><span class="line">    &quot;id&quot;:&quot;WH-64U11527U2666304T-3BK004431V7313539&quot;,</span><br><span class="line">    &quot;event_version&quot;:&quot;1.0&quot;,</span><br><span class="line">    &quot;create_time&quot;:&quot;2016-12-07T09:10:39Z&quot;, </span><br><span class="line">    .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>API校验<strong>失败</strong></p>
-<p>然而，调整 <code>create_time</code> 与 <code>event_version</code> 的顺序</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;webhook_event&quot;:</span><br><span class="line">&#123;</span><br><span class="line">    &quot;id&quot;:&quot;WH-64U11527U2666304T-3BK004431V7313539&quot;,</span><br><span class="line">    &quot;create_time&quot;:&quot;2016-12-07T09:10:39Z&quot;, </span><br><span class="line">    &quot;event_version&quot;:&quot;1.0&quot;,</span><br><span class="line">    .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>API却校验<strong>成功</strong></p>
-<p>通过curl工具，我能方便的调整Post给PayPal的数据中字段的顺序，可是在代码中实测的时候，我却无法做到！</p>
-<p><strong>为什么？</strong></p>
-<p>因为通过Http接口Post给PayPal的数据本质上是一个 <code>String</code>，只不过在Http头中指定数据格式为Json，<code>Content-type: application/json</code>。<br>这个String肯定是通过调用Json对象的序列化函数得来，我没有办法去改变序列化函数的实现，从而调整序列化成String后Key的顺序。</p>
-<h4><span id="校验机制的问题">校验机制的问题</span></h4><p><strong>为什么会导致校验失败？</strong></p>
-<p>这得从 <code>webhook_event</code> 这个字段所需的值说起。<br>这个字段的值，实际上就是PayPal支付成功后通知商户的Notification的值。</p>
-<p>我们复盘一下整个流程：</p>
-<div id="sequence-0"></div>
-
-<p>可见，最初PayPal传递给商户的数据<strong>nf_string</strong>，经过反序列化、再序列化之后得到的数据<strong>nf_string’</strong>，两者并不是byte尺度一致。</p>
-<p><strong>商户的Json库序列化实现与PayPal侧的实现无法保证一致</strong></p>
-<p>这就导致PayPal侧，在接收商户校验Notification请求时候，直接以序列化后新的String计算signature值产生偏差。</p>
-<p>也可能，Notification生成服务与校验服务，Json相关序列化函数实现不一致，导致将Json对象转换为 <code>String</code> 后，计算signature两者不一致，从而导致校验失败。</p>
-<h4><span id="思考">思考</span></h4><p>要解决该问题，有几种方式：</p>
-<ul>
-<li><p>PayPal侧保证数据顺序的一致性，在接收到商户发送来的校验请求数据 <code>post_data</code> 后，先反序列化成Json对象，取出 <code>webhook_event</code> 对象，再将其调用序列化函数转换成String，这样就能保证与最初下发给商户的 <code>nf_string</code> 在byte尺度一致，<strong>因为两个String都是在PayPal侧完成序列化</strong>。<br>  不管商户侧对这个 <code>nf_string</code> 如何调整key的顺序，最终校验签名需要的String，都是在PayPal侧序列化生成，能够保证其与最初下发给商户时的 <code>nf_string</code> 一致。</p>
-</li>
-<li><p><strong>回顾整个流程，症结在于商户序列化的实现</strong>，影响了PayPal侧对于签名的计算，所以可以修改API，将 <code>webhook_event</code> 字段的Value修改为<strong>String</strong>。<br>  这样，商户只需要将PayPal最初下发的 <code>nf_string</code> 填入即可，PayPal从商户post_data中取到的 <code>webhook_event</code> 值，即与最初异步通知下发时候一致。</p>
-</li>
-</ul>
-<p>由于多平台、多语言的存在，对于需要byte级别一致的数据，不应该对客户的环境做任何假设，相关字段最好以 <code>String</code> 形式传递。</p>
-<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">PayPal->商户: post形式通知支付结果，nf_string
-商户-->商户: 根据nf_string反序列化成json对象，nf_object
-商户-->商户: 构造需要校验的Json对象，post_body
-商户-->商户: 将Json对象序列化成String，post_data
-商户->PayPal: 以http的形式将post_data发送</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script></p>
+        <p>观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。</p>
+<a id="more"></a>
+<h4><span id="背景">背景</span></h4><p>前段时间跟老婆一起看了口碑爆棚的神作《我不是药神》，影片很好的反应当代现实与社会问题。<br>特别是里面有句台词，<code>世上有一种病叫穷病——没得治</code>。</p>
+<p>在这里不想讨论大道理，如：医药公司是否过于暴利、政府的缺位等等，只想说一下亲身体会。</p>
+<h4><span id="亲人患病">亲人患病</span></h4><h5><span id="初诊">初诊</span></h5><p>大约7月份的时候，堂弟突然微信联系我，发来一些检查报告，是他岳母的。<br>检查报告先出来，周一才能找医生会诊，心里比较着急，让我找同学帮忙问问报告内容具体什么意思。</p>
+<p>赶紧与同学联系，她是麻醉师，医院各科室都认识人。<br>她找人看了一下检查报告，对方提出需要查看图片影像，以增加信息辅助判断，但是根据检查报告初步怀疑肺癌。</p>
+<p>收到信息后，马上给堂弟打电话，他对此已有所预感，待周一拿上相关资料与医生当面会诊。</p>
+<p><strong>为什么会这样？</strong></p>
+<p>犹如晴天霹雳，今年初的时候还到他们家做客，岳母才47岁，非常年轻，刚当上外婆，宝宝才1岁，为什么这个不幸的病会找上她。<br>且宝宝刚出生时，由于感染，在中心医院住院治疗一个多月，没有明显恢复，后又转院到同济医院，前后花了十多万，举债累累。<br>万幸的是治疗后，宝宝没有后遗症、恢复很好，让人欣慰。</p>
+<p>去年宝宝患病，今年岳母患病，让这个本就不富裕的家庭，更捉襟见肘。</p>
+<p>这可如何是好？虽还没确诊，但我已有如此担忧。</p>
+<h5><span id="确诊">确诊</span></h5><p>周一下午，打电话给堂弟询问具体诊断结果，医生初步怀疑肺癌，需要做病理检查，进一步确认。</p>
+<p>按照医生的要求，一项项检查，焦急的等等……</p>
+<p>周五堂弟打电话过来，确诊：<strong>肺腺癌晚期</strong>。<br>医生反馈由于是晚期，且带有一些扩散，无法进行手术治疗，可以尝试进行<strong>靶向治疗</strong>，但是需要先进行基因检测。</p>
+<p>赶紧打电话给同学，将最新信息同步于她，并寻求建议、打听基因检测价格、靶向药物价格等等。</p>
+<h5><span id="靶向治疗">靶向治疗</span></h5><p>预约基因检测，待拿到检测结果后，再预约医生制定具体治疗方案。<br>基因检测结果显示，可以使用靶向药物，药名：<strong>吉非替尼</strong>，俗名：<strong>易瑞沙</strong>。</p>
+<p>这个药已经国产，一盒大约2000多块钱，疗程10天，一个月大约6000多块钱。</p>
+<p>虽然国产后已便宜许多，但是一个月6000多的药物费用，依然让这个家庭特别吃力。</p>
+<p>这时想起《我不是药神》的情节，这个药有没有印度版？价格怎么样？</p>
+<p>立马在各种同学群找他们帮忙，打听药物渠道、价格如何、疗效怎样。</p>
+<p>由于《药神》上映后，海关检查特别严格，药物不好带，他们多方打听也没有合适渠道。</p>
+<p>不放弃，最后找到一个渠道，印度直接邮寄过来，先来一盒看看疗效，以验证药物是否靠谱，最后药价大约是正版药的<strong>1/5</strong>。</p>
+<p>堂弟将岳母接回老家吃药静养，带带宝宝，放松心情，每半个月复查一次。</p>
+<p>这一切才刚刚开始。</p>
+<h4><span id="隔壁邻居患病离世">隔壁邻居患病离世</span></h4><p>周六定时给家里打电话，老爸突然说道，隔壁华爷爷去世。</p>
+<p>怎么可能？</p>
+<p>年初回家过年，还跟他打招呼着呢。<br>他喜欢喝酒，喝完后拿着泡着茶的保温杯，嘴里叼一根烟，一踱一踱的走着，笑呵呵的对我说，“回来过年啦”，“是啊，过年必须要回来呀，城市过年没气氛，有钱没钱，回家过年”。</p>
+<p>他腿是去年摔断的，这事儿也是听老板说的。</p>
+<p>当时吃了酒席喝了酒，主人家要送他回家。他偏不，倔得很，非要自己骑摩托车回来，不幸摔跤，休养了约半年才好。</p>
+<p>老爸说，华爷爷是今年3-4月份村里大检查时排查出来的，<strong>肺癌晚期</strong>。<br>他又不配合治疗，不打针、不吃药，按他的说法，“还不如拿治病的钱喝酒呢，反正治不好，多花些冤枉钱”。</p>
+<p>也可能是，不想为子女添加负担吧。农村年收入才2-3万元，按最便宜的治疗方案，初期怎么也得花费大几万，后面每个月还有固定开销，对农村家庭真是难以承受。</p>
+<p><strong>穷，真是一种病</strong></p>
+<p>9月6号当晚，可能是疼痛难忍，自己喝药走了。</p>
+<p>这就是华爷爷，看着我长大的华爷爷，就这样走了。</p>
+<p>俗话说，远亲不如近邻，特别是在农村，这种感受尤为强烈。</p>
+<p>深深的无力感，就我认识的人，患癌症的就有7-8个人。</p>
+<p>三姨妈淋巴癌晚期带转移，已经化疗几个疗程，人都瘦得不行，靶向药：<strong>美罗华</strong>，50ml药价25000。<br>姑爹，胃癌，4月份刚去世。<br>舅舅，肺癌，16年去世。<br>堂弟岳母、隔壁华爷爷、隔壁健爹刚45岁胃癌已去世……</p>
+<p><strong>这个世道怎么了？</strong></p>
 
       
     </div>
@@ -416,8 +413,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-05-12/关于PayPal支付接入的思考/" rel="next" title="关于PayPal支付接入的思考——唯一ID的生成">
-                <i class="fa fa-chevron-left"></i> 关于PayPal支付接入的思考——唯一ID的生成
+              <a href="/2018-09-08/linux下hook机制研究/" rel="next" title="linux hook机制研究">
+                <i class="fa fa-chevron-left"></i> linux hook机制研究
               </a>
             
           </div>
@@ -425,10 +422,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-26/极低概率bug排查/" rel="prev" title="极低概率bug排查">
-                极低概率bug排查 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -551,7 +544,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">校验机制介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">校验机制的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">思考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">亲人患病</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">初诊</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">确诊</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.</span> <span class="nav-text">靶向治疗</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">隔壁邻居患病离世</span></a></li></ol></div>
             
 
           </div>
