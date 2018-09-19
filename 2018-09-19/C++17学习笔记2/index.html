@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="C++17学习笔记系列">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-19T04:46:59.817Z">
+<meta property="og:updated_time" content="2018-09-19T05:01:19.705Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++17学习笔记(2)——语言运行期强化">
 <meta name="twitter:description" content="C++17学习笔记系列">
@@ -434,20 +434,52 @@
 <li><p>完美转发<br>  一个声明的右值引用其实是一个左值</p>
    <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span>&amp;&amp; rv2 = lv1 + lv2; <span class="comment">// 合法, 右值引用延长临时对象生命周期</span></span><br><span class="line">rv2 += <span class="string">"Test"</span>; <span class="comment">// 合法, 非常量引用能够修改临时变量</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; rv2 &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// string,string,string,Test</span></span><br><span class="line"></span><br><span class="line">reference(rv2); <span class="comment">// 输出左值</span></span><br></pre></td></tr></table></figure>
 <p>   rv2 虽然引用了一个右值，但由于它是一个引用，所以 rv2 依然是一个左值</p>
+</li>
+</ul>
+</li>
+</ol>
 <p><strong>引用坍缩规则：</strong></p>
 <blockquote>
 <p>在传统 C++ 中，我们不能够对一个引用类型继续进行引用，但 C++ 由于右值引用的出现而放宽了这一做法，从而产生了引用坍缩规则，允许我们对引用进行引用，既能左引用，又能右引用。</p>
 </blockquote>
-<p>| 函数形参类型 | 实参参数类型 | 推导后函数形参类型 |<br>| :—-: | :—-: | :—-: |<br>| T&amp; | 左引用 | T&amp; |<br>| T&amp; | 右引用 | T&amp; |<br>| T&amp;&amp; | 左引用 | T&amp; |<br>| T&amp;&amp; | 右引用 | T&amp;&amp; |</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">函数形参类型</th>
+<th style="text-align:center">实参参数类型</th>
+<th style="text-align:center">推导后函数形参类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">T&amp;</td>
+<td style="text-align:center">左引用</td>
+<td style="text-align:center">T&amp;</td>
+</tr>
+<tr>
+<td style="text-align:center">T&amp;</td>
+<td style="text-align:center">右引用</td>
+<td style="text-align:center">T&amp;</td>
+</tr>
+<tr>
+<td style="text-align:center">T&amp;&amp;</td>
+<td style="text-align:center">左引用</td>
+<td style="text-align:center">T&amp;</td>
+</tr>
+<tr>
+<td style="text-align:center">T&amp;&amp;</td>
+<td style="text-align:center">右引用</td>
+<td style="text-align:center">T&amp;&amp;</td>
+</tr>
+</tbody>
+</table>
+</div>
 <blockquote>
 <p>因此，模板函数中使用 T&amp;&amp; 不一定能进行右值引用，当传入左值时，此函数的引用将被推导为左值。更准确的讲，无论模板参数是什么类型的引用，当且仅当实参类型为右引用时，模板参数才能被推导为右引用类型。这才使得 v 作为左值的成功传递。</p>
 </blockquote>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;utility&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reference</span><span class="params">(<span class="keyword">int</span>&amp; v)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"左值引用"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reference</span><span class="params">(<span class="keyword">int</span>&amp;&amp; v)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"右值引用"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pass</span><span class="params">(T&amp;&amp; v)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"普通传参:"</span>;</span><br><span class="line">    reference(v);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"std::move 传参:"</span>;</span><br><span class="line">    reference(<span class="built_in">std</span>::move(v));</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"std::forward 传参:"</span>;</span><br><span class="line">    reference(<span class="built_in">std</span>::forward&lt;T&gt;(v));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"传递右值:"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    pass(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"传递左值:"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">int</span> v = <span class="number">1</span>;</span><br><span class="line">    pass(v);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">传递右值:</span><br><span class="line">普通传参:左值引用</span><br><span class="line">std::move 传参:右值引用</span><br><span class="line">std::forward 传参:右值引用</span><br><span class="line">传递左值:</span><br><span class="line">普通传参:左值引用</span><br><span class="line">std::move 传参:右值引用</span><br><span class="line">std::forward 传参:左值引用</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
 
       
     </div>
