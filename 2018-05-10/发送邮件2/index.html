@@ -398,7 +398,7 @@
 <p>超文本传输安全协议，是一种通过计算机网络进行安全通信的传输协议<br>HTTPS经由HTTP进行通信，但利用SSL/TLS来加密数据包。HTTPS开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。</p>
 </blockquote>
 <h5><span id="与http的差异">与HTTP的差异</span></h5><blockquote>
-<p>与HTTP的URL由“<a href="http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443" target="_blank" rel="noopener">http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443</a><br>HTTP协议和安全协议同属于应用层（OSI模型的最高层），具体来讲，安全协议工作在HTTP之下，运输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。<br>严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（TLS或SSL）上的常规HTTP协议的称呼。<br><strong>HTTPS报文中的任何东西都被加密，包括所有报头和荷载</strong>。<br>除了可能的选择密文攻击之外，一个攻击者所能知道的只有在两者之间有一连接这一事实。</p>
+<p>与HTTP的URL由“http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443<br>HTTP协议和安全协议同属于应用层（OSI模型的最高层），具体来讲，安全协议工作在HTTP之下，运输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。<br>严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（TLS或SSL）上的常规HTTP协议的称呼。<br><strong>HTTPS报文中的任何东西都被加密，包括所有报头和荷载</strong>。<br>除了可能的选择密文攻击之外，一个攻击者所能知道的只有在两者之间有一连接这一事实。</p>
 </blockquote>
 <p><strong>由此可见，https能够实现网页信息的安全传输</strong></p>
 <h4><span id="smtps">SMTPS</span></h4><p>http协议有对应的安全版本https，其实，smtp协议也有对应的安全版本smtps。<br>smtps协议的 <a href="https://en.wikipedia.org/wiki/SMTPS" target="_blank" rel="noopener">wiki解释</a><br>与https协议类似，smtps协议也是通过 SSL/TLS 在传输层上通过对信息加密来保证安全性</p>
