@@ -81,17 +81,13 @@
 
 
 
-<meta name="description" content="如果一个bug，需要运行百万次才触发一次，该如何排查这个问题？">
-<meta property="og:type" content="article">
-<meta property="og:title" content="极低概率bug排查">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-26/极低概率bug排查/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="曾经浮华的小窝">
+<meta property="og:url" content="http://www.xiaocc.xyz/page/3/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="如果一个bug，需要运行百万次才触发一次，该如何排查这个问题？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-18T03:46:52.430Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="极低概率bug排查">
-<meta name="twitter:description" content="如果一个bug，需要运行百万次才触发一次，该如何排查这个问题？">
+<meta name="twitter:title" content="曾经浮华的小窝">
 
 
 
@@ -121,13 +117,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-26/极低概率bug排查/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/page/3/"/>
 
 
 
 
 
-  <title>极低概率bug排查 | 曾经浮华的小窝</title>
+  <title>曾经浮华的小窝</title>
   
 
 
@@ -155,7 +151,8 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left 
+  page-home">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -258,9 +255,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-expand">
     
+      
 
   
 
@@ -273,7 +270,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-26/极低概率bug排查/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-05/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -290,7 +287,9 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">极低概率bug排查</h1>
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018-05-05/hello-world/" itemprop="url">Hello World</a></h1>
         
 
         <div class="post-meta">
@@ -302,8 +301,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-26T18:00:00+08:00">
-                2018-05-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T12:00:00+08:00">
+                2018-05-05
               </time>
             
 
@@ -313,28 +312,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/编程实践/" itemprop="url" rel="index">
-                    <span itemprop="name">编程实践</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -342,7 +319,7 @@
 
           
           
-             <span id="/2018-05-26/极低概率bug排查/" class="leancloud_visitors" data-flag-title="极低概率bug排查">
+             <span id="/2018-05-05/hello-world/" class="leancloud_visitors" data-flag-title="Hello World">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -373,44 +350,16 @@
       
 
       
-        <p>如果一个bug，需要运行百万次才触发一次，该如何排查这个问题？</p>
-<a id="more"></a>
-<h4><span id="起因">起因</span></h4><p>前几天在内部论坛看到一篇技术贴，关于一个极低概率触发的bug，如何分析与排查。</p>
-<p>借此机会，写一下阅读心得。</p>
-<p>知乎上有一个段子，说是一个面试官出了道题，如果一个bug运行百万次才能触发一次，该如何排查？<br>面试者当场懵逼，很多人讨伐面试官，说这个题目就是故意为难人，考察不到实质内容。</p>
-<p>其实这个问题，挺有意思，可以考察被面试者，在碰到不熟悉的领域以及高困难环境下的分析与应对情况。</p>
-<h4><span id="现象">现象</span></h4><p>文中，作者做https的通用接入平台，每天数百亿次的请求，需要高性能，因而对nginx的底层代码更改很多，特别是握手那块逻辑。<br>自测没问题，线上小流量测试，总是跑个一天左右，会出现进程core的情况。</p>
-<p>如何解决这个棘手的问题？</p>
-<h4><span id="core文件">core文件</span></h4><p>要解决一个bug，最好能够拿到bug触发后的现场，也就是coredump文件，这是进程挂掉最后的遗言。</p>
-<p>也有高手，通过逐行看代码来进行排查，但是面对代码量几十万行的项目，犹如大海捞针。</p>
-<p>开启系统core文件生成后，看看能不能从core文件中有所发现。</p>
-<p>由于nginx的网络框架，数据read后，可能走两个不同的分支逻辑，例如第一次接收数据后，请求包不完整，调用函数A，第二次接收数据后，整个请求包完整，调用函数B，这个时候core文件产生，函数调用栈中只能看到函数B，没有函数A的相关信息，而问题可能是函数A导致，所以整个coredump文件分析下来，没有直接发现问题。</p>
-<p>只是有一个点比较极怪，有一个不可能为空的指针，居然出现为空的情况，这个指针是会话创建之初构建的。</p>
-<h4><span id="复现bug">复现bug</span></h4><p>要排查一个bug，如果能够将bug复现，甚至于必现，那将极大的加快排查速度，可以对关键路径添加日志，然后测试新代码。</p>
-<p>可是一个极低概率触发的bug，如何复现？</p>
-<p>可以自己构造请求以复现，作者特地开发压测工具，以几万/秒的请求量进行压测，晚上开启压测工具，第二天上午就可以收到core文件。</p>
-<h4><span id="排查bug">排查bug</span></h4><p>虽然有了复现bug的方法，也有了core文件，可是从core文件中并不能分析出来有价值的信息。</p>
-<p>那只能通过修改代码，添加日志的方式来进行排查。</p>
-<p>通过添加日志来进行排查，就有讲究了。</p>
-<p>如果日志过多过细，将导致服务性能上不来，原本服务性能几万/秒，可能降低到几百/秒，而且由于日志过多，降低了并发性能，bug可能借此被掩盖而不触发。</p>
-<p>如果日志过少，没有一次请求的全路径信息，不能分析出bug具体出现在哪个点。</p>
-<p>面对这个两难的选择，如何解决？</p>
-<p>作者针对日志系统做了改进，增加日志的粒度，由于bug是低概率触发，绝大部分请求的处理逻辑都是正常的，日志打出来也没用，最好日志系统能抓到那次有问题的请求。<br>作者针对于海量请求，随机触发该次请求的全路径详细日志打印，这样既不会过于降低性能，也不会丢失全路径的详细信息。</p>
-<p>接下来，就是将改进后的代码上线，用工具进行压测，然后，等。。。</p>
-<p>撞大运的事情，终究还是没有发生。。。</p>
-<p>但是，整个日志改造的过程中，作者对于项目代码愈发熟练，对于请求的整个处理流程犹如刻在脑海。</p>
-<h4><span id="分析bug">分析bug</span></h4><p>作者通过与同事讨论交流，分析bug的触发时间点，均在凌晨4-6点，而白天正常，一次core也未发生，这比较奇怪。</p>
-<p>突然灵机一动，联想到凌晨网络运营商会进行维护，可能产生大量异常请求包，是不是这个原因导致的bug发生。</p>
-<p>作者对压测工具进行改造，故意构造一些异常请求，例如tcp三次握手，发了sync包后，就直接将连接close，请求包不完整等等case。</p>
-<p>功夫不负有心人，新版压测工具上线后，不出一个小时就能复现bug，结合网络异常这个点，将代码相关逻辑检查、添加日志，很快就分析出了bug具体原因，session复用机制导致的问题。</p>
-<h4><span id="总结">总结</span></h4><p>这篇文章给出了排查极低概率bug的套路：</p>
-<ul>
-<li>复现bug，可以考虑构造压测工具</li>
-<li>分析bug，可以通过core文件或者在可疑点添加日志</li>
-<li>与同事交流、讨论、思考，分析bug可能触发的原因与场景</li>
-<li>针对性修改压测工具、添加关键点日志</li>
-</ul>
-
+        
+          <p>Hexo用法简介</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018-05-05/hello-world/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
       
     </div>
     
@@ -427,32 +376,12 @@
       
 
       
-      
+
       
 
       
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018-05-15/关于PayPal通知校验的思考/" rel="next" title="关于PayPal支付接入的思考——通知校验机制">
-                <i class="fa fa-chevron-left"></i> 关于PayPal支付接入的思考——通知校验机制
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-28/hbase_schema_design/" rel="prev" title="hbase schema design阅读笔记">
-                hbase schema design阅读笔记 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
-
-      
+        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -462,11 +391,14 @@
   </article>
 
 
+    
+  </section>
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
+
 
 
           </div>
@@ -474,10 +406,6 @@
 
 
           
-
-  
-
-
 
         </div>
         
@@ -498,17 +426,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -568,22 +487,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">core文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">复现bug</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">排查bug</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">分析bug</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -738,10 +641,6 @@
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 
