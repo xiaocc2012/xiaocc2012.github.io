@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="C++17学习笔记系列">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-30T13:48:43.316Z">
+<meta property="og:updated_time" content="2018-09-30T14:22:01.823Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++17学习笔记(3)——容器、指针、线程">
 <meta name="twitter:description" content="C++17学习笔记系列">
@@ -396,19 +396,20 @@
 <li>std::get&lt;N&gt;() 获得元组中某个位置的值<br> 其中N为编译期固定值，包括数字常量值、constexpr值<br> 如何在运行期获取tuple中的值，接下来会介绍</li>
 <li><p>std::tie 从tuple中获取解值</p>
  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// packing/unpacking tuples</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;     // std::cout</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;tuple&gt;        // std::tuple, std::make_tuple, std::tie</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> myint;</span><br><span class="line">  <span class="keyword">char</span> mychar;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::tuple&lt;<span class="keyword">int</span>,<span class="keyword">float</span>,<span class="keyword">char</span>&gt; mytuple;</span><br><span class="line"></span><br><span class="line">  mytuple = <span class="built_in">std</span>::make_tuple (<span class="number">10</span>, <span class="number">2.6</span>, <span class="string">'a'</span>);          <span class="comment">// packing values into tuple</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::tie (myint, <span class="built_in">std</span>::ignore, mychar) = mytuple;   <span class="comment">// unpacking tuple into variables</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"myint contains: "</span> &lt;&lt; myint &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"mychar contains: "</span> &lt;&lt; mychar &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在运行期索引tuple值<br> 利用 <code>boost::variant</code> 配合变长模板参数的黑魔法</p>
- <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;boost/variant.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span> n, <span class="keyword">typename</span>... T&gt;</span><br><span class="line">boost::variant&lt;T...&gt; _tuple_index(<span class="keyword">size_t</span> i, <span class="keyword">const</span> <span class="built_in">std</span>::tuple&lt;T...&gt;&amp; tpl) &#123;</span><br><span class="line">    <span class="keyword">if</span> (i == n)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">std</span>::get&lt;n&gt;(tpl);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="keyword">sizeof</span>...(T) - <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="built_in">std</span>::out_of_range(<span class="string">"越界."</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> _tuple_index&lt;(n &lt; <span class="keyword">sizeof</span>...(T)<span class="number">-1</span> ? n+<span class="number">1</span> : <span class="number">0</span>)&gt;(i, tpl);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... T&gt;</span><br><span class="line">boost::variant&lt;T...&gt; tuple_index(<span class="keyword">size_t</span> i, <span class="keyword">const</span> <span class="built_in">std</span>::tuple&lt;T...&gt;&amp; tpl) &#123;</span><br><span class="line">    <span class="keyword">return</span> _tuple_index&lt;<span class="number">0</span>&gt;(i, tpl);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p> <strong>解释：</strong></p>
+<ul>
+<li><p>在运行期索引tuple值<br>利用 <code>boost::variant</code> 配合变长模板参数的黑魔法</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;boost/variant.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">size_t</span> n, <span class="keyword">typename</span>... T&gt;</span><br><span class="line">boost::variant&lt;T...&gt; _tuple_index(<span class="keyword">size_t</span> i, <span class="keyword">const</span> <span class="built_in">std</span>::tuple&lt;T...&gt;&amp; tpl) &#123;</span><br><span class="line">    <span class="keyword">if</span> (i == n)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">std</span>::get&lt;n&gt;(tpl);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="keyword">sizeof</span>...(T) - <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="built_in">std</span>::out_of_range(<span class="string">"越界."</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> _tuple_index&lt;(n &lt; <span class="keyword">sizeof</span>...(T)<span class="number">-1</span> ? n+<span class="number">1</span> : <span class="number">0</span>)&gt;(i, tpl);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... T&gt;</span><br><span class="line">boost::variant&lt;T...&gt; tuple_index(<span class="keyword">size_t</span> i, <span class="keyword">const</span> <span class="built_in">std</span>::tuple&lt;T...&gt;&amp; tpl) &#123;</span><br><span class="line">    <span class="keyword">return</span> _tuple_index&lt;<span class="number">0</span>&gt;(i, tpl);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>解释：</strong></p>
 <ol>
 <li><code>std::tuple</code> tpl 在其定义时，其能保存的元素个数已经确定，并且在编译期可以获取，也就是 <code>sizeof...(T)</code> 。</li>
 <li><code>std::get&lt;N&gt;()</code> 中 <code>N</code> 只能是常量值，既然要运行期获取tpl中某index值，那么该index可取值区间为 <code>[0, Len - 1]</code> ，那么可以采取一种笨方法，通过获取 <code>get&lt;0&gt;,get&lt;1&gt; ... get&lt;Len - 1&gt;</code> 逐个与index比较，最终即可获取到下标为index的值。</li>
 <li><code>tuple_index</code> 函数，从 <code>0</code> 开始尝试，并在编译期实例化大量的 <code>_tuple_index</code> 函数，即 <code>_tuple_index&lt;0&gt;</code>，<code>_tuple_index&lt;1&gt;</code>，… <code>_tuple_index&lt;Len - 1&gt;</code>，而其中每个函数即可调用 <code>std::get&lt;0&gt;</code>，<code>std::get&lt;1&gt;</code>，… <code>std::get&lt;Len - 1&gt;</code>。</li>
-<li><p>详细过程：<br> 在 <code>_tuple_index&lt;0&gt;</code> 中判断 <code>i</code>，<code>n</code> 值，如果不符，继续往上递归增长式调用 <code>_tuple_index&lt;1&gt;</code>，再次判断 <code>i</code>，<code>n</code>值，如果不符，则调用 <code>_tuple_index&lt;2&gt;</code>，如此往复，直到某个 <code>n</code> 值与 <code>i</code> 相等，则此时调用 <code>std::get&lt;n&gt;(tpl)</code> 获取tpl中值。</p>
+<li>详细过程：<br>在 <code>_tuple_index&lt;0&gt;</code> 中判断 <code>i</code>，<code>n</code> 值，如果不符，继续往上递归增长式调用 <code>_tuple_index&lt;1&gt;</code>，再次判断 <code>i</code>，<code>n</code>值，如果不符，则调用 <code>_tuple_index&lt;2&gt;</code>，如此往复，直到某个 <code>n</code> 值与 <code>i</code> 相等，则此时调用 <code>std::get&lt;n&gt;(tpl)</code> 获取tpl中值。</li>
+</ol>
 <p><strong>使用方式：</strong></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">tuple_len</span><span class="params">(T &amp;tpl)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::tuple_size&lt;T&gt;::value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 迭代</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i != tuple_len(new_tuple); ++i) &#123;</span><br><span class="line">    <span class="comment">// 运行期索引</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; tuple_index(i, new_tuple) &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
-</ol>
+</ul>
 </li>
 </ul>
 </li>
@@ -426,8 +427,10 @@
 </li>
 <li><p>线程与并发</p>
 <ul>
-<li>std::thread</li>
-<li>std::mutex<ul>
+<li><p>std::thread</p>
+</li>
+<li><p>std::mutex</p>
+<ul>
 <li>std::lock_guard<br> RAII，构造函数lock，析构函数unlock</li>
 <li>std::unique_lock<br> 默认行为与std::lock_guard一致，但是提供lock、unlock函数手动操作mutex</li>
 </ul>
@@ -473,6 +476,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018-12-05/协程原理解析1/" rel="prev" title="协程原理解析(1)">
+                协程原理解析(1) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -540,7 +547,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
