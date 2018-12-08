@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="探讨C/C++协程实现原理，分析协程实现依赖的四大函数">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-05T14:59:50.346Z">
+<meta property="og:updated_time" content="2018-12-05T15:12:41.992Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="协程原理解析(1)">
 <meta name="twitter:description" content="探讨C/C++协程实现原理，分析协程实现依赖的四大函数">
@@ -390,14 +390,12 @@
 <p>通过以上方案对比可以发现，采用协程后代码逻辑清晰易懂，同时代码量也更少，出问题后更利于排查。</p>
 <h4><span id="协程原理">协程原理</span></h4><p>协程按类型分为：</p>
 <ul>
-<li><p><code>非对称式协程</code>，协程之间有调用链关系，一个协程A释放控制权有2种方式</p>
-<ul>
+<li><code>非对称式协程</code>，协程之间有调用链关系，一个协程A释放控制权有2种方式<ul>
 <li>通过调用<code>yield</code>，将控制权返还给协程A的创建协程</li>
 <li>通过调用<code>resume</code>，将控制权交给一个子协程</li>
 </ul>
 </li>
-<li><p><code>对称式协程</code>，与<code>非对称式协程</code>不同，各个协程之间可以互相转移控制权，类似于goto语句，这种方式，即使非常有经验的程序员也很难理清调用流程。同时该协程方式实现困难，性能不高。</p>
-</li>
+<li><code>对称式协程</code>，与<code>非对称式协程</code>不同，各个协程之间可以互相转移控制权，类似于goto语句，这种方式，即使非常有经验的程序员也很难理清调用流程。同时该协程方式实现困难，性能不高。</li>
 </ul>
 <p>业内实现的C/C++协程基本都采用<code>非对称</code>的协程方式。</p>
 <p>协程实现主要依赖以下四个系统级函数：</p>
@@ -455,6 +453,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018-12-06/协程原理解析2/" rel="prev" title="协程原理解析(2)">
+                协程原理解析(2) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -531,7 +533,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

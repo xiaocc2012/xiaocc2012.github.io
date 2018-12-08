@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="5N2yIHPcI9plNoKG2bG_5pWzaFZaOlpGfq5EQNeE--o" />
+<meta name="baidu-site-verification" content="heO0pF7brw" />
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="探讨与分析实现协程依赖的四大函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协程原理解析(2)">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-06/协程原理解析2/index.html">
+<meta property="og:site_name" content="曾经浮华的小窝">
+<meta property="og:description" content="探讨与分析实现协程依赖的四大函数">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-08T13:36:31.797Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="协程原理解析(2)">
+<meta name="twitter:description" content="探讨与分析实现协程依赖的四大函数">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-06/协程原理解析2/"/>
+
+
+
+
+
+  <title>协程原理解析(2) | 曾经浮华的小窝</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-118964254-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曾经浮华的小窝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">hello,world!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-12-06/协程原理解析2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="曾经浮华">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曾经浮华的小窝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">协程原理解析(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-06T22:00:00+08:00">
+                2018-12-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018-12-06/协程原理解析2/" class="leancloud_visitors" data-flag-title="协程原理解析(2)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>探讨与分析实现协程依赖的四大函数</p>
+<a id="more"></a>
+<h4><span id="背景">背景</span></h4><p>接上篇讲到协程的实现需要依赖四大函数：</p>
+<ul>
+<li><code>int getcontext(ucontext_t *ucp);</code></li>
+<li><code>void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);</code></li>
+<li><code>int swapcontext(ucontext_t *oucp, ucontext_t *ucp);</code></li>
+<li><code>int setcontext(const ucontext_t *ucp);</code></li>
+</ul>
+<p>本篇具体分析这四大函数的功能与实现，代码阅读阅读工具采用：<br><a href="https://code.woboq.org/" target="_blank" rel="noopener">woboq在线源码阅读平台</a></p>
+<h4><span id="实际例子">实际例子</span></h4><p>先看看使用四大函数构造协程的一个简单例子，例子中函数<code>f1</code>、<code>f2</code>交替运行。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ucontext.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//main-&gt;f1-&gt;f2</span></span><br><span class="line"><span class="comment">//ut[0]-&gt;ut[1]-&gt;ut[2]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">ucontext_t</span> ut[<span class="number">3</span>];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i != <span class="number">10</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"f1:%d\n"</span>, i);</span><br><span class="line">        swapcontext(&amp;ut[<span class="number">1</span>], &amp;ut[<span class="number">2</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i != <span class="number">10</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"f2:%d\n"</span>, i);</span><br><span class="line">        swapcontext(&amp;ut[<span class="number">2</span>], &amp;ut[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> stack_buff[<span class="number">4096</span>];</span><br><span class="line">    <span class="keyword">char</span> stack_buff2[<span class="number">4096</span>];</span><br><span class="line"></span><br><span class="line">    getcontext(&amp;ut[<span class="number">1</span>]);</span><br><span class="line">    ut[<span class="number">1</span>].uc_stack.ss_sp = stack_buff;</span><br><span class="line">    ut[<span class="number">1</span>].uc_stack.ss_size = <span class="keyword">sizeof</span>(stack_buff);</span><br><span class="line">    ut[<span class="number">1</span>].uc_link = &amp;ut[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">    makecontext(&amp;ut[<span class="number">1</span>], f1, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    getcontext(&amp;ut[<span class="number">2</span>]);</span><br><span class="line">    ut[<span class="number">2</span>].uc_stack.ss_sp = stack_buff2;</span><br><span class="line">    ut[<span class="number">2</span>].uc_stack.ss_size = <span class="keyword">sizeof</span>(stack_buff2);</span><br><span class="line">    ut[<span class="number">2</span>].uc_link = &amp;ut[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    makecontext(&amp;ut[<span class="number">2</span>], f2, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    swapcontext(&amp;ut[<span class="number">0</span>], &amp;ut[<span class="number">1</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Stack Overflow上有一个问题：<br><a href="https://stackoverflow.com/questions/19503925/what-does-the-getcontext-system-call-ucontext-h-really-do" target="_blank" rel="noopener">What does the getcontext system call (ucontext.h) really do?</a></p>
+<p>提问者问道：</p>
+<ul>
+<li><code>getcontext</code>究竟干了什么</li>
+<li>与<code>makecontext</code>有什么区别</li>
+<li>为什么不能直接定义一个<code>ucontext_t</code>结构，然后初始化并调用<code>makecontext</code>，再使用<code>swapcontext</code>或者<code>setcontext</code>激活context</li>
+<li>为什么不按照man page要求的<strong>在调用makecontext之前必须调用getcontext</strong>程序就会报错</li>
+</ul>
+<p>为了解决这些疑惑，我们深入到源码级别，看看这些函数到底做了什么。</p>
+<h4><span id="ucontext_t">ucontext_t</span></h4><p>先看看这个最重要的结构的定义</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">ucontext</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ucontext</span> *<span class="title">uc_link</span>;</span></span><br><span class="line">    <span class="keyword">sigset_t</span>         uc_sigmask;</span><br><span class="line">    <span class="keyword">stack_t</span>          uc_stack;</span><br><span class="line">    <span class="keyword">mcontext_t</span>       uc_mcontext;</span><br><span class="line">    ...</span><br><span class="line">&#125; <span class="keyword">ucontext_t</span>;</span><br></pre></td></tr></table></figure>
+<p>其中<code>mcontext_t</code>的定义依赖于特定平台，主要包含寄存器等结构<br><code>uc_link</code>表示该context执行完毕之后，下一个需要激活的context<br><code>stack_t</code>指定context运行时候的stack<br><code>sigset_t</code>主要是该context需要屏蔽的信号</p>
+<h4><span id="int-getcontextucontext_t-ucp">int getcontext(ucontext_t *ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/getcontext.S.html" target="_blank" rel="noopener">getcontext在线代码</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sysdep.h&gt;</span><br><span class="line">#include &lt;asm/prctl.h&gt;</span><br><span class="line">#include &quot;ucontext_i.h&quot;</span><br><span class="line">/*  int __getcontext (ucontext_t *ucp)</span><br><span class="line">  Saves the machine context in UCP such that when it is activated,</span><br><span class="line">  it appears as if __getcontext() returned again.</span><br><span class="line">  This implementation is intended to be used for *synchronous* context</span><br><span class="line">  switches only.  Therefore, it does not have to save anything</span><br><span class="line">  other than the PRESERVED state.  */</span><br><span class="line">ENTRY(__getcontext)</span><br><span class="line">        /* Save the preserved registers, the registers used for passing</span><br><span class="line">           args, and the return address.  */</span><br><span class="line">        movq        %rbx, oRBX(%rdi)</span><br><span class="line">        movq        %rbp, oRBP(%rdi)</span><br><span class="line">        movq        %r12, oR12(%rdi)</span><br><span class="line">        movq        %r13, oR13(%rdi)</span><br><span class="line">        movq        %r14, oR14(%rdi)</span><br><span class="line">        movq        %r15, oR15(%rdi)</span><br><span class="line">        movq        %rdi, oRDI(%rdi)</span><br><span class="line">        movq        %rsi, oRSI(%rdi)</span><br><span class="line">        movq        %rdx, oRDX(%rdi)</span><br><span class="line">        movq        %rcx, oRCX(%rdi)</span><br><span class="line">        movq        %r8, oR8(%rdi)</span><br><span class="line">        movq        %r9, oR9(%rdi)</span><br><span class="line">        movq        (%rsp), %rcx</span><br><span class="line">        movq        %rcx, oRIP(%rdi)</span><br><span class="line">        leaq        8(%rsp), %rcx         /* Exclude the return address.  */</span><br><span class="line">        movq        %rcx, oRSP(%rdi)</span><br><span class="line">#if SHSTK_ENABLED</span><br><span class="line">        /* Check if shadow stack is enabled.  */</span><br><span class="line">        testl        $X86_FEATURE_1_SHSTK, %fs:FEATURE_1_OFFSET</span><br><span class="line">        jz        L(no_shstk)</span><br><span class="line">        /* Save RDI in RDX which won&apos;t be clobbered by syscall.  */</span><br><span class="line">        movq        %rdi, %rdx</span><br><span class="line">        xorl        %eax, %eax</span><br><span class="line">        cmpq        %fs:SSP_BASE_OFFSET, %rax</span><br><span class="line">        jnz        L(shadow_stack_bound_recorded)</span><br><span class="line">        /* Get the base address and size of the default shadow stack</span><br><span class="line">           which must be the current shadow stack since nothing has</span><br><span class="line">           been recorded yet.  */</span><br><span class="line">        sub        $24, %RSP_LP</span><br><span class="line">        mov        %RSP_LP, %RSI_LP</span><br><span class="line">        movl        $ARCH_CET_STATUS, %edi</span><br><span class="line">        movl        $__NR_arch_prctl, %eax</span><br><span class="line">        syscall</span><br><span class="line">        testq        %rax, %rax</span><br><span class="line">        jz        L(continue_no_err)</span><br><span class="line">        /* This should never happen.  */</span><br><span class="line">        hlt</span><br><span class="line">L(continue_no_err):</span><br><span class="line">        /* Record the base of the current shadow stack.  */</span><br><span class="line">        movq        8(%rsp), %rax</span><br><span class="line">        movq        %rax, %fs:SSP_BASE_OFFSET</span><br><span class="line">        add        $24, %RSP_LP</span><br><span class="line">        /* Restore RDI.  */</span><br><span class="line">        movq        %rdx, %rdi</span><br><span class="line">L(shadow_stack_bound_recorded):</span><br><span class="line">        /* Get the current shadow stack pointer.  */</span><br><span class="line">        rdsspq        %rax</span><br><span class="line">        /* NB: Save the caller&apos;s shadow stack so that we can jump back</span><br><span class="line">           to the caller directly.  */</span><br><span class="line">        addq        $8, %rax</span><br><span class="line">        movq        %rax, oSSP(%rdx)</span><br><span class="line">        /* Save the current shadow stack base in ucontext.  */</span><br><span class="line">        movq        %fs:SSP_BASE_OFFSET, %rax</span><br><span class="line">        movq        %rax, (oSSP + 8)(%rdi)</span><br><span class="line">L(no_shstk):</span><br><span class="line">#endif</span><br><span class="line">        /* We have separate floating-point register content memory on the</span><br><span class="line">           stack.  We use the __fpregs_mem block in the context.  Set the</span><br><span class="line">           links up correctly.  */</span><br><span class="line">        leaq        oFPREGSMEM(%rdi), %rcx</span><br><span class="line">        movq        %rcx, oFPREGS(%rdi)</span><br><span class="line">        /* Save the floating-point environment.  */</span><br><span class="line">        fnstenv        (%rcx)</span><br><span class="line">        fldenv        (%rcx)</span><br><span class="line">        stmxcsr oMXCSR(%rdi)</span><br><span class="line">        /* Save the current signal mask with</span><br><span class="line">           rt_sigprocmask (SIG_BLOCK, NULL, set,_NSIG/8).  */</span><br><span class="line">        leaq        oSIGMASK(%rdi), %rdx</span><br><span class="line">        xorl        %esi,%esi</span><br><span class="line">#if SIG_BLOCK == 0</span><br><span class="line">        xorl        %edi, %edi</span><br><span class="line">#else</span><br><span class="line">        movl        $SIG_BLOCK, %edi</span><br><span class="line">#endif</span><br><span class="line">        movl        $_NSIG8,%r10d</span><br><span class="line">        movl        $__NR_rt_sigprocmask, %eax</span><br><span class="line">        syscall</span><br><span class="line">        cmpq        $-4095, %rax                /* Check %rax for error.  */</span><br><span class="line">        jae        SYSCALL_ERROR_LABEL     /* Jump to error handler if error.  */</span><br><span class="line">        /* All done, return 0 for success.  */</span><br><span class="line">        xorl        %eax, %eax</span><br><span class="line">        ret</span><br><span class="line">PSEUDO_END(__getcontext)</span><br><span class="line">weak_alias (__getcontext, getcontext)</span><br></pre></td></tr></table></figure>
+<p>主要是将当前context的相关寄存器值保存，相当于保护现场</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx         /* Exclude the return address.  */</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
+<p>这里需要对C++中函数调用栈熟悉，函数调用时候，先对参数压栈，再压入返回地址，再执行被调函数体指令。</p>
+<p>由于是在当前context中调用得<code>getcontext</code>函数，所以<code>(%rsp)</code>中保存的即是函数返回地址，也就是执行完<code>getcontext</code>这个函数之后需要执行的下一个指令的地址。<br><code>8(%rsp)</code>值即是当前context的栈顶排除返回地址之后的值。</p>
+<p>由于执行context即是由代码+数据组成，保存了相关寄存器的值主要是<code>rip</code>值，同时把当前栈的<code>rsp</code>值也保存了，这样便可以通过这些数据恢复context以继续执行。</p>
+<p>这其中还有一个很重要的操作，保存了浮点寄存器相关数据。</p>
+<h4><span id="void-makecontextucontext_t-ucp-void-func-int-argc">void makecontext(ucontext_t <em>ucp, void (</em>func)(), int argc, …)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/makecontext.c.html" target="_blank" rel="noopener">makecontext在线代码</a></p>
+<p>该函数由C语言实现，代码前部的注释中简明介绍了该函数的工作</p>
+<p>该函数主要是进行栈准备工作，并保存相关值到<code>uc_mcontext</code>的寄存器结构中，同时把<code>uc_link</code>值也做了保存，而需要传递给<code>func</code>函数的参数，一部分保存在寄存器中，剩下的保存在栈中。</p>
+<p>栈布局结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">           +-----------------------+</span><br><span class="line">           | next context          |</span><br><span class="line">           +-----------------------+</span><br><span class="line">           | parameter 7-n         |</span><br><span class="line">           +-----------------------+</span><br><span class="line">           | trampoline address    |</span><br><span class="line">%rsp -&gt;    +-----------------------+</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/* Setup context ucp.  */</span><br><span class="line">/* Address to jump to.  */</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RIP] = (uintptr_t) func;</span><br><span class="line">/* Setup rbx.*/</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RBX] = (uintptr_t) &amp;sp[idx_uc_link];</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RSP] = (uintptr_t) sp;</span><br><span class="line"></span><br><span class="line">sp[0] = (uintptr_t) &amp;__start_context;</span><br><span class="line">sp[idx_uc_link] = (uintptr_t) ucp-&gt;uc_link;</span><br></pre></td></tr></table></figure>
+<p>这其中一个巧妙之处在于，如何实现在该context执行完毕后自动激活<code>uc_link</code>并执行？</p>
+<p>在该函数中把返回地址巧妙的设置为<code>__start_context</code>，这样，当<code>func</code>函数执行完毕后即会转到<code>__start_context</code>执行，而在该函数中即可实现激活<code>uc_link</code>并执行。</p>
+<h4><span id="int-swapcontextucontext_t-oucp-ucontext_t-ucp">int swapcontext(ucontext_t <em>oucp, ucontext_t </em>ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/swapcontext.S.html" target="_blank" rel="noopener">swapcontext在线代码</a></p>
+<p>当<code>makecontext</code>做好准备工作后，即由该函数进行context切换，把执行流程切到另外一个context。</p>
+<p>该函数首先将当前context的相关寄存器值保存到<code>oucp</code>中，而第54-57行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx       /* Exclude the return address.  */</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
+<p>当前<code>rsp</code>指向的地址中存储的即是返回地址，也就是调用<code>swapcontext</code>后当前协程需要执行的下一个指令地址。<br><code>swapcontext</code>函数没有返回值，因为在其内部会发生执行流程的跳转，控制权会转移到另外的context。<br><code>8(%rsp)</code>的值即是排除返回地址后的当前栈顶地址。<br>保存当前context的相关信息后，将来控制权再切回来时，就能正确的恢复现场。</p>
+<p>剩下的工作即是用<code>ucp</code>中保存的信息，设置相关寄存器值，如<code>rsp</code>、<code>rbp</code>等。<br>我们知道程序的指令寄存器为<code>rip</code>，只有改变该寄存器值才能改变程序的执行流程，关键在于函数底部的第231-248行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/* The following ret should return to the address set with</span><br><span class="line">        getcontext.  Therefore push the address on the stack.  */</span><br><span class="line">movq        oRIP(%rdx), %rcx</span><br><span class="line">pushq        %rcx</span><br><span class="line">/* Setup registers used for passing args.  */</span><br><span class="line">movq        oRDI(%rdx), %rdi</span><br><span class="line">movq        oRSI(%rdx), %rsi</span><br><span class="line">movq        oRCX(%rdx), %rcx</span><br><span class="line">movq        oR8(%rdx), %r8</span><br><span class="line">movq        oR9(%rdx), %r9</span><br><span class="line">/* Setup finally %rdx.  */</span><br><span class="line">movq        oRDX(%rdx), %rdx</span><br><span class="line">/* Clear rax to indicate success.  */</span><br><span class="line">xorl        %eax, %eax</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+<p>将<code>ucp</code>中保存的<strong>返回地址压栈</strong>，该返回地址即是该协程之前执行<code>swapcontext</code>的那个点，因为只有执行该函数才能将控制权转移给别的协程，现在如果把控制权再切回该协程，下一个需要执行的指令地址是多少呢？<br>即是当初调用<code>swapcontext</code>函数时候的返回地址，然后执行<code>ret</code>指令，该指令将当前栈上的值弹出并保存到<code>rip</code>，到这里控制权完成切换，从协程<code>oucp</code>切换到<code>ucp</code>。</p>
+<h4><span id="int-setcontextconst-ucontext_t-ucp">int setcontext(const ucontext_t *ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/setcontext.S.html" target="_blank" rel="noopener">setcontext在线代码</a></p>
+<p>该函数功能与<code>swapcontext</code>类似，将控制权转移到<code>ucp</code>中。</p>
+<h4><span id="为什么必须调用getcontext">为什么必须调用<code>getcontext</code></span></h4><p>在<code>getcontext</code>中保存了浮点寄存器相关值，该值在<code>swapcontext</code>、<code>setcontext</code>中都有使用，否则调用时会发生异常。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018-12-05/协程原理解析1/" rel="next" title="协程原理解析(1)">
+                <i class="fa fa-chevron-left"></i> 协程原理解析(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">曾经浮华</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">实际例子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">ucontext_t</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">int getcontext(ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">void makecontext(ucontext_t ucp, void (func)(), int argc, …)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">int swapcontext(ucontext_t oucp, ucontext_t ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">int setcontext(const ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">8.</span> <span class="nav-text">为什么必须调用getcontext</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">曾经浮华</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jlEvdVWxJMzPqUQInKc4Kz6y-gzGzoHsz", "0aA7UQThN5OCpguntTJf4gRp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
