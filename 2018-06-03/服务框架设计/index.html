@@ -88,15 +88,15 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="最近在研究raft论文，想动手实现一下，但是手上没有合适的网络框架，花了几天造了个轮子。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-174640.jpg">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-175915.jpg">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-181150.jpg">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-201920.jpg">
-<meta property="og:updated_time" content="2018-09-18T03:43:33.859Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-175915.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-181150.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-201920.jpg">
+<meta property="og:updated_time" content="2018-12-15T11:17:07.219Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="服务框架设计">
 <meta name="twitter:description" content="最近在研究raft论文，想动手实现一下，但是手上没有合适的网络框架，花了几天造了个轮子。">
-<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-174640.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg">
 
 
 
@@ -382,10 +382,10 @@
 <a id="more"></a>
 <h4><span id="起因">起因</span></h4><p>raft论文去年看过一遍，最近重读，发现上次阅读的东西，一点都不记得。。。<br>决定这次跟着论文简单的实现一遍，加深理解，手上没有合适的网络框架，学go呢，又来不及，花了几天造了个轮子，总算是跑起来了。</p>
 <p><strong>设计思想参考公司内部网络框架，将其部分精简</strong></p>
-<h4><span id="框架设计">框架设计</span></h4><p>底层网络框架依托ZMQ，采用事件驱动形式，client与server端交互图如下：<br><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-174640.jpg" alt=""></p>
-<h4><span id="worker_dispatcher">worker_dispatcher</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-175915.jpg" alt=""><br>以ZMQ_ROUTER的形式对接监听tcp端口，将client请求通过内部inproc的socket负载均衡的转发给worker进行处理<br>数据转发给worker时，将ZMQ_ROUTER的identity帧一并发送，这样待worker处理完毕，通过inproc的socket返回数据时，ZMQ_ROUTER能将数据返回给请求对应的client</p>
-<h4><span id="worker">worker</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-181150.jpg" alt=""><br>创建ZMQ_DEALER的inproc的socket，并与worker_dispatcher连接，以此处理其转发过来的client的请求<br>当其要请求其它服务时，统一通过client_dispatcher对外处理</p>
-<h4><span id="client_dispather">client_dispather</span></h4><p><img src="http://p9ffylu89.bkt.clouddn.com/Jietu20180603-201920.jpg" alt=""><br>其通过inproc的socket接收worker中对其它服务的请求，并管理对外连接，释放长时间不使用的连接等<br>待下游服务返回数据，其通过inproc的socket返回给对应的worker</p>
+<h4><span id="框架设计">框架设计</span></h4><p>底层网络框架依托ZMQ，采用事件驱动形式，client与server端交互图如下：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg" alt=""></p>
+<h4><span id="worker_dispatcher">worker_dispatcher</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-175915.jpg" alt=""><br>以ZMQ_ROUTER的形式对接监听tcp端口，将client请求通过内部inproc的socket负载均衡的转发给worker进行处理<br>数据转发给worker时，将ZMQ_ROUTER的identity帧一并发送，这样待worker处理完毕，通过inproc的socket返回数据时，ZMQ_ROUTER能将数据返回给请求对应的client</p>
+<h4><span id="worker">worker</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-181150.jpg" alt=""><br>创建ZMQ_DEALER的inproc的socket，并与worker_dispatcher连接，以此处理其转发过来的client的请求<br>当其要请求其它服务时，统一通过client_dispatcher对外处理</p>
+<h4><span id="client_dispather">client_dispather</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-201920.jpg" alt=""><br>其通过inproc的socket接收worker中对其它服务的请求，并管理对外连接，释放长时间不使用的连接等<br>待下游服务返回数据，其通过inproc的socket返回给对应的worker</p>
 <p><em>下次讲一下定时器的设计</em></p>
 
       

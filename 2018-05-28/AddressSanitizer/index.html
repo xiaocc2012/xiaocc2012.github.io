@@ -88,12 +88,12 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="Google出品的内存检测工具AddressSanitizer介绍与分析">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/20180528214308.png">
-<meta property="og:updated_time" content="2018-09-18T03:46:22.612Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/20180528214308.png">
+<meta property="og:updated_time" content="2018-12-15T11:12:23.363Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内存检测工具AddressSanitizer">
 <meta name="twitter:description" content="Google出品的内存检测工具AddressSanitizer介绍与分析">
-<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/20180528214308.png">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/20180528214308.png">
 
 
 
@@ -410,7 +410,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><code>AddressSanitizer</code> 将其改写为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">char</span> redzone1[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];          <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">char</span> redzone2[<span class="number">24</span>];</span><br><span class="line">  <span class="keyword">char</span> redzone3[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">int</span>  *shadow_base = MemToShadow(redzone1);</span><br><span class="line">  shadow_base[<span class="number">0</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone1</span></span><br><span class="line">  shadow_base[<span class="number">1</span>] = <span class="number">0xffffff00</span>;  <span class="comment">// poison redzone2, unpoison 'a'</span></span><br><span class="line">  shadow_base[<span class="number">2</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone3</span></span><br><span class="line">  ...</span><br><span class="line">  shadow_base[<span class="number">0</span>] = shadow_base[<span class="number">1</span>] = shadow_base[<span class="number">2</span>] = <span class="number">0</span>; <span class="comment">// unpoison all</span></span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如图：<br><img src="http://p9ffylu89.bkt.clouddn.com/20180528214308.png" alt=""><br>将 <code>char a[8]</code> 两侧用 <code>redzone</code> 包夹，这样数组访问越界时，立马能够侦测。</p>
+<p>如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/20180528214308.png" alt=""><br>将 <code>char a[8]</code> 两侧用 <code>redzone</code> 包夹，这样数组访问越界时，立马能够侦测。</p>
 
       
     </div>

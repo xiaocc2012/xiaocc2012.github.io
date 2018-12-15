@@ -4,8 +4,134 @@
 
     
   <url>
+    <loc>http://www.xiaocc.xyz/2018-08-20/%E6%95%B0%E6%8D%AE%E5%88%86%E9%A1%B5%E6%8B%89%E5%8F%96%E6%9C%BA%E5%88%B6%E6%8E%A2%E8%AE%A8/</loc>
+    <lastmod>2018-12-15T11:17:50.128Z</lastmod>
+    <data>
+        <display>
+        <title>数据分页拉取机制探讨</title>
+        <pubTime>2018-08-20T15:30:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-06-03/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1/</loc>
+    <lastmod>2018-12-15T11:17:07.219Z</lastmod>
+    <data>
+        <display>
+        <title>服务框架设计</title>
+        <pubTime>2018-06-03T09:30:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-06-23/%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/</loc>
+    <lastmod>2018-12-15T11:16:26.705Z</lastmod>
+    <data>
+        <display>
+        <title>定时器的设计</title>
+        <pubTime>2018-06-23T05:30:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-09-08/linux%E4%B8%8Bhook%E6%9C%BA%E5%88%B6%E7%A0%94%E7%A9%B6/</loc>
+    <lastmod>2018-12-15T11:15:43.397Z</lastmod>
+    <data>
+        <display>
+        <title>linux hook机制研究</title>
+        <pubTime>2018-09-08T15:00:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="编程实践" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-05-28/hbase_schema_design/</loc>
+    <lastmod>2018-12-15T11:14:26.403Z</lastmod>
+    <data>
+        <display>
+        <title>hbase schema design阅读笔记</title>
+        <pubTime>2018-05-28T09:00:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-06-10/cpu%E7%9A%84cache%E4%B8%8E%E4%B8%80%E8%87%B4%E6%80%A7/</loc>
+    <lastmod>2018-12-15T11:13:29.261Z</lastmod>
+    <data>
+        <display>
+        <title>CPU Cache与一致性</title>
+        <pubTime>2018-06-10T02:00:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="编程理论" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E7%90%86%E8%AE%BA/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/</loc>
+    <lastmod>2018-12-15T11:12:23.363Z</lastmod>
+    <data>
+        <display>
+        <title>内存检测工具AddressSanitizer</title>
+        <pubTime>2018-05-28T11:30:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="编程实践" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://www.xiaocc.xyz/2018-12-06/%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%902/</loc>
-    <lastmod>2018-12-08T13:56:15.894Z</lastmod>
+    <lastmod>2018-12-14T14:35:42.767Z</lastmod>
     <data>
         <display>
         <title>协程原理解析(2)</title>
@@ -94,24 +220,6 @@
 
     
   <url>
-    <loc>http://www.xiaocc.xyz/2018-05-28/hbase_schema_design/</loc>
-    <lastmod>2018-09-18T03:47:07.256Z</lastmod>
-    <data>
-        <display>
-        <title>hbase schema design阅读笔记</title>
-        <pubTime>2018-05-28T09:00:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>http://www.xiaocc.xyz/2018-08-06/%E4%B8%80%E7%82%B9%E6%84%9F%E6%82%9F/</loc>
     <lastmod>2018-09-18T03:46:59.282Z</lastmod>
     <data>
@@ -170,42 +278,6 @@
 
     
   <url>
-    <loc>http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/</loc>
-    <lastmod>2018-09-18T03:46:22.612Z</lastmod>
-    <data>
-        <display>
-        <title>内存检测工具AddressSanitizer</title>
-        <pubTime>2018-05-28T11:30:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="编程实践" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://www.xiaocc.xyz/2018-09-08/linux%E4%B8%8Bhook%E6%9C%BA%E5%88%B6%E7%A0%94%E7%A9%B6/</loc>
-    <lastmod>2018-09-18T03:46:09.984Z</lastmod>
-    <data>
-        <display>
-        <title>linux hook机制研究</title>
-        <pubTime>2018-09-08T15:00:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="编程实践" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>http://www.xiaocc.xyz/2018-05-07/%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B61/</loc>
     <lastmod>2018-09-18T03:45:58.483Z</lastmod>
     <data>
@@ -235,24 +307,6 @@
            
              
               <breadCrumb title="杂谈" url="http://www.xiaocc.xyz/categories/%E6%9D%82%E8%B0%88/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://www.xiaocc.xyz/2018-06-10/cpu%E7%9A%84cache%E4%B8%8E%E4%B8%80%E8%87%B4%E6%80%A7/</loc>
-    <lastmod>2018-09-18T03:45:20.271Z</lastmod>
-    <data>
-        <display>
-        <title>CPU Cache与一致性</title>
-        <pubTime>2018-06-10T02:00:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="编程理论" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E7%90%86%E8%AE%BA/"/>
           
         </display>
     </data>
@@ -296,24 +350,6 @@
 
     
   <url>
-    <loc>http://www.xiaocc.xyz/2018-08-20/%E6%95%B0%E6%8D%AE%E5%88%86%E9%A1%B5%E6%8B%89%E5%8F%96%E6%9C%BA%E5%88%B6%E6%8E%A2%E8%AE%A8/</loc>
-    <lastmod>2018-09-18T03:44:08.502Z</lastmod>
-    <data>
-        <display>
-        <title>数据分页拉取机制探讨</title>
-        <pubTime>2018-08-20T15:30:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>http://www.xiaocc.xyz/2018-05-12/%E5%85%B3%E4%BA%8EPayPal%E6%94%AF%E4%BB%98%E6%8E%A5%E5%85%A5%E7%9A%84%E6%80%9D%E8%80%83/</loc>
     <lastmod>2018-09-18T03:43:59.941Z</lastmod>
     <data>
@@ -338,42 +374,6 @@
         <display>
         <title>关于PayPal支付接入的思考——通知校验机制</title>
         <pubTime>2018-05-15T11:30:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://www.xiaocc.xyz/2018-06-23/%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/</loc>
-    <lastmod>2018-09-18T03:43:43.392Z</lastmod>
-    <data>
-        <display>
-        <title>定时器的设计</title>
-        <pubTime>2018-06-23T05:30:00.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="系统设计" url="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://www.xiaocc.xyz/2018-06-03/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1/</loc>
-    <lastmod>2018-09-18T03:43:33.859Z</lastmod>
-    <data>
-        <display>
-        <title>服务框架设计</title>
-        <pubTime>2018-06-03T09:30:00.000Z</pubTime>
         
          
            

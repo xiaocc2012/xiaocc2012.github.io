@@ -88,18 +88,18 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="图床终于弄好，可以图文结合了上传一篇以前的阅读笔记，关于hbase的rowkey设计的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/A1223DE1-8F32-46A8-B5B5-464BD723F202.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/0D529E1B-23ED-4450-BE1C-6B2D45F1FF27.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/7DFEF1A3-4124-4681-B3C3-DC858C7DD1EE.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/AEB8F7E0-7711-447C-9E70-7FB4691F9A0E.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/0A2ED8B4-E54A-4E7E-845A-78DA718B84A2.png">
-<meta property="og:image" content="http://p9ffylu89.bkt.clouddn.com/CE8EFA5B-299D-43F9-8EBF-E73D4B79AA6B.png">
-<meta property="og:updated_time" content="2018-09-18T03:47:07.256Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/A1223DE1-8F32-46A8-B5B5-464BD723F202.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/0D529E1B-23ED-4450-BE1C-6B2D45F1FF27.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/7DFEF1A3-4124-4681-B3C3-DC858C7DD1EE.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/AEB8F7E0-7711-447C-9E70-7FB4691F9A0E.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/0A2ED8B4-E54A-4E7E-845A-78DA718B84A2.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/CE8EFA5B-299D-43F9-8EBF-E73D4B79AA6B.png">
+<meta property="og:updated_time" content="2018-12-15T11:14:26.403Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hbase schema design阅读笔记">
 <meta name="twitter:description" content="图床终于弄好，可以图文结合了上传一篇以前的阅读笔记，关于hbase的rowkey设计的">
-<meta name="twitter:image" content="http://p9ffylu89.bkt.clouddn.com/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png">
 
 
 
@@ -383,7 +383,7 @@
       
         <p>图床终于弄好，可以图文结合了<br>上传一篇以前的阅读笔记，关于hbase的rowkey设计的<br><a id="more"></a></p>
 <p>hbase schema design <a href="http://0b4af6cdc2f0c5998459-c0245c5c937c5dedcca3f1764ecc9b2f.r43.cf2.rackcdn.com/9353-login1210_khurana.pdf" target="_blank" rel="noopener">文章pdf地址</a></p>
-<h5><span id="hbase-存储视图">hbase 存储视图</span></h5><p><img src="http://p9ffylu89.bkt.clouddn.com/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png" alt=""></p>
+<h5><span id="hbase-存储视图">hbase 存储视图</span></h5><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/6397885A-85FF-4D6D-AB04-E2D0BA46045A.png" alt=""></p>
 <p><strong>文中，以Twitter关注模式为例，讲解存储设计</strong></p>
 <h5><span id="场景分析">场景分析</span></h5><p>首先分析问题，读、写场景有哪些？</p>
 <p><strong>读：</strong></p>
@@ -398,15 +398,15 @@
 <li>用户A取消关注用户B</li>
 </ol>
 <p>循序渐进的讲解存储设计：</p>
-<p>1.简单的列表存储，用下标做column qualifie，用户名做value，但是读2问题，需要遍历列表解决。同时，新增关注时，不知道下一个下标数值，需要遍历获取。<br><img src="http://p9ffylu89.bkt.clouddn.com/A1223DE1-8F32-46A8-B5B5-464BD723F202.png" alt=""></p>
-<p>2.针对设计1的问题，增加一个额外的column（count），记录当前关注用户数量，但是HBase多API之间的并发问题不容易解决。同时写2问题，用户取消关注B，需要遍历整个列表来delete，同时删除之后的空洞问题无法解决（count数量与下一个下标值无法对应）<br><img src="http://p9ffylu89.bkt.clouddn.com/0D529E1B-23ED-4450-BE1C-6B2D45F1FF27.png" alt=""></p>
-<p>3.针对HBase的column是可变的，非预定义的，同时是bytes []的，所以可以把关注的用户名B作为column qualifier。<br><img src="http://p9ffylu89.bkt.clouddn.com/7DFEF1A3-4124-4681-B3C3-DC858C7DD1EE.png" alt=""></p>
+<p>1.简单的列表存储，用下标做column qualifie，用户名做value，但是读2问题，需要遍历列表解决。同时，新增关注时，不知道下一个下标数值，需要遍历获取。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/A1223DE1-8F32-46A8-B5B5-464BD723F202.png" alt=""></p>
+<p>2.针对设计1的问题，增加一个额外的column（count），记录当前关注用户数量，但是HBase多API之间的并发问题不容易解决。同时写2问题，用户取消关注B，需要遍历整个列表来delete，同时删除之后的空洞问题无法解决（count数量与下一个下标值无法对应）<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/0D529E1B-23ED-4450-BE1C-6B2D45F1FF27.png" alt=""></p>
+<p>3.针对HBase的column是可变的，非预定义的，同时是bytes []的，所以可以把关注的用户名B作为column qualifier。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/7DFEF1A3-4124-4681-B3C3-DC858C7DD1EE.png" alt=""></p>
 <p>这个设计可以很方便的查找用户AK关注了哪些用户，但是针对于哪些用户关注了AK，只能遍历整个table来查找。</p>
-<p>4.针对HBase的rowkey是bytes []，同时是有序的、且方便scan，可以存储一些信息在rowkey中。<br><img src="http://p9ffylu89.bkt.clouddn.com/AEB8F7E0-7711-447C-9E70-7FB4691F9A0E.png" alt=""><br><img src="http://p9ffylu89.bkt.clouddn.com/0A2ED8B4-E54A-4E7E-845A-78DA718B84A2.png" alt=""></p>
+<p>4.针对HBase的rowkey是bytes []，同时是有序的、且方便scan，可以存储一些信息在rowkey中。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/AEB8F7E0-7711-447C-9E70-7FB4691F9A0E.png" alt=""><br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/0A2ED8B4-E54A-4E7E-845A-78DA718B84A2.png" alt=""></p>
 <p>将rowkey设计为 follower + followed形式</p>
 <p>如何查找AK关注了哪些用户——通过扫描HBase的rowkey符合 AK* 模式</p>
 <p>如何查找哪些用户关注了AK——通过扫描HBase的rowkey符合 *AK 模式</p>
-<p>5.如何解决用户名长度不一致问题，可以选择归一化用户名或者采用保存md5的形式<br><img src="http://p9ffylu89.bkt.clouddn.com/CE8EFA5B-299D-43F9-8EBF-E73D4B79AA6B.png" alt=""></p>
+<p>5.如何解决用户名长度不一致问题，可以选择归一化用户名或者采用保存md5的形式<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/CE8EFA5B-299D-43F9-8EBF-E73D4B79AA6B.png" alt=""></p>
 
       
     </div>
