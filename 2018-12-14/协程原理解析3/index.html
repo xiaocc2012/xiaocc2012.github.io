@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="5N2yIHPcI9plNoKG2bG_5pWzaFZaOlpGfq5EQNeE--o" />
+<meta name="baidu-site-verification" content="heO0pF7brw" />
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分析cloudwu(云风)协程库的具体实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协程原理解析(3)">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-14/协程原理解析3/index.html">
+<meta property="og:site_name" content="曾经浮华的小窝">
+<meta property="og:description" content="分析cloudwu(云风)协程库的具体实现">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-192541.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-204455.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-210628.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-213819.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-222926.jpg">
+<meta property="og:updated_time" content="2018-12-15T14:51:27.463Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="协程原理解析(3)">
+<meta name="twitter:description" content="分析cloudwu(云风)协程库的具体实现">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-192541.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-14/协程原理解析3/"/>
+
+
+
+
+
+  <title>协程原理解析(3) | 曾经浮华的小窝</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-118964254-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曾经浮华的小窝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">hello,world!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-12-14/协程原理解析3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="曾经浮华">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曾经浮华的小窝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">协程原理解析(3)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-14T22:30:00+08:00">
+                2018-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018-12-14/协程原理解析3/" class="leancloud_visitors" data-flag-title="协程原理解析(3)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>分析cloudwu(云风)协程库的具体实现</p>
+<a id="more"></a>
+<h4><span id="引子">引子</span></h4><p>前两篇分析了协程库的基本用法及四大函数具体实现，本篇分析一个协程库的具体例子。</p>
+<p>云风多年之前用C语言实现过一个协程库，采用非对称式、<code>stackful</code>模式、未hook系统函数、不提供协程调度功能。<br>源码只有200多行，实现简洁，非常教科书式，对于协程刚入门用户可谓佳品。</p>
+<p>其代码库地址：<a href="https://github.com/cloudwu/coroutine" target="_blank" rel="noopener">云风协程库</a></p>
+<h4><span id="库的用法">库的用法</span></h4><p>我们先看该库的用法，再研究具体实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"coroutine.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">args</span> &#123;</span></span><br><span class="line">	<span class="keyword">int</span> n;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span><br><span class="line">foo(struct schedule * S, <span class="keyword">void</span> *ud) &#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">args</span> * <span class="title">arg</span> = <span class="title">ud</span>;</span></span><br><span class="line">	<span class="keyword">int</span> start = arg-&gt;n;</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line">	<span class="keyword">for</span> (i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++) &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"coroutine %d : %d\n"</span>,coroutine_running(S) , start + i);</span><br><span class="line">		coroutine_yield(S);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span><br><span class="line">test(struct schedule *S) &#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">args</span> <span class="title">arg1</span> = &#123;</span> <span class="number">0</span> &#125;;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">args</span> <span class="title">arg2</span> = &#123;</span> <span class="number">100</span> &#125;;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> co1 = coroutine_new(S, foo, &amp;arg1);</span><br><span class="line">	<span class="keyword">int</span> co2 = coroutine_new(S, foo, &amp;arg2);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"main start\n"</span>);</span><br><span class="line">	<span class="keyword">while</span> (coroutine_status(S,co1) &amp;&amp; coroutine_status(S,co2)) &#123;</span><br><span class="line">		coroutine_resume(S,co1);</span><br><span class="line">		coroutine_resume(S,co2);</span><br><span class="line">	&#125; </span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"main end\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> </span><br><span class="line">main() &#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">schedule</span> * <span class="title">S</span> = <span class="title">coroutine_open</span>();</span></span><br><span class="line">	test(S);</span><br><span class="line">	coroutine_close(S);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先根据代码猜测运行意图：创建了2个协程，它们轮流输出<code>start + i</code>。</p>
+<p>编译并运行，输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">coroutine 0 : 0</span><br><span class="line">coroutine 1 : 100</span><br><span class="line">coroutine 0 : 1</span><br><span class="line">coroutine 1 : 101</span><br><span class="line">coroutine 0 : 2</span><br><span class="line">coroutine 1 : 102</span><br><span class="line">coroutine 0 : 3</span><br><span class="line">coroutine 1 : 103</span><br><span class="line">coroutine 0 : 4</span><br><span class="line">coroutine 1 : 104</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+<p>运行结果符合我们的猜测。</p>
+<p>大体用法：<br>通过调用<code>coroutine_open</code>创建协程环境，调用<code>coroutine_new</code>创建协程并传递工作函数指针，调用<code>coroutine_resume</code>授予协程运行权，在协程中调用<code>coroutine_yield</code>将运行权切出。</p>
+<h4><span id="基础数据结构">基础数据结构</span></h4><p>比较重要的两个数据结构<code>schedule</code>、<code>coroutine</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">schedule</span> &#123;</span></span><br><span class="line">	<span class="keyword">char</span> <span class="built_in">stack</span>[STACK_SIZE];</span><br><span class="line">	<span class="keyword">ucontext_t</span> main;</span><br><span class="line">	<span class="keyword">int</span> nco;</span><br><span class="line">	<span class="keyword">int</span> cap;</span><br><span class="line">	<span class="keyword">int</span> running;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">coroutine</span> **<span class="title">co</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>schedule</code>是所有协程公用的一个环境，其中：</p>
+<ul>
+<li>stack——所有协程运行时的栈空间，新创建协程时在四大函数的<code>getcontext</code>之后，<code>makecontext</code>之前设置，协程运行时会以该空间作为栈空间</li>
+<li>main——主协程，当创建的协程调用<code>coroutine_yield</code>切出控制权，实际上会切到主协程运行</li>
+<li>nco——当前正在运行的协程数量</li>
+<li>cap——协程指针容器的容量</li>
+<li>running——当前正在运行的协程的id，如果在主协程运行，则为-1</li>
+<li>co——指针数组，每一个指针指向一个协程</li>
+</ul>
+<p>内存布局如下：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-192541.jpg" alt=""></p>
+<p>接下来看看<code>coroutine</code>的具体内容：</p>
+<ul>
+<li>func——协程运行时的工作函数</li>
+<li>ud——工作函数的附属参数</li>
+<li>ctx——协程的context</li>
+<li>sch——该协程归属的<code>schedule</code></li>
+<li>cap——拷贝栈时候申请的内存的容量</li>
+<li>size——拷贝栈后的有效数据大小</li>
+<li>status——协程状态</li>
+<li>stack——拷贝栈数据申请的空间</li>
+</ul>
+<p>这里解释一下<code>coroutine</code>结构中的<code>stack</code>的作用：</p>
+<p>由于协程运行时需要栈空间，我们可以选择给每个协程单独申请一块空间(例如：1M大小)，而每个协程运行时候所需空间大小不一，如果空间过小协程运行时候会由于空间不足而栈溢出，如果空间太大则整体空间浪费严重。<br>所以这里采用所有协程公用一块大空间，当协程切出时，把自己运行时候的栈内容一并拷贝，当控制权再次切回来时候，把自己的栈内容还原到公共栈空间。</p>
+<p>示意图如下：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-204455.jpg" alt=""></p>
+<p>这里可以预见当协程切换时候，涉及到大量的内存拷贝操作，这里可能成为瓶颈，如此，便可以采用独立栈结构——即每个协程一个独立栈空间。</p>
+<h4><span id="具体实现">具体实现</span></h4><p>有了以上对两个基础数据结构的分析，接下来分析具体实现代码就比较容易。</p>
+<h5><span id="coroutine_open"><code>coroutine_open</code></span></h5><p>内容比较简单，主要是分配空间容纳<code>coroutine</code>的指针</p>
+<h5><span id="coroutine_close"><code>coroutine_close</code></span></h5><p>没什么好说的</p>
+<h5><span id="coroutine_new"><code>coroutine_new</code></span></h5><p>新建协程的主要函数，在其中，如果<code>schedule</code>中容纳协程指针的空间不足，会进行扩容。<br>这个实现里面有一个<strong>比较有意思的点</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i;</span><br><span class="line"><span class="keyword">for</span> (i=<span class="number">0</span>;i&lt;S-&gt;cap;i++) &#123;</span><br><span class="line">	<span class="keyword">int</span> id = (i+S-&gt;nco) % S-&gt;cap;</span><br><span class="line">	<span class="keyword">if</span> (S-&gt;co[id] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">		S-&gt;co[id] = co;</span><br><span class="line">		++S-&gt;nco;</span><br><span class="line">		<span class="keyword">return</span> id;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里是想找到一个空闲的槽位放置新创建的协程，我们一般会从<code>0</code>开始遍历，如果找到空闲槽位就返回下标，否则<code>i++</code>继续遍历查找。</p>
+<p>但是这里，<code>int id = (i+S-&gt;nco) % S-&gt;cap;</code>，这是什么意思？<br>为什么不是直接取<code>i</code>，而要进行这么复杂的操作？</p>
+<p>如下图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-210628.jpg" alt=""></p>
+<p>其中，橙色表示已分配，灰色表示未分配</p>
+<p>由于是从下标<code>0</code>开始遍历查找空闲槽位，这样头部的槽位会优先被选中，导致后续遍历次数增加才能找到空闲槽位。<br>而<code>int id = (i+S-&gt;nco) % S-&gt;cap;</code>，则是倾向于从使用尾区开始查找，很快就能找到空闲槽位。</p>
+<p>但是这样有个问题，随着头部的空间释放，而尾部作为使用中的空间逐渐增加，依然要遍历多次以跨过正在使用中的空间，并达不到作者想要的效果。</p>
+<p>构造如图所示的申请与释放过程：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-213819.jpg" alt=""></p>
+<ol>
+<li>nco=6，cap=11</li>
+<li>新增一个协程，按照分配算法，从下标<code>5</code>开始往后查找空闲槽位，找到<code>7</code>号槽位</li>
+<li><code>1</code>号槽位协程退出，并释放槽位</li>
+<li>新增一个协程，由于当前nco=6，cap=11，从下标<code>5</code>开始往后查找空闲槽位，找到<code>8</code>号槽位</li>
+</ol>
+<p>以上分析可见，该遍历算法并无实质性优化。</p>
+<ul>
+<li>可以通过记录已经分配的最大下标，从该下标往后查找空闲槽位</li>
+<li>cpu遍历速度非常快，个人认为可以从<code>0</code>开始遍历</li>
+</ul>
+<h5><span id="coroutine_resume"><code>coroutine_resume</code></span></h5><p>将控制权切换到协程的核心函数</p>
+<ul>
+<li>如果协程处于<code>COROUTINE_READY</code>状态，也就是协程刚创建，还未被调度过，则需要初始化协程context</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> COROUTINE_READY:</span><br><span class="line">	getcontext(&amp;C-&gt;ctx);</span><br><span class="line">	C-&gt;ctx.uc_stack.ss_sp = S-&gt;<span class="built_in">stack</span>;</span><br><span class="line">	C-&gt;ctx.uc_stack.ss_size = STACK_SIZE;</span><br><span class="line">	C-&gt;ctx.uc_link = &amp;S-&gt;main;</span><br><span class="line">	S-&gt;running = id;</span><br><span class="line">	C-&gt;status = COROUTINE_RUNNING;</span><br><span class="line">	<span class="keyword">uintptr_t</span> ptr = (<span class="keyword">uintptr_t</span>)S;</span><br><span class="line">	makecontext(&amp;C-&gt;ctx, (<span class="keyword">void</span> (*)(<span class="keyword">void</span>)) mainfunc, <span class="number">2</span>, (<span class="keyword">uint32_t</span>)ptr, (<span class="keyword">uint32_t</span>)(ptr&gt;&gt;<span class="number">32</span>));</span><br><span class="line">	swapcontext(&amp;S-&gt;main, &amp;C-&gt;ctx);</span><br><span class="line">	<span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>教科书式的用法，先调用<code>getcontext</code>初始化<code>ucontext_t</code>，再设置协程运行时候的栈，<strong>注意</strong>，这里的栈设置为<code>schedule</code>中的stack，也就是公共栈空间。再调用<code>makecontext</code>初始化栈结构，最后调用<code>swapcontext</code>，把控制权从主协程切出。</p>
+<ul>
+<li>如果协程处于<code>COROUTINE_SUSPEND</code>状态，表示其已经被调度过，意味则相关初始化工作已经做过。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> COROUTINE_SUSPEND:</span><br><span class="line">	<span class="built_in">memcpy</span>(S-&gt;<span class="built_in">stack</span> + STACK_SIZE - C-&gt;size, C-&gt;<span class="built_in">stack</span>, C-&gt;size);</span><br><span class="line">	S-&gt;running = id;</span><br><span class="line">	C-&gt;status = COROUTINE_RUNNING;</span><br><span class="line">	swapcontext(&amp;S-&gt;main, &amp;C-&gt;ctx);</span><br><span class="line">	<span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>直接将其保存的栈数据从buffer设置到主stack，然后调用<code>swapcontext</code>，将控制权从主协程切出。</p>
+<h5><span id="coroutine_yield"><code>coroutine_yield</code></span></h5><p>协程主动将控制权交出给主协程<br>由于运行时的栈空间是<code>schedule</code>的stack，也就是公共栈空间，是所有协程公用的。<br>所以需要协程自己保存数据，以待将来再次获得控制权时将数据拷贝回公共栈空间，然后运行。</p>
+<p>如何保存协程的栈空间数据？</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span><br><span class="line">_save_stack(struct coroutine *C, <span class="keyword">char</span> *top) &#123;</span><br><span class="line">	<span class="keyword">char</span> dummy = <span class="number">0</span>;</span><br><span class="line">	assert(top - &amp;dummy &lt;= STACK_SIZE);</span><br><span class="line">	<span class="keyword">if</span> (C-&gt;cap &lt; top - &amp;dummy) &#123;</span><br><span class="line">		<span class="built_in">free</span>(C-&gt;<span class="built_in">stack</span>);</span><br><span class="line">		C-&gt;cap = top-&amp;dummy;</span><br><span class="line">		C-&gt;<span class="built_in">stack</span> = <span class="built_in">malloc</span>(C-&gt;cap);</span><br><span class="line">	&#125;</span><br><span class="line">	C-&gt;size = top - &amp;dummy;</span><br><span class="line">	<span class="built_in">memcpy</span>(C-&gt;<span class="built_in">stack</span>, &amp;dummy, C-&gt;size);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里做了一个假定，栈空间由高地址向低地址增长，拷贝有效数据到协程自己的buffer中保存<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181215-222926.jpg" alt=""></p>
+<p>设置协程状态，并将控制权交给主协程</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">coroutine_yield(struct schedule * S) &#123;</span><br><span class="line">	<span class="keyword">int</span> id = S-&gt;running;</span><br><span class="line">	assert(id &gt;= <span class="number">0</span>);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">coroutine</span> * <span class="title">C</span> = <span class="title">S</span>-&gt;<span class="title">co</span>[<span class="title">id</span>];</span></span><br><span class="line">	assert((<span class="keyword">char</span> *)&amp;C &gt; S-&gt;<span class="built_in">stack</span>);</span><br><span class="line">	_save_stack(C,S-&gt;<span class="built_in">stack</span> + STACK_SIZE);</span><br><span class="line">	C-&gt;status = COROUTINE_SUSPEND;</span><br><span class="line">	S-&gt;running = <span class="number">-1</span>;</span><br><span class="line">	swapcontext(&amp;C-&gt;ctx , &amp;S-&gt;main);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4><span id="总结">总结</span></h4><p>分析完云风的协程源码，大家可以参考微信开源的libco加强理解，其hook了系统函数，并包含协程调度逻辑，是一个工业级协程库，不过知乎上也有人提到libco实现有bug云云，不一而足。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018-12-06/协程原理解析2/" rel="next" title="协程原理解析(2)">
+                <i class="fa fa-chevron-left"></i> 协程原理解析(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">曾经浮华</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">库的用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">基础数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">coroutine_open</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">coroutine_close</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">coroutine_new</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.4.</span> <span class="nav-text">coroutine_resume</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">4.5.</span> <span class="nav-text">coroutine_yield</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">曾经浮华</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jlEvdVWxJMzPqUQInKc4Kz6y-gzGzoHsz", "0aA7UQThN5OCpguntTJf4gRp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
