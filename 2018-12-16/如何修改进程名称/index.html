@@ -81,17 +81,20 @@
 
 
 
-<meta name="description" content="频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题">
+<meta name="description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
 <meta property="og:type" content="article">
-<meta property="og:title" content="频控设计与思考">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-08-19/频控设计与思考/index.html">
+<meta property="og:title" content="如何修改进程名称">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题">
+<meta property="og:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-18T03:43:29.275Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg">
+<meta property="og:updated_time" content="2018-12-17T14:38:58.951Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="频控设计与思考">
-<meta name="twitter:description" content="频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题">
+<meta name="twitter:title" content="如何修改进程名称">
+<meta name="twitter:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
 
 
 
@@ -121,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-08-19/频控设计与思考/"/>
+  <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/"/>
 
 
 
 
 
-  <title>频控设计与思考 | 曾经浮华的小窝</title>
+  <title>如何修改进程名称 | 曾经浮华的小窝</title>
   
 
 
@@ -273,7 +276,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-08-19/频控设计与思考/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -290,7 +293,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">频控设计与思考</h1>
+          <h1 class="post-title" itemprop="name headline">如何修改进程名称</h1>
         
 
         <div class="post-meta">
@@ -302,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T23:00:00+08:00">
-                2018-08-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-16T22:30:00+08:00">
+                2018-12-16
               </time>
             
 
@@ -325,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/系统设计/" itemprop="url" rel="index">
-                    <span itemprop="name">系统设计</span>
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
                   </a>
                 </span>
 
@@ -342,7 +345,7 @@
 
           
           
-             <span id="/2018-08-19/频控设计与思考/" class="leancloud_visitors" data-flag-title="频控设计与思考">
+             <span id="/2018-12-16/如何修改进程名称/" class="leancloud_visitors" data-flag-title="如何修改进程名称">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -373,39 +376,20 @@
       
 
       
-        <p>频控系统是后台服务自我保护的很重要的一个子系统，本文讨论几种常见的设计思路、并探讨使用redis进行频控设计中的相关问题</p>
+        <p>分析如何修改进程名称，以利于更清楚的展示进程相关信息</p>
 <a id="more"></a>
-<h4><span id="基本概念">基本概念</span></h4><h5><span id="什么是频控">什么是频控？</span></h5><p>从字面意义理解，<code>频控</code>就是频率控制，多用来对服务及接口进行保护，避免突发大流量请求冲击系统，进而引起系统雪崩，无法对外继续提供服务。<br>另外，也有一些业务层面利用该手段进行自我保护，例如：防刷系统，通过限制用户访问某种资源的频率来阻挡恶意请求。</p>
-<h4><span id="如何进行频控">如何进行频控？</span></h4><p>频控级别主要分为两块：</p>
-<ul>
-<li>系统级频控</li>
-<li>个人级频控</li>
-</ul>
-<p>以下将分别介绍实现方式与相关问题</p>
-<h5><span id="系统级频控"><code>系统级频控</code></span></h5><p>该级别频控有多种实现如下：</p>
-<ul>
-<li>基于内存计数</li>
-<li>基于内存的double-buffer计数</li>
-<li>令牌桶</li>
-</ul>
-<p>1.基于内存计数的实现比较简单，伪代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">uint32_t qps = 0;</span><br><span class="line">time_t monitor_start_time = 0;    //qps记录开始时间</span><br><span class="line"></span><br><span class="line">uint32_t add_qps()</span><br><span class="line">&#123;</span><br><span class="line">    time_t cur_time = ::time(NULL);</span><br><span class="line">    if (cur_time != monitor_start_time)</span><br><span class="line">    &#123;</span><br><span class="line">        //开始新1s的记录</span><br><span class="line">        qps = 1;</span><br><span class="line">        monitor_start_time = cur_time;</span><br><span class="line">        </span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        return __sync_add_and_fecth(&amp;qps, 1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>核心：判断该次请求是累加到记录周期，还是重新开始一次记录周期。</p>
-<p>2.基于内存的double-buffer的实现，主要是优化<code>实现1</code>中的时间判断逻辑。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">uint32_t qps[2] = &#123;0, 0&#125;;</span><br><span class="line"></span><br><span class="line">uint32_t add_qps()</span><br><span class="line">&#123;</span><br><span class="line">    time_t cur_time = ::time(NULL);</span><br><span class="line">    </span><br><span class="line">    qps[(time + 1) % 2] = 0;</span><br><span class="line">    </span><br><span class="line">    return __sync_add_and_fecth(&amp;qps[time % 2], 1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该实现利用<code>uint32_t qps[2]</code>的数组，分别记录当前秒的qps、下一秒的qps，对于每一次<code>add_qps</code>请求，将下一秒记录qps数据的槽位<code>清0</code>，累加当前秒的qps并返回结果。</p>
-<p>3.基于令牌桶的实现，该实现以一定速度将令牌放入桶中，待请求到来，检查当前秒的已放行请求数量是否小于桶中令牌数量，否则，不予通过。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">const uint32_t qps_limit = 9527;</span><br><span class="line">uint64_t start_time_ms = 0;</span><br><span class="line">uint32_t cur_pass_count = 0;</span><br><span class="line"></span><br><span class="line">bool check_pass_qps()</span><br><span class="line">&#123;</span><br><span class="line">    uint64_t cur_time_ms = getTimeMS();</span><br><span class="line">    </span><br><span class="line">    if (!check_in_same_second(cur_time_ms, start_time_ms))</span><br><span class="line">    &#123;</span><br><span class="line">        //清空数据，开始新的周期</span><br><span class="line">        start_time_ms = getStartMS(cur_time_ms);</span><br><span class="line">        cur_pass_count = 1;</span><br><span class="line">        </span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //计算桶中令牌数量</span><br><span class="line">    uint32_t can_pass_count = time_sub(cur_time_ms, start_time_ms) * qps_limit / 1000.0;</span><br><span class="line">    </span><br><span class="line">    //不予通过</span><br><span class="line">    if (cur_pass_count &gt;= can_pass_count)</span><br><span class="line">    &#123;</span><br><span class="line">        retun false;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ++cur_pass_count;</span><br><span class="line">    retun true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该伪代码中设置控制粒度为ms，也就是 qps_limit / 1000.0的由来。</p>
-<h5><span id="用户级频控"><code>用户级频控</code></span></h5><p>主要有基于内存的设计，包括KV存储、Key过期淘汰策略等，这些基本需求与当今热门的NoSql系统<code>redis</code>的功能一样，因而可以用其来进行频控。</p>
-<h4><span id="redis频控">redis频控</span></h4><p>官方有一个针对ip进行频控的例子：<a href="https://redis.io/commands/incr" target="_blank" rel="noopener">地址</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">FUNCTION LIMIT_API_CALL(ip)</span><br><span class="line">ts = CURRENT_UNIX_TIME()</span><br><span class="line">keyname = ip + &quot;:&quot; + ts</span><br><span class="line">current = GET(keyname)</span><br><span class="line">IF current != NULL AND current &gt; 10 THEN</span><br><span class="line">    ERROR &quot;too many requests per second&quot;</span><br><span class="line">ELSE</span><br><span class="line">    MULTI</span><br><span class="line">        INCR(keyname,1)</span><br><span class="line">        EXPIRE(keyname,10)</span><br><span class="line">    EXEC</span><br><span class="line">    PERFORM_API_CALL()</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-<p>其中key的设计有两种方案：ip + ts、ip</p>
-<p>对第一种key的方案<code>ip + ts</code>样例中采用 <code>MULTI + EXEC</code>对命令进行包裹，以解决单独调用<code>INCR</code>后<code>EXPIRE</code>崩溃的问题。可以思考一下，在当前这种key的设计方式下，由于key是<code>ip + ts</code>，就算由于小概率崩溃，导致<code>EXPIRE</code>未执行，对系统无根本性影响，不影响该ip下一秒的调用及频控。</p>
-<p>而第二种key的方案<code>ip</code>，如果不采用<code>MULTI + EXEC</code>对命令进行包裹，如果<code>EXPIRE</code>未执行，完蛋，由于是ip维度进行计数，如果该ip超频，由于没有时机去清理该key，导致该ip超频后一直处于超频状态，永远无法请求相关服务。</p>
-<p>同时官方样例中也说明，可以采用<code>lua脚本</code>的形式来执行命令，因为server端崩溃的概率极低，基本不可能出现该特殊情况。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">local current</span><br><span class="line">current = redis.call(&quot;incr&quot;,KEYS[1])</span><br><span class="line">if tonumber(current) == 1 then</span><br><span class="line">    redis.call(&quot;expire&quot;,KEYS[1],1)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
-<h4><span id="结语">结语</span></h4><p>在之前的paypal支付系统中，由于兑换码是无记名设计，出于安全角度考虑，对ip的请求进行频控，以打击遍历兑换码空间进而恶意兑换的情况。</p>
+<h4><span id="引子">引子</span></h4><p>最近服务器中了挖矿病毒，CPU暴涨，<code>top</code>查看到的高负载进程名为随机字母。<br>一般情况下进程名为可执行文件名，执行<code>cat /proc/{pid}/exe</code>，查看可执行文件路径，可执行文件已经被删除。</p>
+<p>网上搜索相关资料，找到一个有意思的问题，如何改变进程名？</p>
+<p>在<code>redis</code>、<code>nginx</code>中有更改进程名的相关实现，而<code>nginx</code>中原理解释得更为详细。</p>
+<h4><span id="核心">核心</span></h4><p>如<code>nginx</code>中注释所言：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * To change the process title in Linux and Solaris we have to set argv[1]</span><br><span class="line"> * to NULL and to copy the title to the same place where the argv[0] points to.</span><br><span class="line"> * However, argv[0] may be too small to hold a new title.  Fortunately, Linux</span><br><span class="line"> * and Solaris store argv[] and environ[] one after another.  So we should</span><br><span class="line"> * ensure that is the continuous memory and then we allocate the new memory</span><br><span class="line"> * for environ[] and copy it.  After this we could use the memory starting</span><br><span class="line"> * from argv[0] for our process title.</span><br><span class="line"> *</span><br><span class="line"> * The Solaris&apos;s standard /bin/ps does not show the changed process title.</span><br><span class="line"> * You have to use &quot;/usr/ucb/ps -w&quot; instead.  Besides, the UCB ps does not</span><br><span class="line"> * show a new title if its length less than the origin command line length.</span><br><span class="line"> * To avoid it we append to a new title the origin command line in the</span><br><span class="line"> * parenthesis.</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<p>进程名及命令行参数保存在<code>argv</code>数组中，而相关环境变量则保存在<code>environ</code>数组中，其内存布局如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg" alt=""></p>
+<p>可见命令行参数与环境变量是紧凑型存储在一块连续的内存。</p>
+<p>想要改变进程名就得改变<code>argv[0]</code>的值，如果直接设置新进程名，当其过长，会将这块内存区域写坏。</p>
+<h4><span id="实现">实现</span></h4><p>那该如何实现？</p>
+<p>这里采用的方式是给<code>environ</code>数据重新分配一块空间，并改变<code>environ</code>指针数组的值，让其每个指针指向新数据对应地址。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg" alt=""></p>
+<p>这样<code>argv[0]</code>就有足够空间设置新进程名。</p>
+<p><strong>注意</strong><br>如果新进程名比原进程名短，需要先清空<code>argv[0]</code>指向的数据，然后再设置。</p>
 
       
     </div>
@@ -430,8 +414,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-08-06/一点感悟/" rel="next" title="一点感悟">
-                <i class="fa fa-chevron-left"></i> 一点感悟
+              <a href="/2018-12-14/协程原理解析3/" rel="next" title="协程原理解析(3)">
+                <i class="fa fa-chevron-left"></i> 协程原理解析(3)
               </a>
             
           </div>
@@ -439,10 +423,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-08-20/数据分页拉取机制探讨/" rel="prev" title="数据分页拉取机制探讨">
-                数据分页拉取机制探讨 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -574,7 +554,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">什么是频控？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">如何进行频控？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">系统级频控</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">用户级频控</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">redis频控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">结语</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li></ol></div>
             
 
           </div>
