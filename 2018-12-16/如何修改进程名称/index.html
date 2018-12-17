@@ -90,7 +90,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
 <meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg">
-<meta property="og:updated_time" content="2018-12-17T14:53:21.566Z">
+<meta property="og:updated_time" content="2018-12-17T15:02:56.670Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何修改进程名称">
 <meta name="twitter:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
@@ -389,7 +389,7 @@
 <p>那该如何实现？</p>
 <h4><span id="实现">实现</span></h4><p>这里采用的方式是给<code>environ</code>数据重新分配一块空间，并改变<code>environ</code>指针数组的值，让其每个指针指向新数据对应地址。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg" alt=""></p>
 <p>这样<code>argv[0]</code>就有足够空间设置新进程名。</p>
-<p><strong>注意</strong><br>如果新进程名比原进程名短，需要先清空<code>argv[0]</code>指向的数据，然后再设置。<br><code>environ</code>可通过<code>extern char** environ</code>获得。</p>
+<h4><span id="注意">注意</span></h4><p>如果新进程名比原进程名短，需要先清空<code>argv[0]</code>指向的数据，然后再设置。<br><code>environ</code>可通过<code>extern char** environ</code>获得。</p>
 <p><em>TODO：分析为何argv、environ为连续紧凑型存储</em></p>
 
       
@@ -555,7 +555,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
             
 
           </div>
