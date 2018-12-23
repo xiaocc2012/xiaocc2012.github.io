@@ -4,8 +4,26 @@
 
     
   <url>
+    <loc>http://www.xiaocc.xyz/2018-12-23/%E5%88%A9%E7%94%A8redis%E8%BF%9B%E8%A1%8C%E6%97%A0%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95/</loc>
+    <lastmod>2018-12-23T12:52:17.954Z</lastmod>
+    <data>
+        <display>
+        <title>利用redis进行无密码登录服务器</title>
+        <pubTime>2018-12-23T12:30:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="编程实践" url="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://www.xiaocc.xyz/2018-12-19/linux%E7%A8%8B%E5%BA%8F%E8%A3%85%E8%BD%BD%E4%B8%8E%E8%BF%90%E8%A1%8C/</loc>
-    <lastmod>2018-12-21T15:14:22.892Z</lastmod>
+    <lastmod>2018-12-21T15:16:29.559Z</lastmod>
     <data>
         <display>
         <title>Linux程序装载与运行流程分析</title>
