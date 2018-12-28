@@ -1,4 +1,4 @@
-http://www.xiaocc.xyz/2018-12-23/OOM计算规则/
+http://www.xiaocc.xyz/2018-12-28/OOM计算规则/
 http://www.xiaocc.xyz/2018-12-23/利用redis进行无密码登录/
 http://www.xiaocc.xyz/2018-12-19/linux程序装载与运行/
 http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/
