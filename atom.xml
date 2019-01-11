@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xiaocc.xyz/"/>
-  <updated>2018-12-28T15:38:06.808Z</updated>
+  <updated>2019-01-11T07:37:39.083Z</updated>
   <id>http://www.xiaocc.xyz/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JMeter压测工具之使用</title>
+    <link href="http://www.xiaocc.xyz/2019-01-11/JMeter%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7/"/>
+    <id>http://www.xiaocc.xyz/2019-01-11/JMeter压测工具/</id>
+    <published>2019-01-11T06:30:00.000Z</published>
+    <updated>2019-01-11T07:37:39.083Z</updated>
+    
+    <content type="html"><![CDATA[<p><code>Apache JMeter</code>压测工具，简介与使用</p><a id="more"></a><h4><span id="背景">背景</span></h4><p>目前后台服务采用<code>restful</code>模式，网络层使用<code>Http + Json</code>，交互模式比较通用，排查问题时候，<code>Json</code>格式也比较易于阅读。</p><p>之前采用<code>Tcp + 自定义数据格式</code>的交互模式，排查问题比较头疼，就算采用<code>tcpdump</code>等抓包工具，由于数据是二进制格式，非常不直白。</p><p>采用<code>Http</code>协议还有一个重大好处，就是可以直接使用非常多的测试、Debug工具。</p><p>这次需要对服务器性能进行测试，压测每个接口的性能上限，以利于部署机器。</p><p>所以，找到了鼎鼎大名的<code>JMeter</code>，使用过后，强烈推荐。</p><h4><span id="使用">使用</span></h4><p>由于<code>JMeter</code>支持的功能非常非常多，整个软件很复杂，如果只是想进行接口性能测试，只需要了解几个基本用法就行。</p><ul><li><p>创建一个<code>线程组</code><br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-150504.jpg" alt=""></p></li><li><p><code>线程组</code>相关字段解释<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-150758.jpg" alt=""></p><ul><li><code>线程数</code>，可以理解为发起请求的用户数</li><li><code>Ramp-Up时间</code>，创建完全部<code>线程数</code>需要的时间。可以这么理解，如果<code>线程数</code>设置为<code>100</code>，<code>Ramp-Up时间</code>设置为<code>1</code>，相当于100个用户在1秒内顺次发起请求，一个用户发起请求后，下一个用户等待10ms，然后才发起请求，总耗时：<code>100 * 10ms = 1s</code>。</li><li><code>循环次数</code>，如果勾选<code>永远</code>，一个<code>Ramp-Up时间</code>结束后，重新开始一个新的周期。</li></ul><p><strong>所以，如果想以<code>200qps</code>的速度测试某个接口，可以将线程数设置为200，Ramp-Up设置为1</strong></p></li><li><p>线程组配置完毕后，可以进行测试接口相关配置，由于我们需要进行<code>Http</code>接口测试，所以添加一个<code>Http</code>类型的取样器<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-151723.jpg" alt="">  </p></li><li><p>在这个<code>Http</code>取样器中，我们只是简单的访问了一下百度<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-152128.jpg" alt=""><br><em>可以对<code>Http</code>请求进行额外的配置，例如添加Header信息等，均在<code>配置元件</code>栏目中</em></p></li><li><p>为了查看<code>Http</code>请求的响应结果，我们添加<code>监听器</code>栏目中的<code>查看结果树</code></p></li><li><p>为了进行接口性能统计，我们添加<code>监听器</code>栏目中的<code>汇总报告</code><br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-152734.jpg" alt=""></p></li><li><p>点击启动后，可以查看<code>Http</code>服务响应数据信息<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190111-153025.jpg" alt=""></p></li><li><p>在<code>汇总报告</code>中可以查询请求耗时及<code>qps</code>等等数据</p></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;code&gt;Apache JMeter&lt;/code&gt;压测工具，简介与使用&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="工具" scheme="http://www.xiaocc.xyz/categories/%E5%B7%A5%E5%85%B7/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Linux中OOM Killer分数计算规则</title>
@@ -392,26 +412,6 @@
     </summary>
     
       <category term="系统设计" scheme="http://www.xiaocc.xyz/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>内存检测工具AddressSanitizer</title>
-    <link href="http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/"/>
-    <id>http://www.xiaocc.xyz/2018-05-28/AddressSanitizer/</id>
-    <published>2018-05-28T11:30:00.000Z</published>
-    <updated>2018-12-15T11:12:23.363Z</updated>
-    
-    <content type="html"><![CDATA[<p>Google出品的内存检测工具AddressSanitizer介绍与分析</p><a id="more"></a><h4><span id="介绍">介绍</span></h4><p>AddressSanitizer是Google旗下的一个内存问题检测工具，项目地址：<a href="https://github.com/google/sanitizers/wiki/AddressSanitizer" target="_blank" rel="noopener">https://github.com/google/sanitizers/wiki/AddressSanitizer</a></p><p>它与传统的内存问题检测工具，例如 <code>Valgrind</code> ，有何区别？</p><p>用过 <code>Valgrind</code> 的朋友应该都清楚，其会极大的降低程序运行速度，大约降低10倍，而 <code>AddressSanitizer</code> 大约只降低2倍，这是什么概念，果然是Google大法好！</p><h4><span id="具体使用">具体使用</span></h4><p>在LLVM及高版本编译器中已经自带了该工具，编译时添加 <code>-fsanitize=address</code> 选项。<br>正常运行程序，如有内存相关问题，即会打印异常信息。</p><h4><span id="工具原理">工具原理</span></h4><p>工具用法比较简单，这里想重点说说该工具的原理。</p><p>可参考文档：<a href="https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm" target="_blank" rel="noopener">https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm</a></p><p>由于是内存检测工具，其需要对每一次内存读写操作进行检查：<br><code>*address = ...;  // or: ... = *address;</code></p><p>进行如下的逻辑判断：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (IsPoisoned(address)) &#123;</span><br><span class="line">  ReportError(address, kAccessSize, kIsWrite);</span><br><span class="line">&#125;</span><br><span class="line">*address = ...;  <span class="comment">// or: ... = *address;</span></span><br></pre></td></tr></table></figure><p>如果指针读写异常，则统计及打印异常信息，可见整个工具的关键在于 <code>IsPoisoned</code> 如何实现，该函数需要快速而且准确。</p><h4><span id="内存映射">内存映射</span></h4><p>其将内存分为两块：</p><ul><li>主内存：程序常规使用</li><li>影子内存：记录主内存是否可用等meta信息</li></ul><p>如果有个函数 <code>MemToShadow</code> 可以根据主内存地址获取到对应的影子内存地址，那么内存检测的实现，可以改写为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">shadow_address = MemToShadow(address);</span><br><span class="line"><span class="keyword">if</span> (ShadowIsPoisoned(shadow_address)) &#123;</span><br><span class="line">  ReportError(address, kAccessSize, kIsWrite);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4><span id="影子内存">影子内存</span></h4><p><code>AddressSanitizer</code> 用 1 byte 的影子内存，记录主内存中 8 bytes 的数据。</p><p>为什么是 8 bytes ，因为malloc分配内存是按照 8 bytes 对齐。</p><p>这样，8 bytes 的主内存，共构成 9 种不同情况：</p><ul><li>8 bytes 的数据可读写，影子内存中的value值为 <strong>0</strong></li><li>8 bytes 的数据不可读写，影子内存中的value值为 <strong>负数</strong></li><li>前 k bytes 可读写，后 (8 - k) bytes 不可读写，影子内存中的value值为 <strong>k</strong> 。</li></ul><p>如果 <code>malloc(13)</code> ，根据 8 bytes 字节对齐的原则，需要 2 bytes 的影子内存，第一个byte的值为 0，第二个byte的值为 5。</p><p>这时，整个判断流程，可改写为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">byte *shadow_address = MemToShadow(address);</span><br><span class="line">byte shadow_value = *shadow_address;</span><br><span class="line"><span class="keyword">if</span> (shadow_value) &#123;</span><br><span class="line">  <span class="keyword">if</span> (SlowPathCheck(shadow_value, address, kAccessSize)) &#123;</span><br><span class="line">    ReportError(address, kAccessSize, kIsWrite);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Check the cases where we access first k bytes of the qword</span></span><br><span class="line"><span class="comment">// and these k bytes are unpoisoned.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">SlowPathCheck</span><span class="params">(shadow_value, address, kAccessSize)</span> </span>&#123;</span><br><span class="line">  last_accessed_byte = (address &amp; <span class="number">7</span>) + kAccessSize - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> (last_accessed_byte &gt;= shadow_value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4><span id="主内存映射到影子内存">主内存映射到影子内存</span></h4><p><code>MemToShadow</code> 采用简单直接映射的方式<br>64-bit <code>Shadow = (Mem &gt;&gt; 3) + 0x7fff8000;</code><br>32-bit <code>Shadow = (Mem &gt;&gt; 3) + 0x20000000;</code></p><h4><span id="例子">例子</span></h4><p>如何检测数组访问越界：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>AddressSanitizer</code> 将其改写为：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">char</span> redzone1[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">char</span> a[<span class="number">8</span>];          <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">char</span> redzone2[<span class="number">24</span>];</span><br><span class="line">  <span class="keyword">char</span> redzone3[<span class="number">32</span>];  <span class="comment">// 32-byte aligned</span></span><br><span class="line">  <span class="keyword">int</span>  *shadow_base = MemToShadow(redzone1);</span><br><span class="line">  shadow_base[<span class="number">0</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone1</span></span><br><span class="line">  shadow_base[<span class="number">1</span>] = <span class="number">0xffffff00</span>;  <span class="comment">// poison redzone2, unpoison 'a'</span></span><br><span class="line">  shadow_base[<span class="number">2</span>] = <span class="number">0xffffffff</span>;  <span class="comment">// poison redzone3</span></span><br><span class="line">  ...</span><br><span class="line">  shadow_base[<span class="number">0</span>] = shadow_base[<span class="number">1</span>] = shadow_base[<span class="number">2</span>] = <span class="number">0</span>; <span class="comment">// unpoison all</span></span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/20180528214308.png" alt=""><br>将 <code>char a[8]</code> 两侧用 <code>redzone</code> 包夹，这样数组访问越界时，立马能够侦测。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Google出品的内存检测工具AddressSanitizer介绍与分析&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="编程实践" scheme="http://www.xiaocc.xyz/categories/%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     
     
   </entry>
