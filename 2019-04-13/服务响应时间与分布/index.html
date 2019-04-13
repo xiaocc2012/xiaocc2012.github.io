@@ -106,27 +106,26 @@
 
 
 
-  <meta name="description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
+  <meta name="description" content="分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何修改进程名称">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/index.html">
+<meta property="og:title" content="服务响应时间与分布">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-04-13/服务响应时间与分布/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
+<meta property="og:description" content="分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
-<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg">
-<meta property="og:updated_time" content="2018-12-17T15:02:56.670Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg">
+<meta property="og:updated_time" content="2019-04-13T11:34:11.980Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何修改进程名称">
-<meta name="twitter:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
-<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
+<meta name="twitter:title" content="服务响应时间与分布">
+<meta name="twitter:description" content="分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg">
 
 
 
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/">
+  <link rel="canonical" href="http://www.xiaocc.xyz/2019-04-13/服务响应时间与分布/">
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>如何修改进程名称 | 曾经浮华的小窝</title>
+  <title>服务响应时间与分布 | 曾经浮华的小窝</title>
   
 
 
@@ -356,7 +355,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-12-16/如何修改进程名称/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2019-04-13/服务响应时间与分布/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -373,7 +372,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">如何修改进程名称
+          <h1 class="post-title" itemprop="name headline">服务响应时间与分布
 
               
             
@@ -399,24 +398,12 @@
                 
               
 
-              <time title="创建时间：2018-12-16 22:30:00" itemprop="dateCreated datePublished" datetime="2018-12-16T22:30:00+08:00">2018-12-16</time>
+              <time title="创建时间：2019-04-13 14:00:00 / 修改时间：19:34:11" itemprop="dateCreated datePublished" datetime="2019-04-13T14:00:00+08:00">2019-04-13</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-12-17 23:02:56" itemprop="dateModified" datetime="2018-12-17T23:02:56+08:00">2018-12-17</time>
               
             
           </span>
@@ -433,7 +420,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/编程实践/" itemprop="url" rel="index"><span itemprop="name">编程实践</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/学习笔记/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a></span>
 
                 
                 
@@ -474,21 +461,44 @@
       
 
       
-        <p>分析如何修改进程名称，以利于更清楚的展示进程相关信息</p>
+        <p>分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算</p>
 <a id="more"></a>
-<h4><span id="引子">引子</span></h4><p>最近服务器中了挖矿病毒，CPU暴涨，<code>top</code>查看到的高负载进程名为随机字母。<br>一般情况下进程名为可执行文件名，执行<code>cat /proc/{pid}/exe</code>，查看可执行文件路径，可执行文件已经被删除。</p>
-<p>网上搜索相关资料，找到一个有意思的问题，如何修改进程名称？</p>
-<p>在<code>redis</code>、<code>nginx</code>中有修改进程名的相关实现，函数为<code>setproctitle</code>。<br>在<code>nginx</code>中有详细的原理解释。</p>
-<h4><span id="核心">核心</span></h4><p>如<code>nginx</code>中注释所言：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * To change the process title in Linux and Solaris we have to set argv[1]</span><br><span class="line"> * to NULL and to copy the title to the same place where the argv[0] points to.</span><br><span class="line"> * However, argv[0] may be too small to hold a new title.  Fortunately, Linux</span><br><span class="line"> * and Solaris store argv[] and environ[] one after another.  So we should</span><br><span class="line"> * ensure that is the continuous memory and then we allocate the new memory</span><br><span class="line"> * for environ[] and copy it.  After this we could use the memory starting</span><br><span class="line"> * from argv[0] for our process title.</span><br><span class="line"> *</span><br><span class="line"> * The Solaris&apos;s standard /bin/ps does not show the changed process title.</span><br><span class="line"> * You have to use &quot;/usr/ucb/ps -w&quot; instead.  Besides, the UCB ps does not</span><br><span class="line"> * show a new title if its length less than the origin command line length.</span><br><span class="line"> * To avoid it we append to a new title the origin command line in the</span><br><span class="line"> * parenthesis.</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
-<p>进程名及命令行参数保存在<code>argv</code>数组中，而相关环境变量则保存在<code>environ</code>数组中，其内存布局如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg" alt=""></p>
-<p>可见命令行参数与环境变量是紧凑型存储在一块连续的内存。</p>
-<p>想要改变进程名就得改变<code>argv[0]</code>的值，如果直接设置新进程名，当其过长，会将这块内存区域写坏。</p>
-<p>那该如何实现？</p>
-<h4><span id="实现">实现</span></h4><p>这里采用的方式是给<code>environ</code>数据重新分配一块空间，并改变<code>environ</code>指针数组的值，让其每个指针指向新数据对应地址。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg" alt=""></p>
-<p>这样<code>argv[0]</code>就有足够空间设置新进程名。</p>
-<h4><span id="注意">注意</span></h4><p>如果新进程名比原进程名短，需要先清空<code>argv[0]</code>指向的数据，然后再设置。<br><code>environ</code>可通过<code>extern char** environ</code>获得。</p>
-<p><em>TODO：分析为何argv、environ为连续紧凑型存储</em></p>
+<h4><span id="背景">背景</span></h4><p>最近看得多，写得少，所谓</p>
+<blockquote>
+<p>学而不思则罔，思而不学则殆</p>
+</blockquote>
+<p>还是得记录笔记，以加强理解。</p>
+<p>有篇博客提到服务响应时间各种值之优劣，特记录之。</p>
+<h4><span id="平均值">平均值</span></h4><p>我们考察一个服务器的性能，除了QPS数据外，还会考察响应时间，当服务器负载增高时，往往会伴随着响应时间的增长，但是这个值该如何度量，以精准的表现服务器当前之负载呢？</p>
+<p>最常用的值为平均值，表示服务的平均响应时间，通过该值我们能够知道服务当前响应的所有请求耗时的平均值。<br>例如平均耗时为100ms，表示服务器当前<code>请求的总耗时/请求总数量</code>，通过该值，我们大体能知道服务运行情况。<br>但是对于具体有多少个请求的耗时比100ms要大，大多少，是200ms，还是500ms，还是1000ms，我们无从得知。<br>而且，平均值这个数据容易掩盖一些<strong>异常值</strong>问题，比如，我的财富加马云财富的平均值也能过亿，所以，平均值这个数据项过于简单，提供的信息量太少。</p>
+<p>那为什么我们通常采用平均值来衡量或者监控服务性能呢？</p>
+<p>主要是由于该值容易计算，采用两个变量<code>S</code>、<code>N</code>，即可持续计算平均值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S = S + X</span><br><span class="line">N = N + 1</span><br><span class="line">V = S/N</span><br></pre></td></tr></table></figure>
+<p>通过该公式，当有新的耗时值<code>X</code>需要考量，很方便的就能算出平均值，就算QPS到几十万/s，也不在话下。</p>
+<p>注意，该公式有个隐含问题，即是<code>S</code>增长过快问题，如果QPS过高，<code>X</code>值过大，很容易导致<code>S</code>溢出，从而导致结果计算异常。</p>
+<p>可将该公式做如下改造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Vs = S/N</span><br><span class="line">Vn = (S+X)/(N+1) = (Vs*N+X)/(N+1) = Vs + (X - Vs)/(N+1)</span><br></pre></td></tr></table></figure>
+<p>该算法也只需要两个变量，未考量数据<code>X</code>时——平均值<code>Vs</code>、数据个数N<br>但是，该算法由于不累加<code>S</code>，而只累加<code>N</code>，而<code>N</code>的增长极慢，不易导致溢出问题。</p>
+<h4><span id="中位值">中位值</span></h4><p>如上所述，由于平均值不能反映数据分布及极端异常值的问题，可以考虑采用<strong>中位值</strong>来作为度量。</p>
+<p>中位值如何计算？</p>
+<p>我们假设某服务在1s内响应了100个请求，耗时为X1、X2 … X100，可以对这100个数按照从小到大的顺序进行排序，在排序后的列表的中间位置的值——即为中位值，假设为150ms。</p>
+<p>那这个值，150ms，表示什么意思呢？<br>它表示，服务器响应的这100个请求里面有50个的请求耗时小于150ms，另有50个请求的耗时大于150ms。</p>
+<p>如果，我们有一个服务qps为3万/s，经过计算响应耗时中位值为100ms，那么我们可以推断有1.5万个请求的耗时小于100ms，也就是说我们有一半的用户的响应耗时小于100ms，据此我们就可以评估服务响应性能是否可以满足业务要求。</p>
+<p>但是，这个中位值还有另外一个问题，我们只知道还有一半的请求耗时大于100ms，具体是大多少，大200ms，还是500ms，我们无法得知。</p>
+<h4><span id="p95值与p99值">P95值与P99值</span></h4><p>由于中位值只能反映中位数的问题，不能反馈更多信息，例如，我想知道该服务80%的请求耗时在多少ms以内，这些问题需要额外的数据指标。</p>
+<p>P95——响应耗时从小到大排列，顺序处于95%位置的值即为P95值。</p>
+<p>还是采用上面那个例子，100个请求按照响应时间从小到大排列，位置为95的值，即为P95值。<br>我们假设该值为180ms，那这个值又表示什么意思呢？</p>
+<p>意思是说，我们对95%的用户的响应耗时在180ms之内，只有5%的用户的响应耗时大于180ms，据此，我们掌握了更精确的服务响应耗时信息。</p>
+<h4><span id="p999值">P99.9值</span></h4><p>亚马逊经常采用P99.9值，也就是99.9%用户耗时作为指标，也就是1000个用户里面，999个用户的耗时上限，如果测量与优化该值，即可保证绝大多数用户的使用体验。<br>至于P99.99值，优化成本过高，而且服务响应由于网络波动、系统抖动等不能解决之情况，故暂不考虑该指标。</p>
+<h4><span id="如何计算p分位值">如何计算P分位值</span></h4><p>如上说过平均值的计算方式，而P值需要将响应耗时从小到大排序，然后取得对应百分位之值。</p>
+<p>如果服务qps较低，例如：100/秒，记录这100个耗时数据，然后排序，然后取得P分位值，倒不是难事。<br>而如果qps较高，例如：30万/秒，如果还是采用<code>记录+排序</code>的方式，可以预见需要消耗大量内存与计算资源。</p>
+<p>有没有简单的计算方式呢？</p>
+<p>可以采用直方图来进行计算，该计算方式虽不是完全准确值，但精度非常高，误差较小。</p>
+<p>直方图需要界定两个直方之间的跨度，一般采用等分形式，例如对于耗时统计需求，我们可以假定一个耗时上界，然后等分，比如划分成100个区间，对于每个响应耗时落入对应的直方，如下图：</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg" alt=""></p>
+<p>这样就避免了对全部数据进行排序，只需要根据各个直方中的数据数量，即可计算出95%位置位于哪个直方，然后在该直方内部采用插值方法，计算出P95值。</p>
+<p>另外，考虑到数据分布特点，服务耗时异常数据应该只是少数，但是异常值跨度可能很大，大部分耗时数据均靠近正常值，如果直方统计采用等分形式，会导致大量数据堆积在一个直方中，如何解决这个问题？</p>
+<p>可以采用非等分的跨度划分方式，例如采用<strong>指数</strong>形式划分，耗时越低的区间，跨度越小，精度约高。</p>
 
       
     </div>
@@ -519,8 +529,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-12-14/协程原理解析3/" rel="next" title="协程原理解析(3)">
-                <i class="fa fa-chevron-left"></i> 协程原理解析(3)
+              <a href="/2019-01-17/Linux系统调用流程/" rel="next" title="Linux系统调用流程">
+                <i class="fa fa-chevron-left"></i> Linux系统调用流程
               </a>
             
           </div>
@@ -528,10 +538,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-12-19/linux程序装载与运行/" rel="prev" title="Linux程序装载与运行流程分析">
-                Linux程序装载与运行流程分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -679,7 +685,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">平均值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">中位值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">P95值与P99值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">P99.9值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">如何计算P分位值</span></a></li></ol></div>
             
 
           </div>
