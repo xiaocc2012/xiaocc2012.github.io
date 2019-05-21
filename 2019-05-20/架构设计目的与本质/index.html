@@ -106,24 +106,24 @@
 
 
 
-  <meta name="description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+  <meta name="description" content="架构设计相关阅读笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用C++安全的发送邮件">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-10/发送邮件2/index.html">
+<meta property="og:title" content="架构设计目的与本质">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-05-20/架构设计目的与本质/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta property="og:description" content="架构设计相关阅读笔记">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-18T03:44:52.495Z">
+<meta property="og:updated_time" content="2019-05-21T01:55:18.385Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用C++安全的发送邮件">
-<meta name="twitter:description" content="前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施">
+<meta name="twitter:title" content="架构设计目的与本质">
+<meta name="twitter:description" content="架构设计相关阅读笔记">
 
 
 
 
 
 
-  <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/">
+  <link rel="canonical" href="http://www.xiaocc.xyz/2019-05-20/架构设计目的与本质/">
 
 
 
@@ -133,7 +133,7 @@
   };
 </script>
 
-  <title>使用C++安全的发送邮件 | 曾经浮华的小窝</title>
+  <title>架构设计目的与本质 | 曾经浮华的小窝</title>
   
 
 
@@ -353,7 +353,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-05-10/发送邮件2/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2019-05-20/架构设计目的与本质/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="曾经浮华">
@@ -370,7 +370,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用C++安全的发送邮件
+          <h1 class="post-title" itemprop="name headline">架构设计目的与本质
 
               
             
@@ -396,7 +396,7 @@
                 
               
 
-              <time title="创建时间：2018-05-10 23:00:00" itemprop="dateCreated datePublished" datetime="2018-05-10T23:00:00+08:00">2018-05-10</time>
+              <time title="创建时间：2019-05-20 12:30:00" itemprop="dateCreated datePublished" datetime="2019-05-20T12:30:00+08:00">2019-05-20</time>
             
 
             
@@ -413,7 +413,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-09-18 11:44:52" itemprop="dateModified" datetime="2018-09-18T11:44:52+08:00">2018-09-18</time>
+                <time title="修改时间：2019-05-21 09:55:18" itemprop="dateModified" datetime="2019-05-21T09:55:18+08:00">2019-05-21</time>
               
             
           </span>
@@ -430,7 +430,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/编程实践/" itemprop="url" rel="index"><span itemprop="name">编程实践</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/学习笔记/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a></span>
 
                 
                 
@@ -471,45 +471,95 @@
       
 
       
-        <p>前文提到，使用SMTP协议发送邮件不安全，本文将解释具体原因与应对措施</p>
+        <p>架构设计相关阅读笔记</p>
 <a id="more"></a>
-<p>要解释SMTP协议的不安全问题，得先说说http协议</p>
-<h4><span id="http协议">HTTP协议</span></h4><p>具体解释可以参考wiki <a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">HTTP协议</a></p>
-<blockquote>
-<p>它是一种用于分布式、协作式和超媒体信息系统的应用层协议<br>设计HTTP最初的目的是为了提供一种发布和接收HTML页面的方法</p>
-</blockquote>
-<p>http交互内容是明文传输，例如获取google首页的方式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.google.com</span><br></pre></td></tr></table></figure>
-<p>服务器返回内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Length: 3059</span><br><span class="line">Server: GWS/2.0</span><br><span class="line">Date: Sat, 11 Jan 2003 02:44:04 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Cache-control: private</span><br><span class="line">Set-Cookie: PREF=ID=73d4aef52e57bae9:TM=1042253044:LM=1042253044:S=SMCc_HRPCQiqy</span><br><span class="line">X9j; expires=Sun, 17-Jan-2038 19:14:07 GMT; path=/; domain=.google.com</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
-<p>这样有什么安全问题呢？整个交互内容除了Client和Server端，没有第三个人知道。<br>你可能有这样的疑问，其实不对，我们在网络上发送消息，并不是直接传递到Server端，中间会经过很多节点的转发，这样就存在干坏事的时机。</p>
-<div id="sequence-0"></div>
-
-<p>经常上网的你会碰到，有时候打开网页，莫名其妙的多了广告，而且有些是非常著名的网站，这些网站不会自主添加广告。</p>
-<p><strong>那这些广告是哪里来的呢？</strong></p>
-<p>其实是网络运营商对服务端返回的数据进行解析与篡改，由于整个交互内容是明文，很容易知道数据格式，就可以在返回数据中添加自己的广告，然后返回给用户。利用这个原理也可以做一些别的事情，例如：针对非法网页的打击。</p>
-<div id="sequence-1"></div>
-
-<p>这就是常说的 <code>中间人劫持</code>。</p>
-<h4><span id="https">HTTPS</span></h4><p><a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">wiki解释</a></p>
-<blockquote>
-<p>超文本传输安全协议，是一种通过计算机网络进行安全通信的传输协议<br>HTTPS经由HTTP进行通信，但利用SSL/TLS来加密数据包。HTTPS开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。</p>
-</blockquote>
-<h5><span id="与http的差异">与HTTP的差异</span></h5><blockquote>
-<p>与HTTP的URL由“http://”起始且默认使用端口80不同，HTTPS的URL由“https://”起始且默认使用端口443<br>HTTP协议和安全协议同属于应用层（OSI模型的最高层），具体来讲，安全协议工作在HTTP之下，运输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。<br>严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（TLS或SSL）上的常规HTTP协议的称呼。<br><strong>HTTPS报文中的任何东西都被加密，包括所有报头和荷载</strong>。<br>除了可能的选择密文攻击之外，一个攻击者所能知道的只有在两者之间有一连接这一事实。</p>
-</blockquote>
-<p><strong>由此可见，https能够实现网页信息的安全传输</strong></p>
-<h4><span id="smtps">SMTPS</span></h4><p>http协议有对应的安全版本https，其实，smtp协议也有对应的安全版本smtps。<br>smtps协议的 <a href="https://en.wikipedia.org/wiki/SMTPS" target="_blank" rel="noopener">wiki解释</a><br>与https协议类似，smtps协议也是通过 SSL/TLS 在传输层上通过对信息加密来保证安全性</p>
-<h4><span id="实际例子">实际例子</span></h4><p>libcurl中有一个smtp + ssl的例子：<a href="https://curl.haxx.se/libcurl/c/smtp-ssl.html" target="_blank" rel="noopener">code</a></p>
-<p><em>我想知道，还有什么功能是libcurl不能实现的。。。</em></p>
-<p><script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.27/webfontloader.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js"></script><textarea id="sequence-0-code" style="display: none">Client->Node1: data
-Node1-->Node2: data
-Node2-->Node3: data
-Node3-->NodeN: data
-NodeN->Server: data</textarea><textarea id="sequence-0-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-0-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-0", options);</script><textarea id="sequence-1-code" style="display: none">Server->Node1: data
-Node1->Node2: data
-Node2-->NodeN: data->data'
-NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display: none">{"theme":"simple"}</textarea><script>  var code = document.getElementById("sequence-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("sequence-1-options").value));  var diagram = Diagram.parse(code);  diagram.drawSVG("sequence-1", options);</script></p>
+<h4><span id="架构设计目的">架构设计目的</span></h4><p><strong>架构设计目的是解决软件工程中的复杂问题</strong></p>
+<p>软件工程经历过几个大的变革</p>
+<ul>
+<li>编程语言开发效率低的问题。最初的编程语言只有低级的汇编语言，编写应用软件非常不便利，也不利于调试。为了解决这个问题，诞生了C语言，之后又诞生了C++、Java等语言，解决了第一次软件危机</li>
+<li>多核、多机问题。随着硬件发展，处理器多核架构诞生，传统的单进程架构无法利用多核优势，这时候诞生了多进程、多线程架构，以充分利用单机多核优势，之后诞生的分布式架构，将多机协调工作以完成单机无法做到的工作</li>
+<li>随着软件系统的功能愈发复杂，这时候其它问题成为主要矛盾，例如：如何快速添加新需求而不用更改过多代码，如何保证系统稳定性以应对突发流量，如何测试和升级系统以最小化影响用户</li>
+</ul>
+<h4><span id="为什么要进行架构设计">为什么要进行架构设计</span></h4><p>是不是一定要进行架构设计？<br>没有进行架构设计的系统，也运行得好好的，为什么要做架构设计？<br>架构是不是设计得越复杂越好，是不是只有高大上的设计才能称为架构设计？</p>
+<p>以上是架构设计中经常碰到的问题，还有如下问题也经常碰到：</p>
+<p>别人进行了架构设计，那么我也要做架构设计<br>为了高性能、高可用，所以要做架构设计<br>公司要求必须要做架构设计<br>架构设计可以减少代码量、缩短开发时间，提高开发效率</p>
+<p>会提出这些问题，主要是对架构设计的本质没有理解。</p>
+<p>架构设计的目的是什么？</p>
+<p>不是为了显摆架构师的水平有多深，而是要实实在在的解决当前软件系统中的问题。<br>不能说淘宝用了某某架构、微信用了某某架构，我们也得采用某某设计方案，这些考虑都是脱离实际的，淘宝、微信的业务与我们的业务、用户量级不一样，它们碰到的问题，不一定是我们需要解决的问题，如果照搬，会闹笑话。</p>
+<h4><span id="架构设计三原则">架构设计三原则</span></h4><ul>
+<li>简单原则</li>
+<li>适用原则</li>
+<li>演进原则</li>
+</ul>
+<p>简单的方案有利于实施和测试，复杂的方案开发周期长，如果开发中引入某些bug，在测试中难以发现。简单方案还有另外一个好处，容易找出性能瓶颈点，并进行性能优化。</p>
+<p>架构设计要满足适用原则，能够解决实际问题，而不是为了显摆技术能力，或者照搬大厂的某某方案，由于与大厂在业务维度、技术储备维度、人力资源维度均有较大差异，适合大厂的方案不一定适合自己系统。</p>
+<p>由于软件系统不是一成不变的，为了满足用户需求，需要随时调整与添加功能，不要想着一下子做一个万金油式的方案，一劳永逸。可以采用小步快跑的方式，先开发一个最小化的原型，并保留扩展能力，然后随着业务发展持续优化。</p>
+<h4><span id="架构设计案例分析">架构设计案例分析</span></h4><p>文中以”前浪微博”为例，讲解架构设计详细步骤</p>
+<p>前浪微博与新浪微博业务类似，用户注册后需要通知其它模块，例如：新手礼物模块、vip等级模块、消息发送模块等等，之前采用的是注册模块直接调用相关模块的接口进行通知，这种设计随着系统功能的庞大，越来越不适应。<br>用户点击注册按钮后，注册服务需要与多个模块交互，用户等待延迟长，体验差，另一方面，相关模块经常出问题，导致注册服务通知调用失败，最终给用户的反馈就是注册失败。</p>
+<p>架构师经过分析，主要是各个模块之间耦合严重，决定利用消息队列来对用户注册事件进行分发，其它对该事件感兴趣模块自由监听该事件消息，这样就解决了上面提到的两个问题。</p>
+<p>当前系统负载情况如下：<br>用户注册qps大约1200/s，下游需要监听该事件的模块数量约10个。<br>推论出消息队列写qps大约1200/s，读qps约<code>1200 * 10 = 1.2w/s</code>。</p>
+<p>接下来进行方案选型，备选方案一般选择<code>3-4</code>个，低于3个一般是思维狭隘、眼界不够，多于4个会导致方案辩论时间过长，甚至无法选择出最终方案。</p>
+<p>接下来是团队背景信息：</p>
+<ol>
+<li>开发团队人员5人，技术栈为Java，但有两个同事C/C++特别牛</li>
+<li>中间件团队人员5人</li>
+<li>运维团队人员3人</li>
+</ol>
+<p>备选方案有3个，开源方案kafka、Mysql+自研、纯自研</p>
+<p>接下来进行360度方案评估：</p>
+<table>
+<thead>
+<tr>
+<th>360</th>
+<th style="text-align:center">kafka</th>
+<th style="text-align:center">Mysql</th>
+<th style="text-align:center">纯自研</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发团队</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td>中间件团队</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">6</td>
+</tr>
+<tr>
+<td>运维团队</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">9</td>
+</tr>
+</tbody>
+</table>
+<p>评估核心：</p>
+<ul>
+<li>kafka<ul>
+<li>开发团队、中间件团队无意见，主要依赖运维团队，后者表示对kafka不熟悉，并且监控告警机制不完善，担心开源组件稳定性，如果出现问题，无法解决</li>
+</ul>
+</li>
+<li>Mysql<ul>
+<li>开发团队无意见，运维团队对Mysql非常熟练无意见，中间件团队表示无意见，少量开发工作，有利于提高其部门开发实力，同时利于在公司内部露脸彰显技术实力</li>
+</ul>
+</li>
+<li>纯自研<ul>
+<li>开发团队、运维团队表示对中间件团队开发该量级大系统能力表示怀疑，纯自研组件可靠性、稳定性待检测，开发周期长，时间上不允许 </li>
+</ul>
+</li>
+</ul>
+<p>最后架构师基于相关背景、资源，在该约束情况下选择Mysq自研的方式，同时考虑到以下几点：</p>
+<ul>
+<li>Mysql的稳定性、可靠性高，社区活跃、文档多</li>
+<li>Mysql单机性能不错，可以达到2000/s，架构设计时对消息分片以利用多机能力</li>
+<li>运维团队对Mysql熟悉，监控、告警机制齐全</li>
+</ul>
+<p>接下来进行详细的方案设计与讨论</p>
+<h4><span id="总结">总结</span></h4><p>综上，架构设计是为了解决项目中的复杂问题，在有约束情况下(团队技术栈、运维资源)寻找最优解，而不是盲目崇拜大厂方案。<br>技术最终是为了业务而服务，需要遵循架构设计的演化原则，不要想着一步登天，一下子做一个全球领先的方案，以适用业务为原则，只要能实际解决业务遇到的迫切问题就是好方案。</p>
 
       
     </div>
@@ -540,8 +590,8 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018-05-07/发送邮件1/" rel="next" title="使用C++发送邮件">
-                <i class="fa fa-chevron-left"></i> 使用C++发送邮件
+              <a href="/2019-04-20/单点登录(SSO)笔记/" rel="next" title="单点登录(SSO)阅读笔记">
+                <i class="fa fa-chevron-left"></i> 单点登录(SSO)阅读笔记
               </a>
             
           </div>
@@ -549,10 +599,6 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018-05-12/关于PayPal支付接入的思考/" rel="prev" title="关于PayPal支付接入的思考——唯一ID的生成">
-                关于PayPal支付接入的思考——唯一ID的生成 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -700,7 +746,7 @@ NodeN->Client: data'</textarea><textarea id="sequence-1-options" style="display:
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">HTTP协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">与HTTP的差异</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">SMTPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">实际例子</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">架构设计目的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">为什么要进行架构设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">架构设计三原则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">架构设计案例分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>

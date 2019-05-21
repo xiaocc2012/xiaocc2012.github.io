@@ -1,3 +1,4 @@
+http://www.xiaocc.xyz/2019-05-20/架构设计目的与本质/
 http://www.xiaocc.xyz/2019-04-20/单点登录(SSO)笔记/
 http://www.xiaocc.xyz/2019-04-13/服务响应时间与分布/
 http://www.xiaocc.xyz/2019-01-17/Linux系统调用流程/
