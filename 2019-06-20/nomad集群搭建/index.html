@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="分布式作业调度系统nomad集群搭建">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-06-20T15:32:26.363Z">
+<meta property="og:updated_time" content="2019-07-10T03:44:41.746Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nomad集群搭建">
 <meta name="twitter:description" content="分布式作业调度系统nomad集群搭建">
@@ -396,12 +396,24 @@
                 
               
 
-              <time title="创建时间：2019-06-20 22:30:00 / 修改时间：23:32:26" itemprop="dateCreated datePublished" datetime="2019-06-20T22:30:00+08:00">2019-06-20</time>
+              <time title="创建时间：2019-06-20 22:30:00" itemprop="dateCreated datePublished" datetime="2019-06-20T22:30:00+08:00">2019-06-20</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-10 11:44:41" itemprop="dateModified" datetime="2019-07-10T11:44:41+08:00">2019-07-10</time>
               
             
           </span>
@@ -464,7 +476,7 @@
 <h4><span id="引子">引子</span></h4><p>在上篇中提到nomad的基本用法，当时使用的是dev环境，也即一个nomad进程同时充当server和client</p>
 <p>在高可用环境中，这是无法忍受的，需要多台机器构建成一个集群然后对外服务</p>
 <p>在本篇中讲讲nomad集群环境的搭建及任务下发到指定datacenter</p>
-<h4><span id="server端配置">server端配置</span></h4><p>nomad的server端采用gossip协议交换信息，并选举出leader来管理集群</p>
+<h4><span id="server端配置">server端配置</span></h4><p>nomad的server端采用raft协议选主，client端通过gossip协议交换信息</p>
 <p>nomad配置文档如下：<br><a href="https://www.nomadproject.io/docs/configuration/index.html" target="_blank" rel="noopener">https://www.nomadproject.io/docs/configuration/index.html</a></p>
 <p>我们构造两个server端组成集群，相关配置文件如下：</p>
 <p><strong>server1.hcl</strong></p>
@@ -556,6 +568,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019-10-03/btcpool矿池搭建/" rel="prev" title="btcpool矿池搭建">
+                btcpool矿池搭建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -624,7 +640,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
