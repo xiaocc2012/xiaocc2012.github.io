@@ -1,135 +1,72 @@
 <!DOCTYPE html>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.8.0">
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
 
-
-
-
-
-
-
-
-
-
-  <meta name="google-site-verification" content="5N2yIHPcI9plNoKG2bG_5pWzaFZaOlpGfq5EQNeE--o">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
-
-<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
-
-
-
-
-
-
-
-
-
-<script id="hexo.configurations">
+<script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
+    hostname: new URL('http://www.xiaocc.xyz').hostname,
     root: '/',
     scheme: 'Pisces',
-    version: '6.6.0',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
     fancybox: false,
-    fastclick: false,
+    mediumzoom: false,
     lazyload: false,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    pangu: false,
     algolia: {
-      applicationID: '',
+      appID: '',
       apiKey: '',
       indexName: '',
       hits: {"per_page":10},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
   };
 </script>
-
-
-  
-
-
-
 
   <meta name="description" content="linux系统调用流程分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux系统调用流程">
-<meta property="og:url" content="http://www.xiaocc.xyz/2019-01-17/Linux系统调用流程/index.html">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-01-17&#x2F;Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B&#x2F;index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="linux系统调用流程分析">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2019-01-17T15:30:37.492Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux系统调用流程">
-<meta name="twitter:description" content="linux系统调用流程分析">
+
+<link rel="canonical" href="http://www.xiaocc.xyz/2019-01-17/Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B/">
 
 
-
-
-
-
-  <link rel="canonical" href="http://www.xiaocc.xyz/2019-01-17/Linux系统调用流程/">
-
-
-
-<script id="page.configurations">
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
   };
 </script>
 
@@ -141,314 +78,163 @@
 
 
 
-
-
-
-
-
-
   <noscript>
   <style>
-    .use-motion .motion-element,
-    .use-motion .brand,
-    .use-motion .menu-item,
-    .sidebar-inner,
-    .use-motion .post-block,
-    .use-motion .pagination,
-    .use-motion .comments,
-    .use-motion .post-header,
-    .use-motion .post-body,
-    .use-motion .collection-title { opacity: initial; }
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
 
-    .use-motion .logo,
-    .use-motion .site-title,
-    .use-motion .site-subtitle {
-      opacity: initial;
-      top: initial;
-    }
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
 
-    .use-motion .logo-line-before i { left: initial; }
-    .use-motion .logo-line-after i { right: initial; }
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="曾经浮华的小窝" type="application/atom+xml">
 </head>
 
-<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
   <div class="site-meta">
-    
 
-    <div class="custom-logo-site-title">
+    <div>
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">曾经浮华的小窝</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
-    
-      
         <p class="site-subtitle">hello,world!</p>
-      
-    
-    
   </div>
 
   <div class="site-nav-toggle">
-    <button aria-label="切换导航栏">
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
   </div>
 </div>
-
 
 
 <nav class="site-nav">
   
-    <ul id="menu" class="menu">
-      
-        
-        
-        
-          
-          <li class="menu-item menu-item-home">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
 
-    
-    
-    
-      
-    
-
-    
-
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-about">
 
-    
-    
-    
-      
-    
-
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-tags">
+        <li class="menu-item menu-item-tags">
 
-    
-    
-    
-      
-    
-
-    
-
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-categories">
+        <li class="menu-item menu-item-categories">
 
-    
-    
-    
-      
-    
-
-    
-
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-archives">
 
-    
-    
-    
-      
-    
-
-    
-
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
 
   </li>
+  </ul>
 
-      
-      
-    </ul>
-  
-
-  
-
-  
 </nav>
-
-
-
-  
-
-
-
 </div>
     </header>
 
     
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
 
 
-    <main id="main" class="main">
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
           
+
+          <div class="content">
             
 
-          
-          <div id="content" class="content">
-            
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2019-01-17/Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B/">
 
-  <div id="posts" class="posts-expand">
-    
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2019-01-17/Linux系统调用流程/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="曾经浮华">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="曾经浮华的小窝">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">Linux系统调用流程
-
-              
-            
-          </h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          Linux系统调用流程
+        </h1>
 
         <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
+              <span class="post-meta-item-text">发表于</span>
               
 
               <time title="创建时间：2019-01-17 22:00:00 / 修改时间：23:30:37" itemprop="dateCreated datePublished" datetime="2019-01-17T22:00:00+08:00">2019-01-17</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
+            </span>
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/学习笔记/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a></span>
-
-                
-                
-              
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
             </span>
-          
 
           
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="post-meta-item-icon">
-            <i class="fa fa-eye"></i>
-             阅读次数： 
-            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
             </span>
-          
-
-          
-
-          
 
         </div>
       </header>
-    
 
     
     
@@ -456,11 +242,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <p>linux系统调用流程分析</p>
 <a id="more"></a>
+
 <h4><span id="背景">背景</span></h4><p>在前篇中我们讲到，使用<code>kill</code>系统调用进行<code>signal</code>投递之流程，其中有个点没有提到，系统调用详细流程究竟是怎样的。</p>
 <p>大家应该知道传统的系统调用方式，即通过<code>int 0x80</code>指令，以软中断的形式触发系统调用，并将系统调用号放置在<code>rax</code>寄存器中，系统调用其它参数也通过寄存器传递。</p>
 <p>由于通过软中断实现系统调用比较低效，现在普遍采用<code>syscall</code>指令形式。</p>
@@ -468,292 +252,193 @@
 <h4><span id="中断向量表">中断向量表</span></h4><p>在CPU中有中断向量表，可以理解为一个数组，数组的内容为地址，也就是当对应中断发生时候的处理地址。</p>
 <p>按照<code>int 0x80</code>指令的字面意思，应该是触发了中断号为<code>0x80</code>的中断，那么其处理函数是什么呢？</p>
 <h4><span id="初始化中断表">初始化中断表</span></h4><p>以<code>x86</code>-32位架构为例，在内核启动时候，会调用<code>trap_init</code>函数，其实现如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /arch/x86/kernel/traps.c</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> __<span class="function">init <span class="title">trap_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_EISA</span></span><br><span class="line">	<span class="keyword">void</span> __iomem *p = early_ioremap(<span class="number">0x0FFFD9</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (readl(p) == <span class="string">'E'</span> + (<span class="string">'I'</span>&lt;&lt;<span class="number">8</span>) + (<span class="string">'S'</span>&lt;&lt;<span class="number">16</span>) + (<span class="string">'A'</span>&lt;&lt;<span class="number">24</span>))</span><br><span class="line">		EISA_bus = <span class="number">1</span>;</span><br><span class="line">	early_iounmap(p, <span class="number">4</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	set_intr_gate(<span class="number">0</span>, &amp;divide_error);</span><br><span class="line">	set_intr_gate_ist(<span class="number">2</span>, &amp;nmi, NMI_STACK);</span><br><span class="line">	<span class="comment">/* int4 can be called from all */</span></span><br><span class="line">	set_system_intr_gate(<span class="number">4</span>, &amp;overflow);</span><br><span class="line">	set_intr_gate(<span class="number">5</span>, &amp;bounds);</span><br><span class="line">	set_intr_gate(<span class="number">6</span>, &amp;invalid_op);</span><br><span class="line">	set_intr_gate(<span class="number">7</span>, &amp;device_not_available);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_32</span></span><br><span class="line">	set_task_gate(<span class="number">8</span>, GDT_ENTRY_DOUBLEFAULT_TSS);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">	set_intr_gate_ist(<span class="number">8</span>, &amp;double_fault, DOUBLEFAULT_STACK);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	set_intr_gate(<span class="number">9</span>, &amp;coprocessor_segment_overrun);</span><br><span class="line">	set_intr_gate(<span class="number">10</span>, &amp;invalid_TSS);</span><br><span class="line">	set_intr_gate(<span class="number">11</span>, &amp;segment_not_present);</span><br><span class="line">	set_intr_gate_ist(<span class="number">12</span>, &amp;stack_segment, STACKFAULT_STACK);</span><br><span class="line">	set_intr_gate(<span class="number">13</span>, &amp;general_protection);</span><br><span class="line">	set_intr_gate(<span class="number">15</span>, &amp;spurious_interrupt_bug);</span><br><span class="line">	set_intr_gate(<span class="number">16</span>, &amp;coprocessor_error);</span><br><span class="line">	set_intr_gate(<span class="number">17</span>, &amp;alignment_check);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_MCE</span></span><br><span class="line">	set_intr_gate_ist(<span class="number">18</span>, &amp;machine_check, MCE_STACK);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	set_intr_gate(<span class="number">19</span>, &amp;simd_coprocessor_error);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Reserve all the builtin and the syscall vector: */</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FIRST_EXTERNAL_VECTOR; i++)</span><br><span class="line">		set_bit(i, used_vectors);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_IA32_EMULATION</span></span><br><span class="line">	set_system_intr_gate(IA32_SYSCALL_VECTOR, ia32_syscall);</span><br><span class="line">	set_bit(IA32_SYSCALL_VECTOR, used_vectors);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_32</span></span><br><span class="line">	set_system_trap_gate(SYSCALL_VECTOR, &amp;system_call);</span><br><span class="line">	set_bit(SYSCALL_VECTOR, used_vectors);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Should be a barrier for any external CPU state:</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	cpu_init();</span><br><span class="line"></span><br><span class="line">	x86_init.irqs.trap_init();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /arch/x86/kernel/traps.c</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> __<span class="function">init <span class="title">trap_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_EISA</span></span><br><span class="line">	<span class="keyword">void</span> __iomem *p = early_ioremap(<span class="number">0x0FFFD9</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (readl(p) == <span class="string">'E'</span> + (<span class="string">'I'</span>&lt;&lt;<span class="number">8</span>) + (<span class="string">'S'</span>&lt;&lt;<span class="number">16</span>) + (<span class="string">'A'</span>&lt;&lt;<span class="number">24</span>))</span><br><span class="line">		EISA_bus = <span class="number">1</span>;</span><br><span class="line">	early_iounmap(p, <span class="number">4</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	set_intr_gate(<span class="number">0</span>, &amp;divide_error);</span><br><span class="line">	set_intr_gate_ist(<span class="number">2</span>, &amp;nmi, NMI_STACK);</span><br><span class="line">	<span class="comment">/* int4 can be called from all */</span></span><br><span class="line">	set_system_intr_gate(<span class="number">4</span>, &amp;<span class="built_in">overflow</span>);</span><br><span class="line">	set_intr_gate(<span class="number">5</span>, &amp;bounds);</span><br><span class="line">	set_intr_gate(<span class="number">6</span>, &amp;invalid_op);</span><br><span class="line">	set_intr_gate(<span class="number">7</span>, &amp;device_not_available);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_32</span></span><br><span class="line">	set_task_gate(<span class="number">8</span>, GDT_ENTRY_DOUBLEFAULT_TSS);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">	set_intr_gate_ist(<span class="number">8</span>, &amp;double_fault, DOUBLEFAULT_STACK);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	set_intr_gate(<span class="number">9</span>, &amp;coprocessor_segment_overrun);</span><br><span class="line">	set_intr_gate(<span class="number">10</span>, &amp;invalid_TSS);</span><br><span class="line">	set_intr_gate(<span class="number">11</span>, &amp;segment_not_present);</span><br><span class="line">	set_intr_gate_ist(<span class="number">12</span>, &amp;stack_segment, STACKFAULT_STACK);</span><br><span class="line">	set_intr_gate(<span class="number">13</span>, &amp;general_protection);</span><br><span class="line">	set_intr_gate(<span class="number">15</span>, &amp;spurious_interrupt_bug);</span><br><span class="line">	set_intr_gate(<span class="number">16</span>, &amp;coprocessor_error);</span><br><span class="line">	set_intr_gate(<span class="number">17</span>, &amp;alignment_check);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_MCE</span></span><br><span class="line">	set_intr_gate_ist(<span class="number">18</span>, &amp;machine_check, MCE_STACK);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	set_intr_gate(<span class="number">19</span>, &amp;simd_coprocessor_error);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Reserve all the builtin and the syscall vector: */</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FIRST_EXTERNAL_VECTOR; i++)</span><br><span class="line">		set_bit(i, used_vectors);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_IA32_EMULATION</span></span><br><span class="line">	set_system_intr_gate(IA32_SYSCALL_VECTOR, ia32_syscall);</span><br><span class="line">	set_bit(IA32_SYSCALL_VECTOR, used_vectors);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_32</span></span><br><span class="line">	set_system_trap_gate(SYSCALL_VECTOR, &amp;system_call);</span><br><span class="line">	set_bit(SYSCALL_VECTOR, used_vectors);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Should be a barrier for any external CPU state:</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	cpu_init();</span><br><span class="line"></span><br><span class="line">	x86_init.irqs.trap_init();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>在其中进行了大量中断处理函数的设置，注意到其中有这么一句：<br><code>set_system_trap_gate(SYSCALL_VECTOR, &amp;system_call);</code></p>
 <p>而<code>SYSCALL_VECTOR</code>是多少呢？</p>
 <p>其在<code>/arch/x86/include/asm/irq_vectors.h</code>中定义</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_X86_32</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SYSCALL_VECTOR 0x80</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
 <p>是熟悉的<code>0x80</code>，那么<code>system_call</code>，就是这个中断发生时候的处理函数咯。</p>
 <p>我们再找找，看看这个函数具体内容。</p>
 <h4><span id="system_call">system_call</span></h4><p>其在<code>/arch/x86/kernel/entry_32.S</code>中以汇编的形式定义</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ENTRY(system_call)</span><br><span class="line">	RING0_INT_FRAME			# can&apos;t unwind into user space anyway</span><br><span class="line">	pushl_cfi %eax			# save orig_eax</span><br><span class="line">	SAVE_ALL</span><br><span class="line">	GET_THREAD_INFO(%ebp) # system call tracing in operation / emulation</span><br><span class="line">	testl $_TIF_WORK_SYSCALL_ENTRY,TI_flags(%ebp)</span><br><span class="line">	jnz syscall_trace_entry</span><br><span class="line">	cmpl $(nr_syscalls), %eax</span><br><span class="line">	jae syscall_badsys</span><br><span class="line">syscall_call:</span><br><span class="line">	call *sys_call_table(,%eax,4)</span><br><span class="line">	movl %eax,PT_EAX(%esp)		# store the return value	</span><br><span class="line">	...</span><br></pre></td></tr></table></figure>
+
 <p>其中<code>ENTRY</code>在<code>include/linux/linkage.h</code>中定义</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> ENTRY</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ENTRY(name) \</span></span><br><span class="line">  .globl name; \</span><br><span class="line">  ALIGN; \</span><br><span class="line">  name:</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
 <p>在<code>system_call</code>中经过一系列处理，最终调用<br><code>call *sys_call_table(,%eax,4)</code><br>也就是说系统调用号保存在<code>%rax</code>中，并根据其值在系统调用表<code>sys_call_table</code>中进行查找，然后调用其值。</p>
 <h4><span id="sys_call_table-32系统的初始化">sys_call_table 32系统的初始化</span></h4><p>32位系统的初始化比较直接，其在<code>arch/x86/kernel/syscall_table_32.S</code>直接定义</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ENTRY(sys_call_table)</span><br><span class="line">	.long sys_restart_syscall	/* 0 - old &quot;setup()&quot; system call, used for restarting */</span><br><span class="line">	.long sys_exit</span><br><span class="line">	.long ptregs_fork</span><br><span class="line">	.long sys_read</span><br><span class="line">	.long sys_write</span><br><span class="line">	.long sys_open		/* 5 */</span><br><span class="line">	.long sys_close</span><br><span class="line">	.long sys_waitpid</span><br><span class="line">	.long sys_creat</span><br></pre></td></tr></table></figure>
+
 <h4><span id="sys_call_table-64系统的初始化">sys_call_table 64系统的初始化</span></h4><p>64位系统的初始化稍微复杂，其定义在<code>arch/x86/kernel/syscall_64.c</code>中</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* System call table for x86-64. */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/linkage.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/sys.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/cache.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;asm/asm-offsets.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NO_STUBS</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __SYSCALL(nr, sym) extern asmlinkage void sym(void) ;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> _ASM_X86_UNISTD_64_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;asm/unistd_64.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> __SYSCALL</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __SYSCALL(nr, sym) [nr] = sym,</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> _ASM_X86_UNISTD_64_H</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*<span class="keyword">sys_call_ptr_t</span>)</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">sys_ni_syscall</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">sys_call_ptr_t</span> sys_call_table[__NR_syscall_max+<span class="number">1</span>] = &#123;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	*Smells like a like a compiler bug -- it doesn't work</span></span><br><span class="line"><span class="comment">	*when the &amp; below is removed.</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	[<span class="number">0</span> ... __NR_syscall_max] = &amp;sys_ni_syscall,</span><br><span class="line">#include &lt;<span class="keyword">asm</span>/unistd_64.h&gt;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>可见，<code>sys_call_table</code>是一个数组，其值为<code>typedef void (*sys_call_ptr_t)(void);</code>类型的函数指针。</p>
 <p>在其中<code>#include &lt;asm/unistd_64.h&gt;</code>两次，有什么作用，又有什么区别呢？</p>
 <p>直接看看<code>asm/unistd_64.h</code>文件内容</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __SYSCALL</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __SYSCALL(a, b)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * This file contains the system call numbers.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Note: holes are not allowed.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* at least 8 syscall per cacheline */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_read				0</span></span><br><span class="line">__SYSCALL(__NR_read, sys_read)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_write				1</span></span><br><span class="line">__SYSCALL(__NR_write, sys_write)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_open				2</span></span><br><span class="line">__SYSCALL(__NR_open, sys_open)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_close				3</span></span><br><span class="line">__SYSCALL(__NR_close, sys_close)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_stat				4</span></span><br><span class="line">__SYSCALL(__NR_stat, sys_newstat)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_fstat				5</span></span><br><span class="line">__SYSCALL(__NR_fstat, sys_newfstat)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_lstat				6</span></span><br><span class="line">__SYSCALL(__NR_lstat, sys_newlstat)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __NR_poll				7</span></span><br><span class="line">__SYSCALL(__NR_poll, sys_poll)</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
 <p>在其中定义了每个系统调用对应的调用号</p>
 <p>那么再回头看看<code>arch/x86/kernel/syscall_64.c</code>文件内容，其首先对<code>__SYSCALL</code>进行重新定义</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __SYSCALL(nr, sym) extern asmlinkage void sym(void) ;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> _ASM_X86_UNISTD_64_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;asm/unistd_64.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
 <p>这样就可以对每个系统调用原型进行声明，其展开为：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">extern</span> asmlinkage <span class="keyword">void</span> <span class="title">sys_read</span><span class="params">(<span class="keyword">void</span>)</span> </span>;</span><br><span class="line"><span class="function"><span class="keyword">extern</span> asmlinkage <span class="keyword">void</span> <span class="title">sys_write</span><span class="params">(<span class="keyword">void</span>)</span> </span>;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
 <p>继续往下看，其对<code>__SYSCALL</code>又进行重定义</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> __SYSCALL</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __SYSCALL(nr, sym) [nr] = sym,</span></span><br></pre></td></tr></table></figure>
+
 <p>所以，<code>sys_call_table</code>展开为</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">sys_call_ptr_t</span> sys_call_table[__NR_syscall_max+<span class="number">1</span>] = &#123;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	*Smells like a like a compiler bug -- it doesn't work</span></span><br><span class="line"><span class="comment">	*when the &amp; below is removed.</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	[<span class="number">0</span> ... __NR_syscall_max] = &amp;sys_ni_syscall,</span><br><span class="line"></span><br><span class="line">[<span class="number">0</span>] = sys_read,</span><br><span class="line">[<span class="number">1</span>] = sys_write,</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>如此，根据系统调用号，即可在<code>sys_call_table</code>中找到对应的系统调用函数。</p>
 <h4><span id="终">终</span></h4><p>至此，<code>sys_call_table</code>中保存了系统调用的处理地址，执行<code>call *sys_call_table(,%rax,4)</code>即可转入对应系统调用函数进行真正处理。</p>
 <p>精简流程为：<br><code>int 0x80</code>触发软中断<br>-&gt;<br>在中断向量表中查找处理函数，<code>system_call</code><br>-&gt;<br>根据<code>%rax</code>值(系统调用号)查找系统调用处理函数<br>-&gt;<br>执行系统调用</p>
 
-      
     </div>
 
     
-
-    
-    
-    
-
-    
-
-    
-      
     
     
 
-    
+      <footer class="post-footer">
 
-    <footer class="post-footer">
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2019-01-15/Linux信号投递机制/" rel="next" title="Linux信号投递机制">
-                <i class="fa fa-chevron-left"></i> Linux信号投递机制
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019-04-13/服务响应时间与分布/" rel="prev" title="服务响应时间与分布">
-                服务响应时间与分布 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-  </div>
-
-
-          </div>
-          
-
-  
-
-
-
-        </div>
         
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019-01-15/Linux%E4%BF%A1%E5%8F%B7%E6%8A%95%E9%80%92%E6%9C%BA%E5%88%B6/" rel="prev" title="Linux信号投递机制">
+      <i class="fa fa-chevron-left"></i> Linux信号投递机制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019-04-13/%E6%9C%8D%E5%8A%A1%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E4%B8%8E%E5%88%86%E5%B8%83/" rel="next" title="服务响应时间与分布">
+      服务响应时间与分布 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
 
-  <aside id="sidebar" class="sidebar">
-    
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
     <div class="sidebar-inner">
 
-      
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
 
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">中断向量表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">初始化中断表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">system_call</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">5.</span> <span class="nav-text">sys_call_table 32系统的初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">6.</span> <span class="nav-text">sys_call_table 64系统的初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">7.</span> <span class="nav-text">终</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
 
       <div class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-            
-              <p class="site-author-name" itemprop="name">曾经浮华</p>
-              <p class="site-description motion-element" itemprop="description"></p>
-          </div>
-
-          
-            <nav class="site-state motion-element">
-              
-                <div class="site-state-item site-state-posts">
-                
-                  <a href="/archives/">
-                
-                    <span class="site-state-item-count">41</span>
-                    <span class="site-state-item-name">日志</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-categories">
-                  <a href="/categories/index.html">
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">6</span>
-                    <span class="site-state-item-name">分类</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  <a href="/tags/index.html">
-                    
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">2</span>
-                    <span class="site-state-item-name">标签</span>
-                  </a>
-                </div>
-              
-            </nav>
-          
-
-          
-
-          
-
-          
-
-          
-          
-
-          
-            
-          
-          
-
-        </div>
-      </div>
-
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">中断向量表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">初始化中断表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">system_call</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">sys_call_table 32系统的初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">sys_call_table 64系统的初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">终</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">曾经浮华</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
         
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
       </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
-  <span class="with-love" id="animate">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">曾经浮华</span>
-
-  
-
-  
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
 
 
+      </div>
+    </main>
 
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">曾经浮华</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
   <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.6.0</div>
-
-
-
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
+  </div>
 
         
 <div class="busuanzi-count">
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-  
-    <span class="site-uv" title="总访客量">
-      <i class="fa fa-user"></i>
-      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
     </span>
-  
-
-  
-    <span class="site-pv" title="总访问量">
-      <i class="fa fa-eye"></i>
-      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
     </span>
-  
 </div>
-
 
 
 
@@ -765,103 +450,15 @@
         
       </div>
     </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-    
-
-    
   </div>
 
   
-
-<script>
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    <script src="/lib/jquery/index.js?v=2.1.3"></script>
-  
-
-  
-  
-    <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
-
-
-  
-
-
-  <script src="/js/src/utils.js?v=6.6.0"></script>
-
-  <script src="/js/src/motion.js?v=6.6.0"></script>
-
-
-
-  
-  
-
-
-  <script src="/js/src/affix.js?v=6.6.0"></script>
-
-  <script src="/js/src/schemes/pisces.js?v=6.6.0"></script>
-
-
-
-  
-  <script src="/js/src/scrollspy.js?v=6.6.0"></script>
-<script src="/js/src/post-details.js?v=6.6.0"></script>
-
-
-
-  
-
-
-  <script src="/js/src/bootstrap.js?v=6.6.0"></script>
-
-
-
-  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -877,32 +474,10 @@
 
 
 
-  
 
 
 
 
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-
-  
-
-  
-
-  
-
-  
 
   
 
