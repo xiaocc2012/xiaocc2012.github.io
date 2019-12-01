@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://www.xiaocc.xyz').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="golang中udp分为已连接和未连接两种，两者在发送、接收消息行为模式上有重大区别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang中udp的连接性">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-11-30&#x2F;golang%E4%B8%ADudp%E7%9A%84%E8%BF%9E%E6%8E%A5%E6%80%A7&#x2F;index.html">
+<meta property="og:site_name" content="曾经浮华的小窝">
+<meta property="og:description" content="golang中udp分为已连接和未连接两种，两者在发送、接收消息行为模式上有重大区别">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20191130-165501.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20191130-170445.jpg">
+<meta property="og:updated_time" content="2019-12-01T08:09:32.912Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20191130-165501.jpg">
+
+<link rel="canonical" href="http://www.xiaocc.xyz/2019-11-30/golang%E4%B8%ADudp%E7%9A%84%E8%BF%9E%E6%8E%A5%E6%80%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>golang中udp的连接性 | 曾经浮华的小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="曾经浮华的小窝" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曾经浮华的小窝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">hello,world!</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2019-11-30/golang%E4%B8%ADudp%E7%9A%84%E8%BF%9E%E6%8E%A5%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="曾经浮华">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曾经浮华的小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          golang中udp的连接性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-30 16:30:00" itemprop="dateCreated datePublished" datetime="2019-11-30T16:30:00+08:00">2019-11-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-01 16:09:32" itemprop="dateModified" datetime="2019-12-01T16:09:32+08:00">2019-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>golang中udp分为已连接和未连接两种，两者在发送、接收消息行为模式上有重大区别</p>
+<a id="more"></a>
+
+<h4><span id="背景">背景</span></h4><p>前段时间，我们组开发一个紧急需求，需要与其它部门某组进行协议交互，暂且称之为B组。<br>B组底层通信采用UDP形式，使用pb为传输协议，本来很简单的事情，可是联调过程中却遇到一个大坑，关于golang中<strong>udp的连接性</strong>问题。</p>
+<p>我们这边采用golang技术栈，以DialUDP的接口与B组交互，先send数据，再recv数据。就这么简单的逻辑，却出问题了，B组能收到我们的请求数据，我们这边却无法接收到B组的返回数据。</p>
+<p>经过与B组交流，他们那边的架构比较奇怪。</p>
+<p>我们设计系统框架，一般会设计一个网关服务，其负责对外提供接口能力，内部再拆分为其它具体服务模块。<br>外部的请求方将请求发送到网关服务，网关服务再根据服务发现逻辑，将请求转发给具体的内部服务，待内部服务处理完毕后，数据原路返回，通过网关服务返回给外部调用方。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20191130-165501.jpg" alt=""></p>
+<p>可是这个B组的架构设计，他们采用了一种取巧的搞法。<br>由于udp协议，是一种无连接协议，网关服务接收业务方请求后，记录下请求方的ip、port信息，一并发送给内部具体处理服务，该服务处理完毕后，并不是将响应数据发送给网关服务，由其转发给外部调用方。而是其通过udp的形式，直接将响应数据发送给外部调用方。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20191130-170445.jpg" alt=""></p>
+<h4><span id="问题分析">问题分析</span></h4><p>可是，就算这样，又有什么问题呢？<br>我们是UDP服务，B组的网关服务，会将其收到请求的客户端的<code>ip,port</code>信息发送给其内部服务，其再通过udp的形式将数据发送给客户端。</p>
+<p>按照道理，我们是能够收到数据的，可是验证结果，客户端就是收不到返回数据。</p>
+<p>情急之下，我用C语言复写了一下请求逻辑，并进行请求验证，可以正常接收数据，这更增加了我的疑惑。<br>对着golang代码和C语言代码辨析，没什么差别。<br>无奈之下，只能先通过cgo的形式调用C语言函数完成业务需求，待有时间再进行详细分析。</p>
+<p>待业务需求完毕，查阅资料和golang源码后终于搞懂这里面的差别。</p>
+<p>golang中的udp状态分为<strong>已连接</strong>和<strong>未连接</strong>。</p>
+<p>通过DialUDP的形式创建的udp为已连接状态，其会记录remote的ip、port，相当于在两者之间建立了持续通路，发送、接收函数为<code>Write、Read</code>，不需要填remote信息。</p>
+<p>而通过ListenUDP建立的udp为未连接形式，发送、接收函数为<code>WriteTo、ReadFrom</code>，需要填写remote信息。</p>
+<p>在我们与B组交互的这个模式下，由于是通过<code>DialUDP</code>建立的连接，而响应数据并不是通过原通路返回，所以这里无法接收数据。<br>改为使用<code>ListenUDP</code>返回的UDPConn进行数据发送、接收，则可正常接收数据，包括在此种特殊交互模式下。</p>
+<h4><span id="源码分析">源码分析</span></h4><p>下面从源码层面分析<code>DialUDP</code>与<code>ListenUDP</code>有何不同，为什么会导致使用上的如此差异？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">func ListenUDP(network string, laddr *UDPAddr) (*UDPConn, error) &#123;</span><br><span class="line">	switch network &#123;</span><br><span class="line">	case &quot;udp&quot;, &quot;udp4&quot;, &quot;udp6&quot;:</span><br><span class="line">	default:</span><br><span class="line">		return nil, &amp;OpError&#123;Op: &quot;listen&quot;, Net: network, Source: nil, Addr: laddr.opAddr(), Err: UnknownNetworkError(network)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if laddr == nil &#123;</span><br><span class="line">		laddr = &amp;UDPAddr&#123;&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	sl := &amp;sysListener&#123;network: network, address: laddr.String()&#125;</span><br><span class="line">	c, err := sl.listenUDP(context.Background(), laddr)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, &amp;OpError&#123;Op: &quot;listen&quot;, Net: network, Source: nil, Addr: laddr.opAddr(), Err: err&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	return c, nil</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func DialUDP(network string, laddr, raddr *UDPAddr) (*UDPConn, error) &#123;</span><br><span class="line">	switch network &#123;</span><br><span class="line">	case &quot;udp&quot;, &quot;udp4&quot;, &quot;udp6&quot;:</span><br><span class="line">	default:</span><br><span class="line">		return nil, &amp;OpError&#123;Op: &quot;dial&quot;, Net: network, Source: laddr.opAddr(), Addr: raddr.opAddr(), Err: UnknownNetworkError(network)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if raddr == nil &#123;</span><br><span class="line">		return nil, &amp;OpError&#123;Op: &quot;dial&quot;, Net: network, Source: laddr.opAddr(), Addr: nil, Err: errMissingAddress&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	sd := &amp;sysDialer&#123;network: network, address: raddr.String()&#125;</span><br><span class="line">	c, err := sd.dialUDP(context.Background(), laddr, raddr)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, &amp;OpError&#123;Op: &quot;dial&quot;, Net: network, Source: laddr.opAddr(), Addr: raddr.opAddr(), Err: err&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	return c, nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而<code>sl.listenUDP、sd.dialUDP</code>如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">func (sl *sysListener) listenUDP(ctx context.Context, laddr *UDPAddr) (*UDPConn, error) &#123;</span><br><span class="line">	fd, err := internetSocket(ctx, sl.network, laddr, nil, syscall.SOCK_DGRAM, 0, &quot;listen&quot;, sl.ListenConfig.Control)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	return newUDPConn(fd), nil</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (sd *sysDialer) dialUDP(ctx context.Context, laddr, raddr *UDPAddr) (*UDPConn, error) &#123;</span><br><span class="line">	fd, err := internetSocket(ctx, sd.network, laddr, raddr, syscall.SOCK_DGRAM, 0, &quot;dial&quot;, sd.Dialer.Control)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	return newUDPConn(fd), nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可见，两者最终都是调用<code>internetSocket</code>，但是参数层面有差异，特别是<code>listenUDP</code>调用时<strong>raddr</strong>为nil，而<code>dialUDP</code>会传入该值。</p>
+<p>继续往下看，<code>internetSocket</code>内部会调用<code>socket</code>函数，以linux环境为例，其实现在<em>sock_posix.go</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">func socket(ctx context.Context, net string, family, sotype, proto int, ipv6only bool, laddr, raddr sockaddr, ctrlFn func(string, string, syscall.RawConn) error) (fd *netFD, err error) &#123;</span><br><span class="line">	s, err := sysSocket(family, sotype, proto)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	if err = setDefaultSockopts(s, family, sotype, ipv6only); err != nil &#123;</span><br><span class="line">		poll.CloseFunc(s)</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	if fd, err = newFD(s, family, sotype, net); err != nil &#123;</span><br><span class="line">		poll.CloseFunc(s)</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	// This function makes a network file descriptor for the</span><br><span class="line">	// following applications:</span><br><span class="line">	//</span><br><span class="line">	// - An endpoint holder that opens a passive stream</span><br><span class="line">	//   connection, known as a stream listener</span><br><span class="line">	//</span><br><span class="line">	// - An endpoint holder that opens a destination-unspecific</span><br><span class="line">	//   datagram connection, known as a datagram listener</span><br><span class="line">	//</span><br><span class="line">	// - An endpoint holder that opens an active stream or a</span><br><span class="line">	//   destination-specific datagram connection, known as a</span><br><span class="line">	//   dialer</span><br><span class="line">	//</span><br><span class="line">	// - An endpoint holder that opens the other connection, such</span><br><span class="line">	//   as talking to the protocol stack inside the kernel</span><br><span class="line">	//</span><br><span class="line">	// For stream and datagram listeners, they will only require</span><br><span class="line">	// named sockets, so we can assume that it&apos;s just a request</span><br><span class="line">	// from stream or datagram listeners when laddr is not nil but</span><br><span class="line">	// raddr is nil. Otherwise we assume it&apos;s just for dialers or</span><br><span class="line">	// the other connection holders.</span><br><span class="line"></span><br><span class="line">	if laddr != nil &amp;&amp; raddr == nil &#123;</span><br><span class="line">		switch sotype &#123;</span><br><span class="line">		case syscall.SOCK_STREAM, syscall.SOCK_SEQPACKET:</span><br><span class="line">			if err := fd.listenStream(laddr, listenerBacklog(), ctrlFn); err != nil &#123;</span><br><span class="line">				fd.Close()</span><br><span class="line">				return nil, err</span><br><span class="line">			&#125;</span><br><span class="line">			return fd, nil</span><br><span class="line">		case syscall.SOCK_DGRAM:</span><br><span class="line">			if err := fd.listenDatagram(laddr, ctrlFn); err != nil &#123;</span><br><span class="line">				fd.Close()</span><br><span class="line">				return nil, err</span><br><span class="line">			&#125;</span><br><span class="line">			return fd, nil</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if err := fd.dial(ctx, laddr, raddr, ctrlFn); err != nil &#123;</span><br><span class="line">		fd.Close()</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	return fd, nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先创建socket描述符，如果<code>laddr</code>不为nil，而<code>raddr</code>为nil，说明是监听socket，需要调用<code>Listen</code>函数，接下来调用<code>fd.dial</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">func (fd *netFD) dial(ctx context.Context, laddr, raddr sockaddr, ctrlFn func(string, string, syscall.RawConn) error) error &#123;</span><br><span class="line">	if ctrlFn != nil &#123;</span><br><span class="line">		c, err := newRawConn(fd)</span><br><span class="line">		if err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">		var ctrlAddr string</span><br><span class="line">		if raddr != nil &#123;</span><br><span class="line">			ctrlAddr = raddr.String()</span><br><span class="line">		&#125; else if laddr != nil &#123;</span><br><span class="line">			ctrlAddr = laddr.String()</span><br><span class="line">		&#125;</span><br><span class="line">		if err := ctrlFn(fd.ctrlNetwork(), ctrlAddr, c); err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	var err error</span><br><span class="line">	var lsa syscall.Sockaddr</span><br><span class="line">	if laddr != nil &#123;</span><br><span class="line">		if lsa, err = laddr.sockaddr(fd.family); err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125; else if lsa != nil &#123;</span><br><span class="line">			if err = syscall.Bind(fd.pfd.Sysfd, lsa); err != nil &#123;</span><br><span class="line">				return os.NewSyscallError(&quot;bind&quot;, err)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	var rsa syscall.Sockaddr  // remote address from the user</span><br><span class="line">	var crsa syscall.Sockaddr // remote address we actually connected to</span><br><span class="line">	if raddr != nil &#123;</span><br><span class="line">		if rsa, err = raddr.sockaddr(fd.family); err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">		if crsa, err = fd.connect(ctx, lsa, rsa); err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">		fd.isConnected = true</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		if err := fd.init(); err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	// Record the local and remote addresses from the actual socket.</span><br><span class="line">	// Get the local address by calling Getsockname.</span><br><span class="line">	// For the remote address, use</span><br><span class="line">	// 1) the one returned by the connect method, if any; or</span><br><span class="line">	// 2) the one from Getpeername, if it succeeds; or</span><br><span class="line">	// 3) the one passed to us as the raddr parameter.</span><br><span class="line">	lsa, _ = syscall.Getsockname(fd.pfd.Sysfd)</span><br><span class="line">	if crsa != nil &#123;</span><br><span class="line">		fd.setAddr(fd.addrFunc()(lsa), fd.addrFunc()(crsa))</span><br><span class="line">	&#125; else if rsa, _ = syscall.Getpeername(fd.pfd.Sysfd); rsa != nil &#123;</span><br><span class="line">		fd.setAddr(fd.addrFunc()(lsa), fd.addrFunc()(rsa))</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		fd.setAddr(fd.addrFunc()(lsa), raddr)</span><br><span class="line">	&#125;</span><br><span class="line">	return nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>导致<code>ListenUDP</code>、<code>DialUDP</code>的行为差异的核心实现即在此函数</p>
+<p>如果<code>laddr</code>不为nil，还需要调用<code>bind</code>函数，绑定本地ip、port信息，如果<code>raddr</code>不为nil，会调用<code>fd.connect</code>与remote建立连接。</p>
+<p>如此即导致<code>ListenUDP</code>函数构造的UDPConn为<strong>未连接</strong>状态，而<code>DialUDP</code>函数构造的UDPConn为<strong>已连接</strong>状态，因而<code>DialUDP</code>只能从指定远端接收数据，而<code>ListenUDP</code>则可以从任何远端接收数据。</p>
+<p>至此，谜底彻底揭开。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019-11-26/docker%E8%BF%9B%E7%A8%8B%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="prev" title="docker中进程优雅退出">
+      <i class="fa fa-chevron-left"></i> docker中进程优雅退出
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">源码分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">曾经浮华</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">曾经浮华</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
