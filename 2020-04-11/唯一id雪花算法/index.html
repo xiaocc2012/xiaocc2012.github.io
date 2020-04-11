@@ -54,7 +54,7 @@
 <meta property="og:description" content="分析Tweet唯一ID生成的雪花算法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202004&#x2F;Jietu20200411-094438.jpg">
-<meta property="og:updated_time" content="2020-04-11T02:33:13.957Z">
+<meta property="og:updated_time" content="2020-04-11T02:46:56.044Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202004&#x2F;Jietu20200411-094438.jpg">
 
@@ -212,7 +212,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-04-11 09:30:00 / 修改时间：10:33:13" itemprop="dateCreated datePublished" datetime="2020-04-11T09:30:00+08:00">2020-04-11</time>
+              <time title="创建时间：2020-04-11 09:30:00 / 修改时间：10:46:56" itemprop="dateCreated datePublished" datetime="2020-04-11T09:30:00+08:00">2020-04-11</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -247,9 +247,9 @@
         <p>分析Tweet唯一ID生成的雪花算法</p>
 <a id="more"></a>
 
-<h4><span id="算法原理">算法原理</span></h4><p>该算法计算唯一id的过程不依赖其它组件与库，简单而直接。<br>算法将int64位的64bit按功能分割成多个为区间，如下：</p>
+<h4><span id="算法原理">算法原理</span></h4><p>该算法计算唯一id的过程不依赖其它组件与库，简单而直接。<br>算法将int64位的64bit按功能分割成多个bits区间，如下：</p>
 <p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202004/Jietu20200411-094438.jpg" alt=""></p>
-<p>各区间默认bit位如下：<br>12-5-5-41</p>
+<p>各区间默认bits位如下：<br>12-5-5-41</p>
 <p>其中我们约定该唯一id只能是正数，那么最高位不能为1，只能为0，所以timestamp长度为 <code>42 - 1</code></p>
 <h5><span id="时间原点">时间原点</span></h5><p>其中timestamp字段精确到<strong>毫秒</strong>，平时我们计算时间一般从<code>linux epoch</code>开始，也就是linux时间原点(1970年1月1日0点0分0秒)开始计算。</p>
 <p>可以想象，现在数据长度只有41位，不足以放下这个<strong>毫秒</strong>级别的时间差距，怎么办？</p>
@@ -268,8 +268,7 @@
 <p>Benchmark测试：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">go test -bench=.</span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: stest/snow</span><br><span class="line">BenchmarkSnow-4   	 4925791	       245 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok  	stest/snow	1.765s</span><br></pre></td></tr></table></figure>
 
-
-
+<p>生成500万个id耗时1.76秒，约：280万/秒</p>
 
     </div>
 
