@@ -1,3 +1,4 @@
+http://www.xiaocc.xyz/2020-04-19/golang%E4%BB%BB%E5%8A%A1%E4%BD%9C%E4%B8%9A%E7%B3%BB%E7%BB%9F/
 http://www.xiaocc.xyz/2020-04-11/%E5%94%AF%E4%B8%80id%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95/
 http://www.xiaocc.xyz/2020-01-10/jaeger%E6%8B%93%E6%89%91%E8%AE%A1%E7%AE%97/
 http://www.xiaocc.xyz/2020-01-07/%E5%AE%9D%E5%AE%9D%E5%87%BA%E7%94%9F%E8%AE%B0/
