@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,14 +49,16 @@
   <meta name="description" content="作业调度系统nomad介绍与使用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="分布式作业调度系统nomad">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-06-18&#x2F;%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9Fnomad&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-06-18/%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9Fnomad/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="作业调度系统nomad介绍与使用">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20190618-163725.jpg">
-<meta property="og:updated_time" content="2019-06-18T08:44:15.307Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190618-163725.jpg">
+<meta property="article:published_time" content="2019-06-18T06:30:00.000Z">
+<meta property="article:modified_time" content="2019-06-18T08:44:15.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20190618-163725.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190618-163725.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2019-06-18/%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9Fnomad/">
 
@@ -273,10 +275,10 @@
 <h5><span id="启动nomad">启动nomad</span></h5><p>nomad支持集群模式和测试dev模式，在dev模式中client、server直接启动，便于研究和测试</p>
 <p>执行：<code>nomad agent -dev</code> 启动nomad</p>
 <p>通过 <code>nomad node status</code> 查看node状态</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./nomad node status</span><br><span class="line">ID        DC   Name          Class   Drain  Eligibility  Status</span><br><span class="line">3d2f0237  dc1  046ba6241f86  &lt;none&gt;  false  eligible     ready</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;nomad node status</span><br><span class="line">ID        DC   Name          Class   Drain  Eligibility  Status</span><br><span class="line">3d2f0237  dc1  046ba6241f86  &lt;none&gt;  false  eligible     ready</span><br></pre></td></tr></table></figure>
 
 <p>nomad的agent内置gossip协议，其运行于server模式下，会通过该协议获取其它server信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./nomad server members</span><br><span class="line">Name                 Address     Port  Status  Leader  Protocol  Build  Datacenter  Region</span><br><span class="line">046ba6241f86.global  172.17.0.7  4648  alive   true    2         0.9.3  dc1         global</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;nomad server members</span><br><span class="line">Name                 Address     Port  Status  Leader  Protocol  Build  Datacenter  Region</span><br><span class="line">046ba6241f86.global  172.17.0.7  4648  alive   true    2         0.9.3  dc1         global</span><br></pre></td></tr></table></figure>
 
 <h5><span id="运行job">运行job</span></h5><p>通过执行<code>nomad job init</code>生成一个任务模板，观察该任务定义文件大体格式</p>
 <p>该模板任务，定义了一个service，其通过docker启动redis服务<br><code>nomad job run example.nomad</code> 即注册了一个job，等待nomad调度运行</p>
@@ -293,21 +295,21 @@
 <p>常见的定时作业任务属于<code>batch</code>类型，即定时或周期执行一个<code>bash</code>脚本或者程序</p>
 <p>接下来自定义一个job，在其中执行一个<code>bash</code>脚本</p>
 <p>cron.nomad 如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">job &quot;cron&quot; &#123;</span><br><span class="line">	datacenters = [&quot;dc1&quot;]</span><br><span class="line"></span><br><span class="line">	type = &quot;batch&quot;</span><br><span class="line"></span><br><span class="line">	group &quot;test&quot; &#123;</span><br><span class="line">		count = 1</span><br><span class="line"></span><br><span class="line">		task &quot;one&quot; &#123;</span><br><span class="line">			driver = &quot;raw_exec&quot;</span><br><span class="line"></span><br><span class="line">			config = &#123;</span><br><span class="line">				command = &quot;/data/nomad/one.sh&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">job &quot;cron&quot; &#123;</span><br><span class="line">	datacenters &#x3D; [&quot;dc1&quot;]</span><br><span class="line"></span><br><span class="line">	type &#x3D; &quot;batch&quot;</span><br><span class="line"></span><br><span class="line">	group &quot;test&quot; &#123;</span><br><span class="line">		count &#x3D; 1</span><br><span class="line"></span><br><span class="line">		task &quot;one&quot; &#123;</span><br><span class="line">			driver &#x3D; &quot;raw_exec&quot;</span><br><span class="line"></span><br><span class="line">			config &#x3D; &#123;</span><br><span class="line">				command &#x3D; &quot;&#x2F;data&#x2F;nomad&#x2F;one.sh&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>注意<code>command</code>需要为绝对路径</p>
 <p>one.sh 如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">i=1</span><br><span class="line">sum=0</span><br><span class="line">while [ $i -le 100 ]</span><br><span class="line">do</span><br><span class="line">  let sum=sum+$i</span><br><span class="line">  let i+=2</span><br><span class="line">  echo $sum &gt;&gt; /data/nomad/log/one.log</span><br><span class="line">  sleep 1</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo $sum &gt;&gt; /data/nomad/log/one.log</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">i&#x3D;1</span><br><span class="line">sum&#x3D;0</span><br><span class="line">while [ $i -le 100 ]</span><br><span class="line">do</span><br><span class="line">  let sum&#x3D;sum+$i</span><br><span class="line">  let i+&#x3D;2</span><br><span class="line">  echo $sum &gt;&gt; &#x2F;data&#x2F;nomad&#x2F;log&#x2F;one.log</span><br><span class="line">  sleep 1</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo $sum &gt;&gt; &#x2F;data&#x2F;nomad&#x2F;log&#x2F;one.log</span><br></pre></td></tr></table></figure>
 
 <p>执行任务：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">./nomad job run cron.nomad</span><br><span class="line">==&gt; Monitoring evaluation &quot;71f82418&quot;</span><br><span class="line">    Evaluation triggered by job &quot;cron&quot;</span><br><span class="line">    Allocation &quot;15671c83&quot; created: node &quot;92bcf36d&quot;, group &quot;test&quot;</span><br><span class="line">    Allocation &quot;15671c83&quot; status changed: &quot;pending&quot; -&gt; &quot;running&quot; (Tasks are running)</span><br><span class="line">    Evaluation status changed: &quot;pending&quot; -&gt; &quot;complete&quot;</span><br><span class="line">==&gt; Evaluation &quot;71f82418&quot; finished with status &quot;complete&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;nomad job run cron.nomad</span><br><span class="line">&#x3D;&#x3D;&gt; Monitoring evaluation &quot;71f82418&quot;</span><br><span class="line">    Evaluation triggered by job &quot;cron&quot;</span><br><span class="line">    Allocation &quot;15671c83&quot; created: node &quot;92bcf36d&quot;, group &quot;test&quot;</span><br><span class="line">    Allocation &quot;15671c83&quot; status changed: &quot;pending&quot; -&gt; &quot;running&quot; (Tasks are running)</span><br><span class="line">    Evaluation status changed: &quot;pending&quot; -&gt; &quot;complete&quot;</span><br><span class="line">&#x3D;&#x3D;&gt; Evaluation &quot;71f82418&quot; finished with status &quot;complete&quot;</span><br></pre></td></tr></table></figure>
 
 <h5><span id="周期任务">周期任务</span></h5><p>目前小组主要使用nomad来跑定时task，比如每5分钟、每30分钟执行的任务等等</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">job &quot;after&quot; &#123;</span><br><span class="line"></span><br><span class="line">	datacenters = [&quot;dc1&quot;]</span><br><span class="line"></span><br><span class="line">	type = &quot;batch&quot;</span><br><span class="line"></span><br><span class="line">  	periodic &#123;</span><br><span class="line">    	cron             = &quot;*/3 * * * * *&quot;</span><br><span class="line">    	prohibit_overlap = true</span><br><span class="line">  	&#125;</span><br><span class="line"></span><br><span class="line">	group &quot;test&quot; &#123;</span><br><span class="line">		count = 1</span><br><span class="line"></span><br><span class="line">		task &quot;two&quot; &#123;</span><br><span class="line">			driver = &quot;raw_exec&quot;</span><br><span class="line"></span><br><span class="line">			config = &#123;</span><br><span class="line">				command = &quot;/data/nomad/two.sh&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">job &quot;after&quot; &#123;</span><br><span class="line"></span><br><span class="line">	datacenters &#x3D; [&quot;dc1&quot;]</span><br><span class="line"></span><br><span class="line">	type &#x3D; &quot;batch&quot;</span><br><span class="line"></span><br><span class="line">  	periodic &#123;</span><br><span class="line">    	cron             &#x3D; &quot;*&#x2F;3 * * * * *&quot;</span><br><span class="line">    	prohibit_overlap &#x3D; true</span><br><span class="line">  	&#125;</span><br><span class="line"></span><br><span class="line">	group &quot;test&quot; &#123;</span><br><span class="line">		count &#x3D; 1</span><br><span class="line"></span><br><span class="line">		task &quot;two&quot; &#123;</span><br><span class="line">			driver &#x3D; &quot;raw_exec&quot;</span><br><span class="line"></span><br><span class="line">			config &#x3D; &#123;</span><br><span class="line">				command &#x3D; &quot;&#x2F;data&#x2F;nomad&#x2F;two.sh&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4><span id="ui">UI</span></h4><p>nomad支持可视化页面，对任务、集群进行查看和管理</p>
 <p>URL：http://*:4646/ui/jobs</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190618-163725.jpg" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190618-163725.jpg"></p>
 
     </div>
 
@@ -367,7 +369,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">nomad简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">与k8s区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.2.</span> <span class="nav-text">启动nomad</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.3.</span> <span class="nav-text">运行job</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.4.</span> <span class="nav-text">自定义任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.5.</span> <span class="nav-text">周期任务</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">UI</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">nomad简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">与k8s区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.2.</span> <span class="nav-text">启动nomad</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.3.</span> <span class="nav-text">运行job</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.4.</span> <span class="nav-text">自定义任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.5.</span> <span class="nav-text">周期任务</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">UI</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -381,7 +383,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -425,7 +427,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -469,9 +471,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

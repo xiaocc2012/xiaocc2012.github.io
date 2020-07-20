@@ -46,19 +46,26 @@
   };
 </script>
 
-  <meta name="description" content="观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。">
+  <meta name="description" content="多阶hash作为腾讯即通部门底层存储，在资料、关系链系统中均有使用，内部文档大多讲述实现原理，缺少实现细节与具体源码，在github偶遇一份类似实现，特分析之。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="穷，是一种病">
-<meta property="og:url" content="http://www.xiaocc.xyz/2018-09-12/%E7%A9%B7%E6%98%AF%E4%B8%80%E7%A7%8D%E7%97%85/index.html">
+<meta property="og:title" content="多阶hash实现与分析">
+<meta property="og:url" content="http://www.xiaocc.xyz/2020-07-20/%E5%A4%9A%E9%98%B6hash%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
-<meta property="og:description" content="观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。">
+<meta property="og:description" content="多阶hash作为腾讯即通部门底层存储，在资料、关系链系统中均有使用，内部文档大多讲述实现原理，缺少实现细节与具体源码，在github偶遇一份类似实现，特分析之。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2018-09-12T15:00:00.000Z">
-<meta property="article:modified_time" content="2018-09-18T03:45:44.000Z">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-193241.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-195236.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-203342.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-204303.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-205853.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-210431.jpg">
+<meta property="article:published_time" content="2020-07-20T11:30:00.000Z">
+<meta property="article:modified_time" content="2020-07-20T13:22:13.910Z">
 <meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-193241.jpg">
 
-<link rel="canonical" href="http://www.xiaocc.xyz/2018-09-12/%E7%A9%B7%E6%98%AF%E4%B8%80%E7%A7%8D%E7%97%85/">
+<link rel="canonical" href="http://www.xiaocc.xyz/2020-07-20/%E5%A4%9A%E9%98%B6hash%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90/">
 
 
 <script id="page-configurations">
@@ -72,7 +79,7 @@
   };
 </script>
 
-  <title>穷，是一种病 | 曾经浮华的小窝</title>
+  <title>多阶hash实现与分析 | 曾经浮华的小窝</title>
   
 
 
@@ -188,7 +195,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2018-09-12/%E7%A9%B7%E6%98%AF%E4%B8%80%E7%A7%8D%E7%97%85/">
+    <link itemprop="mainEntityOfPage" href="http://www.xiaocc.xyz/2020-07-20/%E5%A4%9A%E9%98%B6hash%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -201,7 +208,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          穷，是一种病
+          多阶hash实现与分析
         </h1>
 
         <div class="post-meta">
@@ -210,24 +217,18 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2018-09-12 23:00:00" itemprop="dateCreated datePublished" datetime="2018-09-12T23:00:00+08:00">2018-09-12</time>
+              <time title="创建时间：2020-07-20 19:30:00 / 修改时间：21:22:13" itemprop="dateCreated datePublished" datetime="2020-07-20T19:30:00+08:00">2020-07-20</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2018-09-18 11:45:44" itemprop="dateModified" datetime="2018-09-18T11:45:44+08:00">2018-09-18</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%9D%82%E8%B0%88/" itemprop="url" rel="index">
-                    <span itemprop="name">杂谈</span>
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
                   </a>
                 </span>
             </span>
@@ -250,45 +251,64 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>观看《我不是药神》后，一直想就这个话题写点东西，三十年的邻居突患病离世，更添些许压抑。</p>
+        <p>多阶hash作为腾讯即通部门底层存储，在资料、关系链系统中均有使用，内部文档大多讲述实现原理，缺少实现细节与具体源码，在github偶遇一份类似实现，特分析之。</p>
 <a id="more"></a>
 
-<h4><span id="背景">背景</span></h4><p>前段时间跟老婆一起看了口碑爆棚的神作《我不是药神》，影片很好的反应当代现实与社会问题。<br>特别是里面有句台词，<code>世上有一种病叫穷病——没得治</code>。</p>
-<p>在这里不想讨论大道理，如：医药公司是否过于暴利、政府的缺位等等，只想说一下亲身体会。</p>
-<h4><span id="亲人患病">亲人患病</span></h4><h5><span id="初诊">初诊</span></h5><p>大约7月份的时候，堂弟突然微信联系我，发来一些检查报告，是他岳母的。<br>检查报告先出来，周一才能找医生会诊，心里比较着急，让我找同学帮忙问问报告内容具体什么意思。</p>
-<p>赶紧与同学联系，她是麻醉师，医院各科室都认识人。<br>她找人看了一下检查报告，对方提出需要查看图片影像，以增加信息辅助判断，但是根据检查报告初步怀疑肺癌。</p>
-<p>收到信息后，马上给堂弟打电话，他对此已有所预感，待周一拿上相关资料与医生当面会诊。</p>
-<p><strong>为什么会这样？</strong></p>
-<p>犹如晴天霹雳，今年初的时候还到他们家做客，岳母才47岁，非常年轻，刚当上外婆，宝宝才1岁，为什么这个不幸的病会找上她。<br>且宝宝刚出生时，由于感染，在中心医院住院治疗一个多月，没有明显恢复，后又转院到同济医院，前后花了十多万，举债累累。<br>万幸的是治疗后，宝宝没有后遗症、恢复很好，让人欣慰。</p>
-<p>去年宝宝患病，今年岳母患病，让这个本就不富裕的家庭，更捉襟见肘。</p>
-<p>这可如何是好？虽还没确诊，但我已有如此担忧。</p>
-<h5><span id="确诊">确诊</span></h5><p>周一下午，打电话给堂弟询问具体诊断结果，医生初步怀疑肺癌，需要做病理检查，进一步确认。</p>
-<p>按照医生的要求，一项项检查，焦急的等等……</p>
-<p>周五堂弟打电话过来，确诊：<strong>肺腺癌晚期</strong>。<br>医生反馈由于是晚期，且带有一些扩散，无法进行手术治疗，可以尝试进行<strong>靶向治疗</strong>，但是需要先进行基因检测。</p>
-<p>赶紧打电话给同学，将最新信息同步于她，并寻求建议、打听基因检测价格、靶向药物价格等等。</p>
-<h5><span id="靶向治疗">靶向治疗</span></h5><p>预约基因检测，待拿到检测结果后，再预约医生制定具体治疗方案。<br>基因检测结果显示，可以使用靶向药物，药名：<strong>吉非替尼</strong>，俗名：<strong>易瑞沙</strong>。</p>
-<p>这个药已经国产，一盒大约2000多块钱，疗程10天，一个月大约6000多块钱。</p>
-<p>虽然国产后已便宜许多，但是一个月6000多的药物费用，依然让这个家庭特别吃力。</p>
-<p>这时想起《我不是药神》的情节，这个药有没有印度版？价格怎么样？</p>
-<p>立马在各种同学群找他们帮忙，打听药物渠道、价格如何、疗效怎样。</p>
-<p>由于《药神》上映后，海关检查特别严格，药物不好带，他们多方打听也没有合适渠道。</p>
-<p>不放弃，最后找到一个渠道，印度直接邮寄过来，先来一盒看看疗效，以验证药物是否靠谱，最后药价大约是正版药的<strong>1/5</strong>。</p>
-<p>堂弟将岳母接回老家吃药静养，带带宝宝，放松心情，每半个月复查一次。</p>
-<p>这一切才刚刚开始。</p>
-<h4><span id="隔壁邻居患病离世">隔壁邻居患病离世</span></h4><p>周六定时给家里打电话，老爸突然说道，隔壁华爷爷去世。</p>
-<p>怎么可能？</p>
-<p>年初回家过年，还跟他打招呼着呢。<br>他喜欢喝酒，喝完后拿着泡着茶的保温杯，嘴里叼一根烟，一踱一踱的走着，笑呵呵的对我说，“回来过年啦”，“是啊，过年必须要回来呀，城市过年没气氛，有钱没钱，回家过年”。</p>
-<p>他腿是去年摔断的，这事儿也是听老爸说的。</p>
-<p>当时吃了酒席喝了酒，主人家要送他回家。他偏不，倔得很，非要自己骑摩托车回来，不幸摔跤，休养了约半年才好。</p>
-<p>老爸说，华爷爷是今年3-4月份村里大检查时排查出来的，<strong>肺癌晚期</strong>。<br>他又不配合治疗，不打针、不吃药，按他的说法，“还不如拿治病的钱喝酒呢，反正治不好，多花些冤枉钱”。</p>
-<p>也可能是，不想为子女添加负担吧。农村年收入才2-3万元，按最便宜的治疗方案，初期怎么也得花费大几万，后面每个月还有固定开销，对农村家庭真是难以承受。</p>
-<p><strong>穷，真是一种病</strong></p>
-<p>9月6号当晚，可能是疼痛难忍，自己喝药走了。</p>
-<p>这就是华爷爷，看着我长大的华爷爷，就这样走了。</p>
-<p>俗话说，远亲不如近邻，特别是在农村，这种感受尤为强烈。</p>
-<p>深深的无力感，就我认识的人，患癌症的就有7-8个人。</p>
-<p>三姨妈淋巴癌晚期带转移，已经化疗几个疗程，人都瘦得不行，靶向药：<strong>美罗华</strong>，50ml药价25000。<br>姑爹，胃癌，4月份刚去世。<br>舅舅，肺癌，16年去世。<br>堂弟岳母、隔壁华爷爷、隔壁健爹刚45岁胃癌已去世……</p>
-<p><strong>这个世道怎么了？</strong></p>
+<h4><span id="多阶hash简介">多阶hash简介</span></h4><p>我们常用的hash只有一层结构，常采用链表法进行冲突解决：</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-193241.jpg"></p>
+<p>当hash结构装载的数据较多时，冲突严重，链表结构长度较长，查找key的过程需要对链表进行遍历，耗时不可控，这时可以进行hash扩容，即将hash桶数量扩大，数据重新迁移到某个index下，但此数据迁移过程耗时较长，同时需要考虑读写冲突问题。</p>
+<p>腾讯设计的多阶hash，即是将某一层冲突的key，交由下一层进行填充，直到最终层</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-195236.jpg"></p>
+<p>多阶hash构造时候，需要两个参数，第0层最多容纳的元素个数N，阶数M</p>
+<p><strong>每一阶可容纳元素个数如何计算呢？</strong></p>
+<p>从N开始计算比它小的素数，依次作为每一阶的元素个数</p>
+<p>假如N=100，M=5，那么每一阶元素个数为：</p>
+<p><code>97,89,83,79,73</code></p>
+<p><strong>元素插入流程：</strong></p>
+<p>根据元素key计算hash值，对N0取模得到下标，查看该坑位是否被占<br>如果该坑位被占，那么下移到下一阶，重复上述计算过程，直到：</p>
+<ul>
+<li>某一阶有空余坑位，那么将该元素插入</li>
+<li>如果查找到最后一阶，仍然没有空余坑位，那么插入不成功，对外报错。但是综合考虑N，M值，这种情况概率极低</li>
+</ul>
+<p>最差情况下，需要查找M阶，才能找到可插入坑位</p>
+<p><strong>元素查找流程：</strong></p>
+<p>与元素插入流程类似<br>根据原始key计算hash值，从第0阶开始依次查找对应坑位，检查坑位中元素key与待查找元素key是否匹配，如果不匹配，则下移到下一阶，继续查找<br>如果某一阶对应坑位hash值为0，也就是该坑位为空，不能停止查找元素，因为该坑位可能是由于删除操作而释放出来</p>
+<p>最差情况下，需要查找到最后一阶，也就是查找M阶，才能找到元素</p>
+<p>综上，该数据结构，最坏情况下需要查找M阶</p>
+<p>与普通hash结构相比，其优缺点如下：</p>
+<p>优点：</p>
+<ul>
+<li>实现结构简单，利于cpu缓存，查找速度不一定慢</li>
+<li>可直接将数据结构保存到磁盘，进行落地存储</li>
+<li>插入与查找时间可控，不需要复杂的动态扩容流程</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>初始内存占用多，不像普通hash随着元素插入逐渐消耗内存</li>
+<li>不支持扩容，初始构建时即限定可插入最大元素数量</li>
+</ul>
+<p>综合考虑优缺点，可用其实现一些高性能的存储系统</p>
+<h4><span id="多阶hash实现">多阶hash实现</span></h4><p>多阶hash的元素一般保存key值，其value需要找地方额外存储</p>
+<p>整个系统设计如下：</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-203342.jpg"></p>
+<p>系统保留一大块内存，并切分为小的block，每个block有固定大小，这样一个value会占据一个至多个block</p>
+<p>例如：每个block为32字节，需要写入value为70字节，那么其将占据3个(2 * 32 + 6)block</p>
+<p>内存布局：</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-204303.jpg"></p>
+<p>整个存储由：<br>header + nodes + blocks<br>三部分构成，其中nodes由所有的node节点组成，blocks由所有的block元素构成</p>
+<p>nodes即是由多阶hash打平而来，而blocks本来就是预先申请的大块存储</p>
+<p>内存结构即最终磁盘组织结构，不需要额外转存，设计非常巧妙</p>
+<p>如果再配合内存映射<code>mmap</code>简直完美，操作内存即是操作文件！</p>
+<h4><span id="几个问题">几个问题</span></h4><ul>
+<li><p>插入元素时，如何查找可用block？<br>  将空闲block组织成链表结构，在每个空闲block中记录下一个空闲的block地址，将空闲block逻辑上串联，在header中记录空闲链表头部地址。<br>  需要空闲block时，从空闲链表头部开始获取即可</p>
+<p>  <img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-205853.jpg"></p>
+</li>
+<li><p>删除元素后如何回收block？<br>  查找待删除的最后一个block，将其next设置为header中空闲链表头部地址，同时将header中空闲链表头部地址更新为删除的第一个block地址</p>
+<p>  <img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202007/Jietu20200720-210431.jpg"></p>
+</li>
+</ul>
+<h4><span id="最后">最后</span></h4><p>经过以上分析，再查看项目源码会理解得比较透彻</p>
+<p>项目地址：<a href="https://github.com/zfengzhen/mem_hash" target="_blank" rel="noopener">多阶hash</a></p>
 
     </div>
 
@@ -304,13 +324,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018-09-08/linux%E4%B8%8Bhook%E6%9C%BA%E5%88%B6%E7%A0%94%E7%A9%B6/" rel="prev" title="linux hook机制研究">
-      <i class="fa fa-chevron-left"></i> linux hook机制研究
+    <a href="/2020-04-19/golang%E4%BB%BB%E5%8A%A1%E4%BD%9C%E4%B8%9A%E7%B3%BB%E7%BB%9F/" rel="prev" title="golang任务作业系统实现分析">
+      <i class="fa fa-chevron-left"></i> golang任务作业系统实现分析
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2018-09-18/c++17%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/" rel="next" title="C++17学习笔记(1)——语言可用性强化">
-      C++17学习笔记(1)——语言可用性强化 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -348,7 +365,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">亲人患病</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.1.</span> <span class="nav-text">初诊</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.2.</span> <span class="nav-text">确诊</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.3.</span> <span class="nav-text">靶向治疗</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">隔壁邻居患病离世</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">多阶hash简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">多阶hash实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">几个问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

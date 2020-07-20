@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,11 +49,13 @@
   <meta name="description" content="探讨与分析实现协程依赖的四大函数">
 <meta property="og:type" content="article">
 <meta property="og:title" content="协程原理解析(2)">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2018-12-06&#x2F;%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%902&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-06/%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%902/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="探讨与分析实现协程依赖的四大函数">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-12-14T14:35:42.767Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-12-06T14:00:00.000Z">
+<meta property="article:modified_time" content="2018-12-14T14:35:42.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-06/%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%902/">
@@ -277,30 +279,30 @@
 <p>其中:<br><code>uc_link</code>表示该context执行完毕之后，下一个需要激活的context<br><code>uc_sigmask</code>主要是该context需要屏蔽的信号<br><code>uc_stack</code>指定context运行时候的栈空间<br><code>mcontext_t</code>的定义依赖于特定平台，主要包含寄存器等结构</p>
 <h4><span id="int-getcontextucontext_t-ucp">int getcontext(ucontext_t *ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/getcontext.S.html" target="_blank" rel="noopener">getcontext在线代码</a></p>
 <p>主要是将当前context的相关寄存器值保存，相当于保护现场</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx         /* Exclude the return address.  */</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx         &#x2F;* Exclude the return address.  *&#x2F;</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
 
 <p>这里需要对C++中函数调用栈熟悉，函数调用时候，先对参数压栈，再压入返回地址，再执行被调函数体指令。</p>
 <p>由于是在当前context中调用得<code>getcontext</code>函数，所以<code>(%rsp)</code>中保存的即是函数返回地址，也就是执行完<code>getcontext</code>这个函数之后需要执行的下一个指令的地址。<br><code>8(%rsp)</code>值即是当前context的栈顶排除返回地址之后的值。</p>
 <p>由于context即是由代码+数据组成，保存了相关寄存器的值主要是<code>rip</code>值，同时把当前栈的<code>rsp</code>值也保存，这样便可以通过这些数据恢复context以再次继续执行。</p>
 <p>这其中还有一个很重要的操作，保存了浮点寄存器相关数据。</p>
-<h4><span id="void-makecontextucontext_t-ucp-void-func-int-argc">void makecontext(ucontext_t <em>ucp, void (</em>func)(), int argc, …)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/makecontext.c.html" target="_blank" rel="noopener">makecontext在线代码</a></p>
+<h4><span id="void-makecontextucontext_t-ucp-void-func-int-argc">void makecontext(ucontext_t *ucp, void (*func)(), int argc, …)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/makecontext.c.html" target="_blank" rel="noopener">makecontext在线代码</a></p>
 <p>该函数由C语言实现，代码前部的注释中简明介绍了该函数的工作</p>
 <p>该函数主要是进行栈准备工作，并保存相关值到<code>uc_mcontext</code>的寄存器结构中，同时把<code>uc_link</code>值也做了保存，而需要传递给<code>func</code>函数的参数，一部分保存在寄存器中，剩下的保存在栈中。</p>
 <p>栈布局结构如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">           +-----------------------+</span><br><span class="line">           | next context          |</span><br><span class="line">           +-----------------------+</span><br><span class="line">           | parameter 7-n         |</span><br><span class="line">           +-----------------------+</span><br><span class="line">           | trampoline address    |</span><br><span class="line">%rsp -&gt;    +-----------------------+</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/* Setup context ucp.  */</span><br><span class="line">/* Address to jump to.  */</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RIP] = (uintptr_t) func;</span><br><span class="line">/* Setup rbx.*/</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RBX] = (uintptr_t) &amp;sp[idx_uc_link];</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RSP] = (uintptr_t) sp;</span><br><span class="line"></span><br><span class="line">sp[0] = (uintptr_t) &amp;__start_context;</span><br><span class="line">sp[idx_uc_link] = (uintptr_t) ucp-&gt;uc_link;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* Setup context ucp.  *&#x2F;</span><br><span class="line">&#x2F;* Address to jump to.  *&#x2F;</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RIP] &#x3D; (uintptr_t) func;</span><br><span class="line">&#x2F;* Setup rbx.*&#x2F;</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RBX] &#x3D; (uintptr_t) &amp;sp[idx_uc_link];</span><br><span class="line">ucp-&gt;uc_mcontext.gregs[REG_RSP] &#x3D; (uintptr_t) sp;</span><br><span class="line"></span><br><span class="line">sp[0] &#x3D; (uintptr_t) &amp;__start_context;</span><br><span class="line">sp[idx_uc_link] &#x3D; (uintptr_t) ucp-&gt;uc_link;</span><br></pre></td></tr></table></figure>
 
 <p>这其中一个巧妙之处在于，如何实现在该context执行完毕后自动激活<code>uc_link</code>并执行？</p>
 <p>在该函数中把返回地址巧妙的设置为<code>__start_context</code>，这样，当<code>func</code>函数执行完毕后即会转到<code>__start_context</code>执行，而在该函数中即可实现激活<code>uc_link</code>并执行。</p>
 <h4><span id="int-swapcontextucontext_t-oucp-ucontext_t-ucp">int swapcontext(ucontext_t *oucp, ucontext_t *ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/swapcontext.S.html" target="_blank" rel="noopener">swapcontext在线代码</a></p>
 <p>当<code>makecontext</code>做好准备工作后，即由该函数进行context切换，把执行流程切到另外一个context。</p>
 <p>该函数首先将当前context的相关寄存器值保存到<code>oucp</code>中，而第54-57行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx       /* Exclude the return address.  */</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movq        (%rsp), %rcx</span><br><span class="line">movq        %rcx, oRIP(%rdi)</span><br><span class="line">leaq        8(%rsp), %rcx       &#x2F;* Exclude the return address.  *&#x2F;</span><br><span class="line">movq        %rcx, oRSP(%rdi)</span><br></pre></td></tr></table></figure>
 
 <p>当前<code>rsp</code>指向的地址中存储的即是返回地址，也就是调用<code>swapcontext</code>后当前协程需要执行的下一个指令地址。<br><code>swapcontext</code>函数没有返回值，因为在其内部会发生执行流程的跳转，控制权会转移到另外的context。<br><code>8(%rsp)</code>的值即是排除返回地址后的当前栈顶地址。<br>保存当前context的相关信息后，将来控制权再切回来时，就能正确的恢复现场。</p>
 <p>剩下的工作即是用<code>ucp</code>中保存的信息，设置相关寄存器值，如<code>rsp</code>、<code>rbp</code>等。<br>我们知道程序的指令寄存器为<code>rip</code>，只有改变该寄存器值才能改变程序的执行流程，关键在于函数底部的第231-248行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/* The following ret should return to the address set with</span><br><span class="line">        getcontext.  Therefore push the address on the stack.  */</span><br><span class="line">movq        oRIP(%rdx), %rcx</span><br><span class="line">pushq        %rcx</span><br><span class="line">/* Setup registers used for passing args.  */</span><br><span class="line">movq        oRDI(%rdx), %rdi</span><br><span class="line">movq        oRSI(%rdx), %rsi</span><br><span class="line">movq        oRCX(%rdx), %rcx</span><br><span class="line">movq        oR8(%rdx), %r8</span><br><span class="line">movq        oR9(%rdx), %r9</span><br><span class="line">/* Setup finally %rdx.  */</span><br><span class="line">movq        oRDX(%rdx), %rdx</span><br><span class="line">/* Clear rax to indicate success.  */</span><br><span class="line">xorl        %eax, %eax</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* The following ret should return to the address set with</span><br><span class="line">        getcontext.  Therefore push the address on the stack.  *&#x2F;</span><br><span class="line">movq        oRIP(%rdx), %rcx</span><br><span class="line">pushq        %rcx</span><br><span class="line">&#x2F;* Setup registers used for passing args.  *&#x2F;</span><br><span class="line">movq        oRDI(%rdx), %rdi</span><br><span class="line">movq        oRSI(%rdx), %rsi</span><br><span class="line">movq        oRCX(%rdx), %rcx</span><br><span class="line">movq        oR8(%rdx), %r8</span><br><span class="line">movq        oR9(%rdx), %r9</span><br><span class="line">&#x2F;* Setup finally %rdx.  *&#x2F;</span><br><span class="line">movq        oRDX(%rdx), %rdx</span><br><span class="line">&#x2F;* Clear rax to indicate success.  *&#x2F;</span><br><span class="line">xorl        %eax, %eax</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
 
 <p>将<code>ucp</code>中保存的<strong>返回地址压栈</strong>，该返回地址即是该协程之前执行<code>swapcontext</code>的那个点，因为只有执行该函数才能将控制权转移给别的协程，现在如果把控制权再切回该协程，下一个需要执行的指令地址是多少呢？<br>即是当初调用<code>swapcontext</code>函数时候的返回地址，然后执行<code>ret</code>指令，该指令将当前栈上的值弹出并保存到<code>rip</code>，到这里控制权完成切换，从协程<code>oucp</code>切换到<code>ucp</code>。</p>
 <h4><span id="int-setcontextconst-ucontext_t-ucp">int setcontext(const ucontext_t *ucp)</span></h4><p><a href="https://code.woboq.org/userspace/glibc/sysdeps/unix/sysv/linux/x86_64/setcontext.S.html" target="_blank" rel="noopener">setcontext在线代码</a></p>
@@ -365,7 +367,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">实际例子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">基础结构ucontext_t</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">5.</span> <span class="nav-text">int getcontext(ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">6.</span> <span class="nav-text">void makecontext(ucontext_t ucp, void (func)(), int argc, …)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">7.</span> <span class="nav-text">int swapcontext(ucontext_t *oucp, ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">8.</span> <span class="nav-text">int setcontext(const ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">9.</span> <span class="nav-text">为什么必须调用getcontext</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">实际例子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">基础结构ucontext_t</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">5.</span> <span class="nav-text">int getcontext(ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">6.</span> <span class="nav-text">void makecontext(ucontext_t *ucp, void (*func)(), int argc, …)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">7.</span> <span class="nav-text">int swapcontext(ucontext_t *oucp, ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">8.</span> <span class="nav-text">int setcontext(const ucontext_t *ucp)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">9.</span> <span class="nav-text">为什么必须调用getcontext</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -379,7 +381,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -423,7 +425,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -467,9 +469,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

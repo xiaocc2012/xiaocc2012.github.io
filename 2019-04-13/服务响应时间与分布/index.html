@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,14 +49,16 @@
   <meta name="description" content="分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算">
 <meta property="og:type" content="article">
 <meta property="og:title" content="服务响应时间与分布">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-04-13&#x2F;%E6%9C%8D%E5%8A%A1%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E4%B8%8E%E5%88%86%E5%B8%83&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-04-13/%E6%9C%8D%E5%8A%A1%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E4%B8%8E%E5%88%86%E5%B8%83/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="分析服务响应时间分布，如：均值、中位值、P95值、P99值等如何计算">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20190413-183557.jpg">
-<meta property="og:updated_time" content="2019-04-13T11:34:11.980Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg">
+<meta property="article:published_time" content="2019-04-13T06:00:00.000Z">
+<meta property="article:modified_time" content="2019-04-13T11:34:11.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20190413-183557.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2019-04-13/%E6%9C%8D%E5%8A%A1%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E4%B8%8E%E5%88%86%E5%B8%83/">
 
@@ -257,12 +259,12 @@
 <p>最常用的值为平均值，表示服务的平均响应时间，通过该值我们能够知道服务当前响应的所有请求耗时的平均值。<br>例如平均耗时为100ms，表示服务器当前<code>请求的总耗时/请求总数量</code>，通过该值，我们大体能知道服务运行情况。<br>但是对于具体有多少个请求的耗时比100ms要大，大多少，是200ms，还是500ms，还是1000ms，我们无从得知。<br>而且，平均值这个数据容易掩盖一些<strong>异常值</strong>问题，比如，我的财富加马云财富的平均值也能过亿，所以，平均值这个数据项过于简单，提供的信息量太少。</p>
 <p>那为什么我们通常采用平均值来衡量或者监控服务性能呢？</p>
 <p>主要是由于该值容易计算，采用两个变量<code>S</code>、<code>N</code>，即可持续计算平均值：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S = S + X</span><br><span class="line">N = N + 1</span><br><span class="line">V = S/N</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S &#x3D; S + X</span><br><span class="line">N &#x3D; N + 1</span><br><span class="line">V &#x3D; S&#x2F;N</span><br></pre></td></tr></table></figure>
 
 <p>通过该公式，当有新的耗时值<code>X</code>需要考量，很方便的就能算出平均值，就算QPS到几十万/s，也不在话下。</p>
 <p>注意，该公式有个隐含问题，即是<code>S</code>增长过快问题，如果QPS过高，<code>X</code>值过大，很容易导致<code>S</code>溢出，从而导致结果计算异常。</p>
 <p>可将该公式做如下改造：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Vs = S/N</span><br><span class="line">Vn = (S+X)/(N+1) = (Vs*N+X)/(N+1) = Vs + (X - Vs)/(N+1)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Vs &#x3D; S&#x2F;N</span><br><span class="line">Vn &#x3D; (S+X)&#x2F;(N+1) &#x3D; (Vs*N+X)&#x2F;(N+1) &#x3D; Vs + (X - Vs)&#x2F;(N+1)</span><br></pre></td></tr></table></figure>
 
 <p>该算法也只需要两个变量，未考量数据<code>X</code>时——平均值<code>Vs</code>、数据个数N<br>但是，该算法由于不累加<code>S</code>，而只累加<code>N</code>，而<code>N</code>的增长极慢，不易导致溢出问题。</p>
 <h4><span id="中位值">中位值</span></h4><p>如上所述，由于平均值不能反映数据分布及极端异常值的问题，可以考虑采用<strong>中位值</strong>来作为度量。</p>
@@ -281,7 +283,7 @@
 <p>有没有简单的计算方式呢？</p>
 <p>可以采用直方图来进行计算，该计算方式虽不是完全准确值，但精度非常高，误差较小。</p>
 <p>直方图需要界定两个直方之间的跨度，一般采用等分形式，例如对于耗时统计需求，我们可以假定一个耗时上界，然后等分，比如划分成100个区间，对于每个响应耗时落入对应的直方，如下图：</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20190413-183557.jpg"></p>
 <p>这样就避免了对全部数据进行排序，只需要根据各个直方中的数据数量，即可计算出95%位置位于哪个直方，然后在该直方内部采用插值方法，计算出P95值。</p>
 <p>另外，考虑到数据分布特点，服务耗时异常数据应该只是少数，但是异常值跨度可能很大，大部分耗时数据均靠近正常值，如果直方统计采用等分形式，会导致大量数据堆积在一个直方中，如何解决这个问题？</p>
 <p>可以采用非等分的跨度划分方式，例如采用<strong>指数</strong>形式划分，耗时越低的区间，跨度越小，精度约高。</p>
@@ -344,7 +346,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">平均值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">中位值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">P95值与P99值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">5.</span> <span class="nav-text">P99.9值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">6.</span> <span class="nav-text">如何计算P分位值</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">平均值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">中位值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">P95值与P99值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">5.</span> <span class="nav-text">P99.9值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">6.</span> <span class="nav-text">如何计算P分位值</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -358,7 +360,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -402,7 +404,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -446,9 +448,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

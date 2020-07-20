@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,15 +49,17 @@
   <meta name="description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何修改进程名称">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2018-12-16&#x2F;%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9%E8%BF%9B%E7%A8%8B%E5%90%8D%E7%A7%B0&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-12-16/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9%E8%BF%9B%E7%A8%8B%E5%90%8D%E7%A7%B0/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="分析如何修改进程名称，以利于更清楚的展示进程相关信息">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20181216-231645.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20181216-232458.jpg">
-<meta property="og:updated_time" content="2018-12-17T15:02:56.670Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg">
+<meta property="article:published_time" content="2018-12-16T14:30:00.000Z">
+<meta property="article:modified_time" content="2018-12-17T15:02:56.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20181216-231645.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2018-12-16/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9%E8%BF%9B%E7%A8%8B%E5%90%8D%E7%A7%B0/">
 
@@ -258,13 +260,13 @@
 <p>网上搜索相关资料，找到一个有意思的问题，如何修改进程名称？</p>
 <p>在<code>redis</code>、<code>nginx</code>中有修改进程名的相关实现，函数为<code>setproctitle</code>。<br>在<code>nginx</code>中有详细的原理解释。</p>
 <h4><span id="核心">核心</span></h4><p>如<code>nginx</code>中注释所言：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * To change the process title in Linux and Solaris we have to set argv[1]</span><br><span class="line"> * to NULL and to copy the title to the same place where the argv[0] points to.</span><br><span class="line"> * However, argv[0] may be too small to hold a new title.  Fortunately, Linux</span><br><span class="line"> * and Solaris store argv[] and environ[] one after another.  So we should</span><br><span class="line"> * ensure that is the continuous memory and then we allocate the new memory</span><br><span class="line"> * for environ[] and copy it.  After this we could use the memory starting</span><br><span class="line"> * from argv[0] for our process title.</span><br><span class="line"> *</span><br><span class="line"> * The Solaris&apos;s standard /bin/ps does not show the changed process title.</span><br><span class="line"> * You have to use &quot;/usr/ucb/ps -w&quot; instead.  Besides, the UCB ps does not</span><br><span class="line"> * show a new title if its length less than the origin command line length.</span><br><span class="line"> * To avoid it we append to a new title the origin command line in the</span><br><span class="line"> * parenthesis.</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line"> * To change the process title in Linux and Solaris we have to set argv[1]</span><br><span class="line"> * to NULL and to copy the title to the same place where the argv[0] points to.</span><br><span class="line"> * However, argv[0] may be too small to hold a new title.  Fortunately, Linux</span><br><span class="line"> * and Solaris store argv[] and environ[] one after another.  So we should</span><br><span class="line"> * ensure that is the continuous memory and then we allocate the new memory</span><br><span class="line"> * for environ[] and copy it.  After this we could use the memory starting</span><br><span class="line"> * from argv[0] for our process title.</span><br><span class="line"> *</span><br><span class="line"> * The Solaris&#39;s standard &#x2F;bin&#x2F;ps does not show the changed process title.</span><br><span class="line"> * You have to use &quot;&#x2F;usr&#x2F;ucb&#x2F;ps -w&quot; instead.  Besides, the UCB ps does not</span><br><span class="line"> * show a new title if its length less than the origin command line length.</span><br><span class="line"> * To avoid it we append to a new title the origin command line in the</span><br><span class="line"> * parenthesis.</span><br><span class="line"> *&#x2F;</span><br></pre></td></tr></table></figure>
 
-<p>进程名及命令行参数保存在<code>argv</code>数组中，而相关环境变量则保存在<code>environ</code>数组中，其内存布局如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg" alt=""></p>
+<p>进程名及命令行参数保存在<code>argv</code>数组中，而相关环境变量则保存在<code>environ</code>数组中，其内存布局如图：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-231645.jpg"></p>
 <p>可见命令行参数与环境变量是紧凑型存储在一块连续的内存。</p>
 <p>想要改变进程名就得改变<code>argv[0]</code>的值，如果直接设置新进程名，当其过长，会将这块内存区域写坏。</p>
 <p>那该如何实现？</p>
-<h4><span id="实现">实现</span></h4><p>这里采用的方式是给<code>environ</code>数据重新分配一块空间，并改变<code>environ</code>指针数组的值，让其每个指针指向新数据对应地址。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg" alt=""></p>
+<h4><span id="实现">实现</span></h4><p>这里采用的方式是给<code>environ</code>数据重新分配一块空间，并改变<code>environ</code>指针数组的值，让其每个指针指向新数据对应地址。<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20181216-232458.jpg"></p>
 <p>这样<code>argv[0]</code>就有足够空间设置新进程名。</p>
 <h4><span id="注意">注意</span></h4><p>如果新进程名比原进程名短，需要先清空<code>argv[0]</code>指向的数据，然后再设置。<br><code>environ</code>可通过<code>extern char** environ</code>获得。</p>
 <p><em>TODO：分析为何argv、environ为连续紧凑型存储</em></p>
@@ -327,7 +329,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">核心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -341,7 +343,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -385,7 +387,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -429,9 +431,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

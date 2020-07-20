@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,14 +49,16 @@
   <meta name="description" content="分析Tweet唯一ID生成的雪花算法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="唯一ID生成之雪花算法">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2020-04-11&#x2F;%E5%94%AF%E4%B8%80id%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2020-04-11/%E5%94%AF%E4%B8%80id%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="分析Tweet唯一ID生成的雪花算法">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202004&#x2F;Jietu20200411-094438.jpg">
-<meta property="og:updated_time" content="2020-04-11T02:46:56.044Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202004/Jietu20200411-094438.jpg">
+<meta property="article:published_time" content="2020-04-11T01:30:00.000Z">
+<meta property="article:modified_time" content="2020-04-11T02:46:56.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202004&#x2F;Jietu20200411-094438.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202004/Jietu20200411-094438.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2020-04-11/%E5%94%AF%E4%B8%80id%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95/">
 
@@ -248,7 +250,7 @@
 <a id="more"></a>
 
 <h4><span id="算法原理">算法原理</span></h4><p>该算法计算唯一id的过程不依赖其它组件与库，简单而直接。<br>算法将int64位的64bit按功能分割成多个bits区间，如下：</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202004/Jietu20200411-094438.jpg" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202004/Jietu20200411-094438.jpg"></p>
 <p>各区间默认bits位如下：<br>12-5-5-41</p>
 <p>其中我们约定该唯一id只能是正数，那么最高位不能为1，只能为0，所以timestamp长度为 <code>42 - 1</code></p>
 <h5><span id="时间原点">时间原点</span></h5><p>其中timestamp字段精确到<strong>毫秒</strong>，平时我们计算时间一般从<code>linux epoch</code>开始，也就是linux时间原点(1970年1月1日0点0分0秒)开始计算。</p>
@@ -266,7 +268,7 @@
 <p>如果在1ms内seq增长到了最大值，即占满12个bit，怎么办，算法会停顿1ms，这点延迟通常不是什么大问题。</p>
 <h4><span id="算法实现">算法实现</span></h4><p>代码地址：<br><a href="https://github.com/xiaocc2012/snow.git" target="_blank" rel="noopener">snow</a></p>
 <p>Benchmark测试：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">go test -bench=.</span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: stest/snow</span><br><span class="line">BenchmarkSnow-4   	 4925791	       245 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok  	stest/snow	1.765s</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">go test -bench&#x3D;.</span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: stest&#x2F;snow</span><br><span class="line">BenchmarkSnow-4   	 4925791	       245 ns&#x2F;op</span><br><span class="line">PASS</span><br><span class="line">ok  	stest&#x2F;snow	1.765s</span><br></pre></td></tr></table></figure>
 
 <p>生成500万个id耗时1.76秒，约：280万/秒</p>
 
@@ -328,7 +330,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">算法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">1.1.</span> <span class="nav-text">时间原点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">1.2.</span> <span class="nav-text">算法性能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">1.3.</span> <span class="nav-text">算法问题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">算法实现</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">算法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">1.1.</span> <span class="nav-text">时间原点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">1.2.</span> <span class="nav-text">算法性能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">1.3.</span> <span class="nav-text">算法问题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">算法实现</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -342,7 +344,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -386,7 +388,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -430,9 +432,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

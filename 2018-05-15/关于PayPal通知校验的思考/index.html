@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,11 +49,13 @@
   <meta name="description" content="PayPal支付中通知校验机制的思考">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于PayPal支付接入的思考——通知校验机制">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2018-05-15&#x2F;%E5%85%B3%E4%BA%8EPayPal%E9%80%9A%E7%9F%A5%E6%A0%A1%E9%AA%8C%E7%9A%84%E6%80%9D%E8%80%83&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-05-15/%E5%85%B3%E4%BA%8EPayPal%E9%80%9A%E7%9F%A5%E6%A0%A1%E9%AA%8C%E7%9A%84%E6%80%9D%E8%80%83/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="PayPal支付中通知校验机制的思考">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-18T03:43:48.024Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-05-15T11:30:00.000Z">
+<meta property="article:modified_time" content="2018-09-18T03:43:48.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2018-05-15/%E5%85%B3%E4%BA%8EPayPal%E9%80%9A%E7%9F%A5%E6%A0%A1%E9%AA%8C%E7%9A%84%E6%80%9D%E8%80%83/">
@@ -277,7 +279,7 @@
 <p>我们复盘一下整个流程：</p>
 <div id="sequence-0"></div>
 
-<p>可见，最初PayPal传递给商户的数据<strong>nf_string</strong>，经过反序列化、再序列化之后得到的数据<strong>nf_string’</strong>，两者并不是byte尺度一致。</p>
+<p>可见，最初PayPal传递给商户的数据<strong>nf_string</strong>，经过反序列化、再序列化之后得到的数据**nf_string’**，两者并不是byte尺度一致。</p>
 <p><strong>商户的Json库序列化实现与PayPal侧的实现无法保证一致</strong></p>
 <p>这就导致PayPal侧，在接收商户校验Notification请求时候，直接以序列化后新的String计算signature值产生偏差。</p>
 <p>也可能，Notification生成服务与校验服务，Json相关序列化函数实现不一致，导致将Json对象转换为 <code>String</code> 后，计算signature两者不一致，从而导致校验失败。</p>
@@ -352,7 +354,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">校验机制介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">校验机制的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">思考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">校验机制介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">校验机制的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -366,7 +368,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -410,7 +412,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -454,9 +456,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

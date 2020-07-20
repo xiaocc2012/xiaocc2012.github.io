@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,11 +49,13 @@
   <meta name="description" content="本文记录docker中的进程如何优雅退出">
 <meta property="og:type" content="article">
 <meta property="og:title" content="docker中进程优雅退出">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-11-26&#x2F;docker%E8%BF%9B%E7%A8%8B%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-11-26/docker%E8%BF%9B%E7%A8%8B%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="本文记录docker中的进程如何优雅退出">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-26T08:12:40.841Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-26T07:30:00.000Z">
+<meta property="article:modified_time" content="2019-11-26T08:12:40.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2019-11-26/docker%E8%BF%9B%E7%A8%8B%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">
@@ -259,7 +261,7 @@
 
 <h4><span id="实践">实践</span></h4><p>据此，我们可以让用户进程监听<code>SIGTERM</code>信号，收到信号时执行相应清理动作，然后退出</p>
 <p>测试代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">&quot;fmt&quot;</span><br><span class="line">&quot;os&quot;</span><br><span class="line">&quot;os/signal&quot;</span><br><span class="line">&quot;syscall&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    fmt.Println(&quot;program start ...&quot;)</span><br><span class="line"></span><br><span class="line">    ch := make(chan os.Signal, 1)</span><br><span class="line">    signal.Notify(ch, syscall.SIGTERM)</span><br><span class="line"></span><br><span class="line">    s := &lt;-ch</span><br><span class="line"></span><br><span class="line">    if s == syscall.SIGTERM &#123;</span><br><span class="line">        fmt.Println(&quot;sigterm received&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fmt.Println(&quot;exit ...&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">&quot;fmt&quot;</span><br><span class="line">&quot;os&quot;</span><br><span class="line">&quot;os&#x2F;signal&quot;</span><br><span class="line">&quot;syscall&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    fmt.Println(&quot;program start ...&quot;)</span><br><span class="line"></span><br><span class="line">    ch :&#x3D; make(chan os.Signal, 1)</span><br><span class="line">    signal.Notify(ch, syscall.SIGTERM)</span><br><span class="line"></span><br><span class="line">    s :&#x3D; &lt;-ch</span><br><span class="line"></span><br><span class="line">    if s &#x3D;&#x3D; syscall.SIGTERM &#123;</span><br><span class="line">        fmt.Println(&quot;sigterm received&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fmt.Println(&quot;exit ...&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>程序启动时监听<code>SIGTERM</code>信号，通过docker stop结束容器，可以观察到相应信号接收日志</p>
 
@@ -321,7 +323,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">实践</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">实践</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -335,7 +337,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -379,7 +381,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -423,9 +425,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

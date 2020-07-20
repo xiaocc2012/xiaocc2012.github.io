@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,14 +49,16 @@
   <meta name="description" content="前一段时间学习raft论文，自己造了个服务框架的轮子，网络通信采用ZMQ，还需要设计定时器，以实现周期性功能，如心跳发布。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="定时器的设计">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2018-06-23&#x2F;%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-06-23/%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="前一段时间学习raft论文，自己造了个服务框架的轮子，网络通信采用ZMQ，还需要设计定时器，以实现周期性功能，如心跳发布。">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180623-142645.jpg">
-<meta property="og:updated_time" content="2018-12-15T11:16:26.705Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180623-142645.jpg">
+<meta property="article:published_time" content="2018-06-23T05:30:00.000Z">
+<meta property="article:modified_time" content="2018-12-15T11:16:26.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180623-142645.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180623-142645.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2018-06-23/%E5%AE%9A%E6%97%B6%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/">
 
@@ -269,7 +271,7 @@
 <li>方案一中，需要定时检查是否可以触发timer，就算任何一个timer的触发时间未到，该检查步骤无法避免</li>
 <li>方案二中，一部分timer触发后，可以直接获取下一个待触发的timer的触发时间，从而设置tfd_的超时，在超时时间到达之前，tfd_不会被事件框架触发</li>
 </ul>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180623-142645.jpg" alt=""><br>如图所示：<br>方框中数字为timer需要触发的时刻，假设当前时刻为 <code>3</code> ，那么前4个timer需要触发，下一个待触发的timer的时刻为 <code>8</code>，所以我们可以调整tfd_相对超时时间为 <code>5</code>，在那之前tfd_上都不会有read事件，当然也不会触发事件框架。</p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180623-142645.jpg"><br>如图所示：<br>方框中数字为timer需要触发的时刻，假设当前时刻为 <code>3</code> ，那么前4个timer需要触发，下一个待触发的timer的时刻为 <code>8</code>，所以我们可以调整tfd_相对超时时间为 <code>5</code>，在那之前tfd_上都不会有read事件，当然也不会触发事件框架。</p>
 <h4><span id="几个关键问题">几个关键问题</span></h4><h5><span id="定时器模式">定时器模式</span></h5><p>定时器有两种常用模式</p>
 <ul>
 <li>一次性定时器，设置在某个时间点触发一次，可以称为 <code>run_after</code></li>
@@ -351,7 +353,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">周期遍历</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">timer_fd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">几个关键问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.1.</span> <span class="nav-text">定时器模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">3.2.</span> <span class="nav-text">在timer处理函数中再次添加timer</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">周期遍历</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">timer_fd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">几个关键问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.1.</span> <span class="nav-text">定时器模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">3.2.</span> <span class="nav-text">在timer处理函数中再次添加timer</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -365,7 +367,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -409,7 +411,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -453,9 +455,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

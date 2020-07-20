@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,16 +49,18 @@
   <meta name="description" content="比特币矿池搭建">
 <meta property="og:type" content="article">
 <meta property="og:title" content="btcpool矿池搭建">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2019-10-03&#x2F;btcpool%E7%9F%BF%E6%B1%A0%E6%90%AD%E5%BB%BA&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2019-10-03/btcpool%E7%9F%BF%E6%B1%A0%E6%90%AD%E5%BB%BA/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="比特币矿池搭建">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;btcpool.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;1666320-20190423103204842-912445068.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;btcpool%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg">
-<meta property="og:updated_time" content="2019-10-03T01:58:11.895Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/1666320-20190423103204842-912445068.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg">
+<meta property="article:published_time" content="2019-10-03T00:30:00.000Z">
+<meta property="article:modified_time" content="2019-10-03T01:58:11.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;btcpool.png">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool.png">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2019-10-03/btcpool%E7%9F%BF%E6%B1%A0%E6%90%AD%E5%BB%BA/">
 
@@ -253,7 +255,7 @@
 <p>周末尝试搭建，并阅读比特币相关资料，特此即之。</p>
 <h4><span id="btcpool">btcpool</span></h4><p>github地址：<br><a href="https://github.com/btccom/btcpool" target="_blank" rel="noopener">https://github.com/btccom/btcpool</a></p>
 <p>其整体架构如图：</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool.png" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool.png"></p>
 <p>初次看到这张图有点懵逼，其实，首先找到数据的起始点，然后跟着数据流向，再结合文档就能很容易的理解各个服务的作用。</p>
 <h4><span id="依赖">依赖</span></h4><p>从图中可知整个矿池依赖<code>zookeeper</code>、<code>kafka</code>，整个矿池的核心即是以<code>kafka</code>为数据交换中心</p>
 <p>而<code>bitcoind</code>即是比特币核心，其加入比特币网络，下载历史交易链数据，获取当前未上链交易数据。<br>比特币网络分为<code>正式环境</code>和<code>测试环境</code>，可以先用测试网络搭建矿池，测试功能，因为正式环境的hash计算难度太高，而测试环境相对来说比较容易获得解。</p>
@@ -261,7 +263,7 @@
 <li>GbtMaker——通过<code>getblocktemplate</code> rpc接口从bitcoind获取挖矿所需数据，并把数据(rawgbt)发送到kafka</li>
 </ul>
 <p>比特币区块头部结构如下：</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/1666320-20190423103204842-912445068.jpg" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/1666320-20190423103204842-912445068.jpg"></p>
 <p><code>previousblockhash</code>当前已确认的最新块的hash值<br><code>nBits</code>挖矿难度，第1个字节表示数据长度，后3个字节表示数据头部，数据尾部用0补齐，可以预见该数值特别大，不直观，可以与创世块难度相除以获得一个比值，该比值即代表挖矿难度提升多少倍。<br>可以调整<code>time</code>、<code>nonce</code>以使最终区块hash值满足难度要求</p>
 <ul>
 <li><p>JobMaker——解码GbtMaker发送的rawgbt数据，将coinbase按照extraNone拆分成coinbase1、extraNone和coinbase2，同时根据rawgbt中的交易数据生成merkle hash数组，以便和coinbase交易生成merkel root。将这些数据(stratumjob)发送到kafka</p>
@@ -280,7 +282,7 @@
 <h4><span id="主链测试">主链测试</span></h4><p>观察几大矿池商算力及出块情况，起码得1000P，2-3天才能出一个块，而这2-3天的成本要多少呢？<br>一台普通矿机算力30T，<code>1000P/30T=30000</code>，需要大约3万台机器，算单机1万一台，成本3亿。<br>这么大的测试成本，矿场主一般是不愿意切换矿池的，特别是在矿池稳定性存疑的情况下。</p>
 <h4><span id="最后">最后</span></h4><p>阅读了其它比特币相关资料，如比特币白皮书等，以及51%算力攻击，POW文档等</p>
 <p>附：自己画的容灾架构图</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/btcpool%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg"></p>
 
     </div>
 
@@ -340,7 +342,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">btcpool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">各个服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">6.</span> <span class="nav-text">主链测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">7.</span> <span class="nav-text">最后</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">btcpool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">各个服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">6.</span> <span class="nav-text">主链测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">7.</span> <span class="nav-text">最后</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -354,7 +356,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -398,7 +400,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -442,9 +444,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

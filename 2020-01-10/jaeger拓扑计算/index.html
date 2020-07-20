@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,15 +49,17 @@
   <meta name="description" content="jaegerTracing可视化UI中可以清晰展示服务之间调用依赖关系与调用次数，笔者在此文中分析其计算流程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jaegerTracing拓扑关系计算">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2020-01-10&#x2F;jaeger%E6%8B%93%E6%89%91%E8%AE%A1%E7%AE%97&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2020-01-10/jaeger%E6%8B%93%E6%89%91%E8%AE%A1%E7%AE%97/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="jaegerTracing可视化UI中可以清晰展示服务之间调用依赖关系与调用次数，笔者在此文中分析其计算流程">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202001&#x2F;1_XLxS6v_BWwtU2cvbSsHFyQ.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202001&#x2F;Jietu20200114-143929.jpg">
-<meta property="og:updated_time" content="2020-01-14T07:41:50.427Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/1_XLxS6v_BWwtU2cvbSsHFyQ.png">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/Jietu20200114-143929.jpg">
+<meta property="article:published_time" content="2020-01-10T09:00:00.000Z">
+<meta property="article:modified_time" content="2020-01-14T07:41:50.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;202001&#x2F;1_XLxS6v_BWwtU2cvbSsHFyQ.png">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/1_XLxS6v_BWwtU2cvbSsHFyQ.png">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2020-01-10/jaeger%E6%8B%93%E6%89%91%E8%AE%A1%E7%AE%97/">
 
@@ -261,7 +263,7 @@
 <p>有没有一种直观的方式可以清晰的展示处理逻辑、耗时情况、上下文日志等。</p>
 <p>有，这种技术就是<code>分布式追踪</code>。</p>
 <h4><span id="拓扑计算">拓扑计算</span></h4><p>在本文中不讲解tracing相关技术，而是分析另外一个问题，如下的服务间拓扑图，如何计算出来？</p>
-<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/1_XLxS6v_BWwtU2cvbSsHFyQ.png" alt=""></p>
+<p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/1_XLxS6v_BWwtU2cvbSsHFyQ.png"></p>
 <p>图中，每个顶点是服务名，每条边展示服务之间的调用次数。</p>
 <p>有了此图，可以方便的解决很多问题</p>
 <ul>
@@ -273,13 +275,13 @@
 <p>接下来以<code>jaegertracing</code>项目中Flink计算模式为例，解析其拓扑计算流程：<br>项目地址：<a href="https://github.com/jaegertracing/jaeger-analytics-flink" target="_blank" rel="noopener">https://github.com/jaegertracing/jaeger-analytics-flink</a></p>
 <h5><span id="总体流程">总体流程</span></h5><p>服务或框架以TracingAPI的形式将span数据上报，包括tracing_id，span_id，parent_span_id等</p>
 <p>以下是笔者测试上报的span信息：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">publisher:</span><br><span class="line">2019/12/06 11:28:32 Reporting span 373f56c0dacafddf:2f69248998aaeeea:5d8ac19e1d4dea0d:1</span><br><span class="line"></span><br><span class="line">formater:</span><br><span class="line">2019/12/06 11:28:32 Reporting span 373f56c0dacafddf:6962f843e8efa05e:37c328b9efb96096:1</span><br><span class="line"></span><br><span class="line">hello:</span><br><span class="line">2019/12/06 11:28:32 Reporting span 373f56c0dacafddf:37c328b9efb96096:373f56c0dacafddf:1</span><br><span class="line">2019/12/06 11:28:32 Reporting span 373f56c0dacafddf:5d8ac19e1d4dea0d:373f56c0dacafddf:1</span><br><span class="line">2019/12/06 11:28:32 Reporting span 373f56c0dacafddf:373f56c0dacafddf:0:1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">publisher:</span><br><span class="line">2019&#x2F;12&#x2F;06 11:28:32 Reporting span 373f56c0dacafddf:2f69248998aaeeea:5d8ac19e1d4dea0d:1</span><br><span class="line"></span><br><span class="line">formater:</span><br><span class="line">2019&#x2F;12&#x2F;06 11:28:32 Reporting span 373f56c0dacafddf:6962f843e8efa05e:37c328b9efb96096:1</span><br><span class="line"></span><br><span class="line">hello:</span><br><span class="line">2019&#x2F;12&#x2F;06 11:28:32 Reporting span 373f56c0dacafddf:37c328b9efb96096:373f56c0dacafddf:1</span><br><span class="line">2019&#x2F;12&#x2F;06 11:28:32 Reporting span 373f56c0dacafddf:5d8ac19e1d4dea0d:373f56c0dacafddf:1</span><br><span class="line">2019&#x2F;12&#x2F;06 11:28:32 Reporting span 373f56c0dacafddf:373f56c0dacafddf:0:1</span><br></pre></td></tr></table></figure>
 
 <p>数据格式为：<br>trace_id : span_id : parent_span_id : flags</p>
 <p><code>hello</code>服务调用<code>publisher</code>、<code>formater</code>服务，总计上报5个span数据</p>
 <p>以此数据为例，方便理解flink拓扑计算逻辑</p>
 <p><code>jaeger-analytics-flink</code>项目中计算拓扑逻辑的代码在：<br><code>jaeger-analytics-flink/dependencies-job/src/main/java/io/jaegertracing/dependencies/DependenciesProcessor.java</code></p>
-<h5><span id="流程图">流程图</span></h5><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/Jietu20200114-143929.jpg" alt=""></p>
+<h5><span id="流程图">流程图</span></h5><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/202001/Jietu20200114-143929.jpg"></p>
 <h5><span id="流程解析">流程解析</span></h5><ul>
 <li>对上报的span有效性进行清洗，过滤出标志为client/server的span</li>
 <li>按照trace_id进行分组，即将同一个trace_id下上报的span放在一起</li>
@@ -354,7 +356,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">拓扑计算</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">2.1.</span> <span class="nav-text">总体流程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">2.2.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#null"><span class="nav-number">2.3.</span> <span class="nav-text">流程解析</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">拓扑计算</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.1.</span> <span class="nav-text">总体流程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.2.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.3.</span> <span class="nav-text">流程解析</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -368,7 +370,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -412,7 +414,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -456,9 +458,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 

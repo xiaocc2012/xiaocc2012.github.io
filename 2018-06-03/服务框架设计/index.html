@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="generator" content="Hexo 4.2.1">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -49,17 +49,19 @@
   <meta name="description" content="最近在研究raft论文，想动手实现一下，但是手上没有合适的网络框架，花了几天造了个轮子。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="服务框架设计">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.xiaocc.xyz&#x2F;2018-06-03&#x2F;%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1&#x2F;index.html">
+<meta property="og:url" content="http://www.xiaocc.xyz/2018-06-03/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="曾经浮华的小窝">
 <meta property="og:description" content="最近在研究raft论文，想动手实现一下，但是手上没有合适的网络框架，花了几天造了个轮子。">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180603-174640.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180603-175915.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180603-181150.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180603-201920.jpg">
-<meta property="og:updated_time" content="2018-12-15T11:17:07.219Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-175915.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-181150.jpg">
+<meta property="og:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-201920.jpg">
+<meta property="article:published_time" content="2018-06-03T09:30:00.000Z">
+<meta property="article:modified_time" content="2018-12-15T11:17:07.000Z">
+<meta property="article:author" content="曾经浮华">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;blog-1256756464.cos.ap-shanghai.myqcloud.com&#x2F;image&#x2F;Jietu20180603-174640.jpg">
+<meta name="twitter:image" content="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg">
 
 <link rel="canonical" href="http://www.xiaocc.xyz/2018-06-03/%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1/">
 
@@ -258,10 +260,10 @@
 
 <h4><span id="起因">起因</span></h4><p>raft论文去年看过一遍，最近重读，发现上次阅读的东西，一点都不记得。。。<br>决定这次跟着论文简单的实现一遍，加深理解，手上没有合适的网络框架，学go呢，又来不及，花了几天造了个轮子，总算是跑起来了。</p>
 <p><strong>设计思想参考公司内部网络框架，将其部分精简</strong></p>
-<h4><span id="框架设计">框架设计</span></h4><p>底层网络框架依托ZMQ，采用事件驱动形式，client与server端交互图如下：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg" alt=""></p>
-<h4><span id="worker_dispatcher">worker_dispatcher</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-175915.jpg" alt=""><br>以ZMQ_ROUTER的形式对接监听tcp端口，将client请求通过内部inproc的socket负载均衡的转发给worker进行处理<br>数据转发给worker时，将ZMQ_ROUTER的identity帧一并发送，这样待worker处理完毕，通过inproc的socket返回数据时，ZMQ_ROUTER能将数据返回给请求对应的client</p>
-<h4><span id="worker">worker</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-181150.jpg" alt=""><br>创建ZMQ_DEALER的inproc的socket，并与worker_dispatcher连接，以此处理其转发过来的client的请求<br>当其要请求其它服务时，统一通过client_dispatcher对外处理</p>
-<h4><span id="client_dispather">client_dispather</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-201920.jpg" alt=""><br>其通过inproc的socket接收worker中对其它服务的请求，并管理对外连接，释放长时间不使用的连接等<br>待下游服务返回数据，其通过inproc的socket返回给对应的worker</p>
+<h4><span id="框架设计">框架设计</span></h4><p>底层网络框架依托ZMQ，采用事件驱动形式，client与server端交互图如下：<br><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-174640.jpg"></p>
+<h4><span id="worker_dispatcher">worker_dispatcher</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-175915.jpg"><br>以ZMQ_ROUTER的形式对接监听tcp端口，将client请求通过内部inproc的socket负载均衡的转发给worker进行处理<br>数据转发给worker时，将ZMQ_ROUTER的identity帧一并发送，这样待worker处理完毕，通过inproc的socket返回数据时，ZMQ_ROUTER能将数据返回给请求对应的client</p>
+<h4><span id="worker">worker</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-181150.jpg"><br>创建ZMQ_DEALER的inproc的socket，并与worker_dispatcher连接，以此处理其转发过来的client的请求<br>当其要请求其它服务时，统一通过client_dispatcher对外处理</p>
+<h4><span id="client_dispather">client_dispather</span></h4><p><img src="https://blog-1256756464.cos.ap-shanghai.myqcloud.com/image/Jietu20180603-201920.jpg"><br>其通过inproc的socket接收worker中对其它服务的请求，并管理对外连接，释放长时间不使用的连接等<br>待下游服务返回数据，其通过inproc的socket返回给对应的worker</p>
 <p><em>下次讲一下定时器的设计</em></p>
 
     </div>
@@ -322,7 +324,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text">框架设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">3.</span> <span class="nav-text">worker_dispatcher</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text">worker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">5.</span> <span class="nav-text">client_dispather</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">框架设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">worker_dispatcher</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">worker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">5.</span> <span class="nav-text">client_dispather</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -336,7 +338,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -380,7 +382,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">曾经浮华</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
   </div>
   <span class="post-meta-divider">|</span>
   <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
@@ -424,9 +426,17 @@
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
 <script src="/js/schemes/pisces.js"></script>
+
+
 <script src="/js/next-boot.js"></script>
+
 
 
 
